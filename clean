@@ -1,0 +1,2 @@
+rm -rf build
+cmake -B build --preset default

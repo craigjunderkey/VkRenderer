@@ -1,0 +1,70 @@
+#pragma once
+#include <expected>
+#include <iostream>
+
+// unit
+struct Unit {};
+
+Unit Ok()
+{
+    return Unit();
+}
+
+
+// control flow
+inline void panic(std::string message)
+{
+    std::cerr << "ERROR: " << message << std::endl;
+    std::exit(EXIT_FAILURE);
+}
+
+
+// result
+template <typename T, typename E>
+class Result
+{
+private:
+    std::expected<T, E> val_;
+
+public:
+    
+    // Result(std::expected<T, E> val) : val_(val) {}
+    Result(std::expected<T, E>&& val) : val_(std::move(val)) {}
+
+    // Result(std::unexpected<E> val) : val_(val) {}
+    Result(std::unexpected<E>&& val) : val_(val) {}
+
+    // Result(E err) : val_(std::unexpected<E>(err)) {}
+    Result(T val) : val_(std::expected<T, E>(val)) {}
+
+    operator bool() const { return this->val_.has_value(); }
+    operator std::expected<T, E>() { return this->val_; }
+
+    T unwrap()
+    {
+        if (!this->val_)
+            panic("Unwrap failed.");
+
+        return this->val_.value();
+    }
+
+    T expect(const char* message)
+    {
+        if (!this->val_)
+            panic(message);    
+        
+        this->val_.value();    
+    }
+
+    inline bool isErr() const { return !this->val_.has_value(); }
+    inline bool isOk() const { return this->val_.has_value(); }
+};
+
+template <typename E>
+using Err = std::unexpected<E>;
+
+
+// option
+template <typename T>
+using Option = std::optional<T>;
+
