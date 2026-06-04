@@ -11,5 +11,4 @@ set(ENABLE_CPP20_MODULE Off)
 add_compile_options("-stdlib=libc++")
 add_link_options("-stdlib=libc++")
 
-# setup Vulkan
-include("CMake/VulkanSetup.cmake")
+add_subdirectory(src)
