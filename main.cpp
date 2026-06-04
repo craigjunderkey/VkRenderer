@@ -2,7 +2,7 @@
 
 int main()
 {
-    HelloTriangleApplication app;
+    HelloTriangleApplication::App app;
     app.run();
 
     return EXIT_SUCCESS;

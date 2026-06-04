@@ -1,13 +1,6 @@
-#include <vulkan/vulkan.hpp>
-#if defined(__INTELLISENSE__) || !defined(USE_CPP20_MODULES)
-#include <vulkan/vulkan_raii.hpp>
-#else
-import vulkan_hpp;
-#endif
+#pragma once
 
-#define VULKAN_HPP_NO_EXCEPTIONS
-
-#define GLFW_INCLUDE_VULKAN
+#include "utilities/vulkan_common.h"
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -16,8 +9,10 @@ import vulkan_hpp;
 #include "../utility/types.h"
 #include "../utility/constants.h"
 
-class HelloTriangleApplication
+namespace HelloTriangleApplication
 {
+    class App
+    {
     public:
         void run()
         {
@@ -27,11 +22,11 @@ class HelloTriangleApplication
             cleanup();
         }
 
-    private:
         GLFWwindow* window;
         vk::raii::Context context;
         vk::raii::Instance instance = nullptr;
 
+    private:
         void initWindow()
         {
             std::cout << "Initializing window\n";
@@ -124,4 +119,5 @@ class HelloTriangleApplication
 
             return Ok();
         }
-};
+    };
+}
