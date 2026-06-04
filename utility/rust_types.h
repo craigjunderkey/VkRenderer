@@ -38,7 +38,7 @@ public:
     Result(T val) : val_(std::expected<T, E>(val)) {}
 
     operator bool() const { return this->val_.has_value(); }
-    operator std::expected<T, E>() { return this->val_; }
+    operator std::expected<T, E>() const { return this->val_; }
 
     T unwrap()
     {
