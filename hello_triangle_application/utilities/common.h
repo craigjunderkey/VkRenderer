@@ -1,2 +1,3 @@
-#include "../../utility/types.h";
-#include "../../utility/constants.h";
+#pragma once
+#include "../../utility/types.h"
+#include "../../utility/constants.h"
