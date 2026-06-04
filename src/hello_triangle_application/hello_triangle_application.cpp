@@ -1,5 +1,5 @@
 #include "hello_triangle_application.h"
-#include "instance.h"
+#include "utilities/instance.h"
 
 namespace HelloTriangleApplication
 {

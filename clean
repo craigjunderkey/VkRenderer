@@ -1,2 +1,4 @@
 rm -rf build
+touch CMakeLists.txt
+touch src/CMakeLists.txt
 cmake -B build --preset default

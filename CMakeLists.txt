@@ -11,4 +11,10 @@ set(ENABLE_CPP20_MODULE Off)
 add_compile_options("-stdlib=libc++")
 add_link_options("-stdlib=libc++")
 
+# get sources
+file(GLOB_RECURSE SOURCES
+    src/*.h
+    src/*.cpp
+)
+
 add_subdirectory(src)

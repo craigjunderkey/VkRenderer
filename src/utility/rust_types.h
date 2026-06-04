@@ -4,8 +4,7 @@
 
 // unit
 struct Unit {};
-
-Unit Ok()
+inline Unit Ok()
 {
     return Unit();
 }

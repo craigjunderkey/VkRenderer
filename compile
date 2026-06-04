@@ -1,1 +1,3 @@
+touch CMakeLists.txt
+touch src/CMakeLists.txt
 cmake --build build --preset default
