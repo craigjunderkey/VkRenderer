@@ -15,3 +15,5 @@ using u64 = std::uint64_t;
 
 using f32 = glm::float32_t;
 using f64 = glm::float64_t;
+
+using usize = size_t;

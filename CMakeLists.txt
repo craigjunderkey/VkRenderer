@@ -5,6 +5,7 @@ project(VkRenderer)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED On)
 set(ENABLE_CPP20_MODULE Off)
+set(CMAKE_BUILD_TYPE Debug)
 
 # for whatever reason the default standard library that CMake uses is wrong
 # so, switch it to this one
