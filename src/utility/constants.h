@@ -13,7 +13,7 @@ const std::vector<const char*> VALIDATION_LAYERS = {
 };
 
 #ifndef NDEBUG
-constexpr bool VALIDATION_LAYERS_ENABLED = false;
-#else
 constexpr bool VALIDATION_LAYERS_ENABLED = true;
+#else
+constexpr bool VALIDATION_LAYERS_ENABLED = false;
 #endif
