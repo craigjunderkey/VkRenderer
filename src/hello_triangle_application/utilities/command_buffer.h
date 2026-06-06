@@ -3,6 +3,6 @@
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createCommandBuffer(App& app);
+    Result<Unit, std::string> createCommandBuffers(App& app);
     void recordCommandBuffer(App& app, u32 imageIndex);
 }

@@ -39,29 +39,32 @@ void transitionImageLayout(
         .pImageMemoryBarriers = &barrier,
     };
 
-    app.commandBuffer.pipelineBarrier2(dependencyInfo);
+    app.commandBuffers[app.frameIndex].pipelineBarrier2(dependencyInfo);
 }
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createCommandBuffer(App& app)
+    Result<Unit, std::string> createCommandBuffers(App& app)
     {
         vk::CommandBufferAllocateInfo allocInfo {
             .commandPool = app.commandPool,
             .level = vk::CommandBufferLevel::ePrimary,
-            .commandBufferCount = 1
+            .commandBufferCount = MAX_FRAMES_IN_FLIGHT
         };
 
-        std::vector<vk::raii::CommandBuffer> commandBuffers;
-        TRY_ASSIGN(commandBuffers, castVkResult(app.device.allocateCommandBuffers(allocInfo)));
-        app.commandBuffer = std::move(commandBuffers.front());
+        TRY_ASSIGN(
+            app.commandBuffers,
+            castVkResult(app.device.allocateCommandBuffers(allocInfo))
+        );
 
         return Ok();
     }
 
     void recordCommandBuffer(App& app, u32 imageIndex)
     {
-        app.commandBuffer.begin({});
+        const vk::raii::CommandBuffer& commandBuffer = app.commandBuffers[app.frameIndex];
+        
+        commandBuffer.begin({});
 
         // before we start rendering, transition to color attachment optimal image layout
         transitionImageLayout(
@@ -100,17 +103,17 @@ namespace HelloTriangleApplication::Utilities
         };
 
         // begin rendering
-        app.commandBuffer.beginRendering(renderingInfo);
-        app.commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *app.graphicsPipeline);
+        commandBuffer.beginRendering(renderingInfo);
+        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *app.graphicsPipeline);
 
         // viewport and scissor are dynamic, so we must set them here
-        app.commandBuffer.setViewport(0, vk::Viewport {
+        commandBuffer.setViewport(0, vk::Viewport {
             .x = 0.0f, .y = 0.0f,
             .width = static_cast<f32>(app.swapChainExtent.width),
             .height = static_cast<f32>(app.swapChainExtent.height),
             .minDepth = 0.0f, .maxDepth = 1.0f
         });
-        app.commandBuffer.setScissor(
+        commandBuffer.setScissor(
             0,
             vk::Rect2D {
                 .offset = vk::Offset2D {.x = 0, .y = 0},
@@ -119,10 +122,10 @@ namespace HelloTriangleApplication::Utilities
         );
 
         // draw the damn thing
-        app.commandBuffer.draw(3, 1, 0, 0);
+        commandBuffer.draw(3, 1, 0, 0);
 
         // stop rendering
-        app.commandBuffer.endRendering();
+        commandBuffer.endRendering();
 
         // after rendering, transition the image layout to one that can be presented
         transitionImageLayout(
@@ -136,6 +139,6 @@ namespace HelloTriangleApplication::Utilities
             vk::PipelineStageFlagBits2::eBottomOfPipe
         );
 
-        app.commandBuffer.end();
+        commandBuffer.end();
     }
 }

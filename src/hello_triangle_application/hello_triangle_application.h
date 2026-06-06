@@ -39,10 +39,11 @@ namespace HelloTriangleApplication
 
         // drawing
         vk::raii::CommandPool commandPool = nullptr;
-        vk::raii::CommandBuffer commandBuffer = nullptr;
-        vk::raii::Semaphore presentCompleteSemaphore = nullptr;
-        vk::raii::Semaphore renderFinishedSemaphore = nullptr;
-        vk::raii::Fence drawFence = nullptr;
+        std::vector<vk::raii::CommandBuffer> commandBuffers;
+        std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
+        std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
+        std::vector<vk::raii::Fence> inFlightFences;
+        u32 frameIndex = 0;
 
     private:
         void initWindow();
