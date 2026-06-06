@@ -26,6 +26,10 @@ namespace HelloTriangleApplication
 
         // presentation
         vk::raii::SurfaceKHR surface = nullptr;
+        vk::raii::SwapchainKHR swapChain = nullptr;
+        std::vector<vk::Image> swapChainImages;
+        vk::SurfaceFormatKHR swapChainFormat;
+        vk::Extent2D swapChainExtent;
 
     private:
         void initWindow();

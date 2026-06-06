@@ -3,6 +3,7 @@
 #include "utilities/physical_device.h"
 #include "utilities/logical_device.h"
 #include "utilities/surface.h"
+#include "utilities/swap_chain.h"
 
 namespace HelloTriangleApplication
 {
@@ -32,6 +33,7 @@ namespace HelloTriangleApplication
         Utilities::createSurface(*this).unwrap();
         Utilities::pickPhysicalDevice(*this).unwrap();
         Utilities::createLogicalDevice(*this).unwrap();
+        Utilities::createSwapChain(*this).unwrap();
     }
 
     void App::mainLoop()

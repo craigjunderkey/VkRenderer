@@ -1,5 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "surface.h"
+#include <limits>
+#include <algorithm>
 
 using HelloTriangleApplication::App;
 
