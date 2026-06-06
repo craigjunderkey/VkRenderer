@@ -32,6 +32,9 @@ namespace HelloTriangleApplication
         vk::SurfaceFormatKHR swapChainFormat;
         vk::Extent2D swapChainExtent;
 
+        // graphics pipeline
+        vk::raii::PipelineLayout pipelineLayout = nullptr;
+
     private:
         void initWindow();
         void initVulkan();
