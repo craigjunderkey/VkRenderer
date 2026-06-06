@@ -97,7 +97,10 @@ namespace HelloTriangleApplication::Utilities
             .ppEnabledExtensionNames = extensions.extensionNames
         };
 
-        TRY_ASSIGN(app.instance, castVkResult(app.context.createInstance(createInfo)));
+        TRY_ASSIGN(
+            app.instance,
+            castVkResult(app.context.createInstance(createInfo))
+        );
 
         return Ok();
     }

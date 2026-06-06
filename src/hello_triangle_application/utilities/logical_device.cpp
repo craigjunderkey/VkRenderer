@@ -46,7 +46,12 @@ namespace HelloTriangleApplication::Utilities
             .ppEnabledExtensionNames = REQUIRED_DEVICE_EXTENSIONS.data()
         };
 
-        TRY_ASSIGN(app.device, castVkResult(app.physicalDevice.createDevice(deviceCreateInfo)));
+        TRY_ASSIGN(
+            app.device,
+            castVkResult(app.physicalDevice.createDevice(deviceCreateInfo))
+        );
+
+        app.graphicsQueue = app.device.getQueue(graphicsIndex, 0);
 
         return Ok();
     }
