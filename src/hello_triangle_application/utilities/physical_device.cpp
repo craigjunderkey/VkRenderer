@@ -3,7 +3,7 @@
 
 using HelloTriangleApplication::App;
 
-bool isDeviceSuitable(const vk::raii::PhysicalDevice& device)
+Result<bool, std::string> isDeviceSuitable(const vk::raii::PhysicalDevice& device)
 {
     // supports Vulkan 1.3
     auto properties = device.getProperties();
@@ -21,11 +21,12 @@ bool isDeviceSuitable(const vk::raii::PhysicalDevice& device)
     if (!supportsGraphics) return false;
 
     // supports all extensions
-    std::vector<const char*> requiredDeviceExtensions = { vk::KHRSwapchainExtensionName };
-    auto availableDeviceExtensions = castVkResult(device.enumerateDeviceExtensionProperties()).unwrap();
+    std::vector<vk::ExtensionProperties> availableDeviceExtensions;
+    TRY_ASSIGN(availableDeviceExtensions, castVkResult(device.enumerateDeviceExtensionProperties()));
+
     bool supportsAllRequiredExtensions =
         std::ranges::all_of(
-            requiredDeviceExtensions,
+            REQUIRED_DEVICE_EXTENSIONS,
             [&availableDeviceExtensions](const char* requiredExtension) {
                 return std::ranges::any_of(
                     availableDeviceExtensions,
@@ -53,7 +54,8 @@ namespace HelloTriangleApplication::Utilities
 {
     Result<Unit, std::string> pickPhysicalDevice(App& app)
     {
-        auto physicalDevices = castVkResult(app.instance.enumeratePhysicalDevices()).unwrap();
+        std::vector<vk::raii::PhysicalDevice> physicalDevices;
+        TRY_ASSIGN(physicalDevices, castVkResult(app.instance.enumeratePhysicalDevices()));
 
         if (physicalDevices.empty())
             return Err<std::string>("Failed to find GPUs with Vulkan support.");
@@ -61,7 +63,8 @@ namespace HelloTriangleApplication::Utilities
         auto deviceIter = std::ranges::find_if(
             physicalDevices,
             [](const vk::raii::PhysicalDevice& physicalDevice) {
-                return isDeviceSuitable(physicalDevice);
+                Result<bool, std::string> suitability = isDeviceSuitable(physicalDevice);
+                return suitability.isOk() && suitability.value();
             }
         );
 

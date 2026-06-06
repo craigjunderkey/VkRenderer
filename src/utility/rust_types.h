@@ -37,12 +37,12 @@ public:
     Result(T&& val) : val_(std::expected<T, E>(std::move(val))) {}
 
     operator bool() const { return this->val_.has_value(); }
-    operator std::expected<T, E>() const { return this->val_; } // will this cause problems?
+    operator std::expected<T, E>() { return std::move(this->val_); } // will this cause problems?
 
     T unwrap()
     {
         if (!this->val_)
-            panic("Unwrap failed.");
+            panic(std::format("{}", this->val_.error()));
 
         return std::move(this->val_.value());
     }
@@ -50,9 +50,21 @@ public:
     T expect(const char* message)
     {
         if (!this->val_)
-            panic(message);    
+            panic(std::format("{}", this->val_.error()));    
         
-        return std::move(this->val_.value());    
+        return std::move(this->val_.value());
+    }
+
+    T value()
+    {
+        assert(this->val_.has_value());
+        return std::move(this->val_.value());
+    }
+    
+    E error()
+    {
+        assert(!this->val_.has_value());
+        return std::move(this->val_.error());
     }
 
     inline bool isErr() const { return !this->val_.has_value(); }

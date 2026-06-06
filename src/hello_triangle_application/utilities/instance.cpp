@@ -16,7 +16,9 @@ Result<Extensions, std::string> fetchExtensions(App& app)
     auto glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
     // check if all the required GLFW extensions are supported
-    auto extensionProperties = castVkResult(app.context.enumerateInstanceExtensionProperties()).unwrap();
+    std::vector<vk::ExtensionProperties> extensionProperties;
+    TRY_ASSIGN(extensionProperties, castVkResult(app.context.enumerateInstanceExtensionProperties()));
+    
     for (u32 i = 0; i < glfwExtensionCount; i++)
     {
         bool extensionNotFound = std::ranges::none_of(
@@ -47,7 +49,9 @@ Result<ValidationLayers, std::string> fetchValidationLayers(App& app)
         requiredLayers.assign(VALIDATION_LAYERS.begin(), VALIDATION_LAYERS.end());
 
     // check that all the required layers are supported
-    auto layerProperties = castVkResult(app.context.enumerateInstanceLayerProperties()).unwrap();
+    std::vector<vk::LayerProperties> layerProperties;
+    TRY_ASSIGN(layerProperties, castVkResult(app.context.enumerateInstanceLayerProperties()));
+
     auto unsupportedLayerIt = std::ranges::find_if(
         layerProperties,
         [requiredLayers] (vk::LayerProperties layer) {
@@ -77,9 +81,12 @@ namespace HelloTriangleApplication::Utilities
         };
 
         // fetch the extensions
-        Extensions extensions = fetchExtensions(app).unwrap();
+        Extensions extensions;
+        TRY_ASSIGN(extensions, fetchExtensions(app));
+
         // fetch the validation layers
-        ValidationLayers layers = fetchValidationLayers(app).unwrap();
+        ValidationLayers layers;
+        TRY_ASSIGN(layers, fetchValidationLayers(app));
 
         // create the instance
         vk::InstanceCreateInfo createInfo {
@@ -90,8 +97,7 @@ namespace HelloTriangleApplication::Utilities
             .ppEnabledExtensionNames = extensions.extensionNames
         };
 
-        // app.instance = vk::raii::Instance(app.context, createInfo);
-        app.instance = castVkResult(app.context.createInstance(createInfo)).unwrap();
+        TRY_ASSIGN(app.instance, castVkResult(app.context.createInstance(createInfo)));
 
         return Ok();
     }

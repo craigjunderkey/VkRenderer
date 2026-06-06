@@ -1,6 +1,7 @@
 #include "hello_triangle_application.h"
 #include "utilities/instance.h"
 #include "utilities/physical_device.h"
+#include "utilities/logical_device.h"
 
 namespace HelloTriangleApplication
 {
@@ -28,6 +29,7 @@ namespace HelloTriangleApplication
 
         Utilities::createInstance(*this).unwrap();
         Utilities::pickPhysicalDevice(*this).unwrap();
+        Utilities::createLogicalDevice(*this).unwrap();
     }
 
     void App::mainLoop()

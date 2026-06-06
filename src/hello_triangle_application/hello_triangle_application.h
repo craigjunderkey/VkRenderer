@@ -20,6 +20,7 @@ namespace HelloTriangleApplication
         vk::raii::Context context;
         vk::raii::Instance instance = nullptr;
         vk::raii::PhysicalDevice physicalDevice = nullptr;
+        vk::raii::Device device = nullptr;
 
     private:
         void initWindow();

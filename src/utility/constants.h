@@ -12,6 +12,10 @@ const std::vector<const char*> VALIDATION_LAYERS = {
     "VK_LAYER_KHRONOS_validation"
 };
 
+const std::vector<const char*> REQUIRED_DEVICE_EXTENSIONS = {
+    vk::KHRSwapchainExtensionName
+};
+
 #ifndef NDEBUG
 constexpr bool VALIDATION_LAYERS_ENABLED = true;
 #else
