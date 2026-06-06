@@ -132,6 +132,7 @@ namespace HelloTriangleApplication::Utilities
             app.swapChainImages,
             castVkResult(app.swapChain.getImages())
         );
+        
 
         // store format and extent
         app.swapChainFormat = format;

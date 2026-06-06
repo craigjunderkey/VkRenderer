@@ -9,7 +9,6 @@ namespace HelloTriangleApplication::Utilities
     {
         // get index of first queue family that supports graphics and presentation
         std::vector<vk::QueueFamilyProperties> queueFamilyProperties = app.physicalDevice.getQueueFamilyProperties();
-        Option<u32> familyIndex;
         for (u32 i = 0; i < queueFamilyProperties.size(); i++)
         {
             const vk::QueueFamilyProperties& properties = queueFamilyProperties[i];
@@ -20,17 +19,17 @@ namespace HelloTriangleApplication::Utilities
 
             if (supportsGraphics && supportsSurface)
             {
-                familyIndex = i;
+                app.queueIndex = i;
                 break;
             }
         }
 
-        if (!familyIndex) return Err<std::string>("Could not find a queue for graphics and present support.");
+        if (!app.queueIndex) return Err<std::string>("Could not find a queue for graphics and present support.");
 
         // make device queue
         f32 queuePriority = 0.5f;
         vk::DeviceQueueCreateInfo deviceQueueCreateInfo {
-            .queueFamilyIndex = familyIndex.value(), .queueCount = 1, .pQueuePriorities = &queuePriority
+            .queueFamilyIndex = app.queueIndex.value(), .queueCount = 1, .pQueuePriorities = &queuePriority
         };
 
         // specify used device features
@@ -40,10 +39,10 @@ namespace HelloTriangleApplication::Utilities
             vk::PhysicalDeviceVulkan13Features,
             vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT> featureChain =
         {
-            {},                                 // vk::PhysicalDeviceFeatures2 (empty for now)
-            {.shaderDrawParameters = true},     // enable shader draw parameters from Vulkan 1.1
-            {.dynamicRendering = true},         // enable dynamic rendering from Vulkan 1.3
-            {.extendedDynamicState = true}      // enable extended dynamic state from the extension
+            {},                                                     // vk::PhysicalDeviceFeatures2 (empty for now)
+            {.shaderDrawParameters = true},                         // enable shader draw parameters from Vulkan 1.1
+            {.synchronization2 = true, .dynamicRendering = true},   // enable dynamic rendering from Vulkan 1.3
+            {.extendedDynamicState = true}                          // enable extended dynamic state from the extension
         };
 
         // make logical device
@@ -60,7 +59,7 @@ namespace HelloTriangleApplication::Utilities
             castVkResult(app.physicalDevice.createDevice(deviceCreateInfo))
         );
 
-        app.graphicsQueue = app.device.getQueue(familyIndex.value(), 0);
+        app.queue = app.device.getQueue(app.queueIndex.value(), 0);
 
         return Ok();
     }

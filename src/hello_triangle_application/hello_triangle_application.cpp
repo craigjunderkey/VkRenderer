@@ -6,6 +6,8 @@
 #include "utilities/swap_chain.h"
 #include "utilities/image_views.h"
 #include "utilities/graphics_pipeline.h"
+#include "utilities/command_pool.h"
+#include "utilities/command_buffer.h"
 
 using namespace HelloTriangleApplication::Utilities;
 
@@ -40,6 +42,10 @@ namespace HelloTriangleApplication
         createSwapChain(*this).unwrap();
         createImageViews(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
+        createCommandPool(*this).unwrap();
+        createCommandBuffer(*this).unwrap();
+
+        recordCommandBuffer(*this, 0);
     }
 
     void App::mainLoop()

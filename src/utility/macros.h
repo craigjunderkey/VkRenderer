@@ -5,5 +5,7 @@
 #define CHECK(result) if (!result) return Err<std::string>(std::move(result.error()));
 
 #define TRY_ASSIGN(var, result) \
-    if (!result) return Err<std::string>(std::move(result.error())); \
-    var = result.value(); 
+    { \
+    auto _crazyJerry = std::move(result); \
+    if (!_crazyJerry) return Err<std::string>(std::move(_crazyJerry.error())); \
+    var = _crazyJerry.value(); }

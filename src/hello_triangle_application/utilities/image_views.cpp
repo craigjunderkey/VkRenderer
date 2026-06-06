@@ -7,17 +7,11 @@ namespace HelloTriangleApplication::Utilities
 {
     Result<Unit, std::string> createImageViews(App& app)
     {
-        if (app.swapChainImages.empty()) return Err<std::string>("No images in the swap chain.");
+        if (!app.swapChainImageViews.empty()) return Err<std::string>("Already swap chain image views present.");
 
         vk::ImageViewCreateInfo imageViewCreateInfo {
             .viewType = vk::ImageViewType::e2D,
             .format = app.swapChainFormat.format,
-            .components = vk::ComponentMapping {
-                .r = vk::ComponentSwizzle::eIdentity,
-                .g = vk::ComponentSwizzle::eIdentity,
-                .b = vk::ComponentSwizzle::eIdentity,
-                .a = vk::ComponentSwizzle::eIdentity,
-            },
             .subresourceRange = vk::ImageSubresourceRange {
                 .aspectMask = vk::ImageAspectFlagBits::eColor,
                 .levelCount = 1,
@@ -31,7 +25,7 @@ namespace HelloTriangleApplication::Utilities
             
             vk::raii::ImageView imageView = nullptr;
             TRY_ASSIGN(imageView, castVkResult(app.device.createImageView(imageViewCreateInfo)));
-            app.swapChainImageViews.emplace_back(imageView);
+            app.swapChainImageViews.emplace_back(std::move(imageView));
         }
         
         return Ok();

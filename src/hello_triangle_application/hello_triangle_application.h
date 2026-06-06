@@ -22,19 +22,24 @@ namespace HelloTriangleApplication
         vk::raii::Instance instance = nullptr;
         vk::raii::PhysicalDevice physicalDevice = nullptr;
         vk::raii::Device device = nullptr;
-        vk::raii::Queue graphicsQueue = nullptr;
+        Option<u32> queueIndex;
+        vk::raii::Queue queue = nullptr;
 
         // presentation
         vk::raii::SurfaceKHR surface = nullptr;
         vk::raii::SwapchainKHR swapChain = nullptr;
         std::vector<vk::Image> swapChainImages;
-        std::vector<vk::ImageView> swapChainImageViews;
+        std::vector<vk::raii::ImageView> swapChainImageViews;
         vk::SurfaceFormatKHR swapChainFormat;
         vk::Extent2D swapChainExtent;
 
         // graphics pipeline
         vk::raii::PipelineLayout pipelineLayout = nullptr;
         vk::raii::Pipeline graphicsPipeline = nullptr;
+
+        // drawing
+        vk::raii::CommandPool commandPool = nullptr;
+        vk::raii::CommandBuffer commandBuffer = nullptr;
 
     private:
         void initWindow();
