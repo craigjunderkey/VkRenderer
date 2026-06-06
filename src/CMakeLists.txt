@@ -9,5 +9,7 @@ include("../CMake/VulkanSetup.cmake")
 
 # compile shaders
 set(SHADER_SLANG_SOURCES "shader")
+set (IN_SHADERS_DIR ${CMAKE_CURRENT_LIST_DIR}/shaders)
+set (OUT_SHADERS_DIR ${CMAKE_CURRENT_LIST_DIR}/../shaders) # this sucks
 add_slang_shader_target(SHADER_TARGETS SOURCES ${SHADER_SLANG_SOURCES})
 add_dependencies(${TEMPLATE_NAME} ${SHADER_TARGETS})

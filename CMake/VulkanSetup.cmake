@@ -116,21 +116,22 @@ endif()
 
 function (add_slang_shader_target TARGETS_OUT)
   cmake_parse_arguments ("SHADER" "" "" "SOURCES" ${ARGN})
-  set (SHADERS_DIR ${CMAKE_CURRENT_LIST_DIR}/shaders)
   set (ENTRY_POINTS -entry vertMain -entry fragMain)
 
   add_custom_command (
-          OUTPUT ${SHADERS_DIR}
-          COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADERS_DIR}
+          OUTPUT ${OUT_SHADERS_DIR}
+          POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_SHADERS_DIR}
   )
   
   foreach (source IN LISTS SHADER_SOURCES)
 
     add_custom_command(
-      OUTPUT "${SHADERS_DIR}/${source}.spv"
-      COMMAND ${SLANGC_EXECUTABLE} ${source}.slang -target spirv -profile spirv_1_4 -emit-spirv-directly -fvk-use-entrypoint-name ${ENTRY_POINTS} -o ${source}.spv
-      WORKING_DIRECTORY ${SHADERS_DIR}
-      DEPENDS "${SHADERS_DIR}/${source}.slang"
+      OUTPUT "${OUT_SHADERS_DIR}/${source}.spv"
+      POST_BUILD
+      COMMAND ${SLANGC_EXECUTABLE} ${source}.slang -target spirv -profile spirv_1_4 -emit-spirv-directly -fvk-use-entrypoint-name ${ENTRY_POINTS} -o ${OUT_SHADERS_DIR}/${source}.spv
+      WORKING_DIRECTORY ${IN_SHADERS_DIR}
+      DEPENDS "${IN_SHADERS_DIR}/${source}.slang"
       COMMENT "Compiling ${source}.slang"
       VERBATIM
     )
@@ -138,7 +139,7 @@ function (add_slang_shader_target TARGETS_OUT)
     set(TARGET "SHADER_${source}")
     list(APPEND ${TARGETS_OUT} ${TARGET})
 
-    add_custom_target(${TARGET} DEPENDS "${SHADERS_DIR}/${source}.spv")
+    add_custom_target(${TARGET} DEPENDS "${OUT_SHADERS_DIR}/${source}.spv")
 
   endforeach()
 
