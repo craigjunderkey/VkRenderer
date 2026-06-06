@@ -39,32 +39,6 @@ Result<vk::raii::ShaderModule, std::string> createShaderModule(App& app, const s
     return shaderModule;
 }
 
-Result<std::array<vk::PipelineShaderStageCreateInfo, 2>, std::string> makeProgrammableStages(App& app)
-{
-    std::vector<char> shaderCode;
-    TRY_ASSIGN(shaderCode, readFile(SHADER_PATH));
-
-    vk::raii::ShaderModule shaderModule = nullptr;
-    TRY_ASSIGN(shaderModule, createShaderModule(app, std::move(shaderCode)));
-
-    vk::PipelineShaderStageCreateInfo vertShaderStageInfo {
-        .stage = vk::ShaderStageFlagBits::eVertex,
-        .module = shaderModule,
-        .pName = "vertMain"
-    };
-
-    vk::PipelineShaderStageCreateInfo fragShaderStageInfo {
-        .stage = vk::ShaderStageFlagBits::eFragment,
-        .module = shaderModule,
-        .pName = "fragMain"
-    };
-
-    return std::array<vk::PipelineShaderStageCreateInfo, 2> {
-        std::move(vertShaderStageInfo),
-        std::move(fragShaderStageInfo)
-    };
-}
-
 namespace HelloTriangleApplication::Utilities
 {
     Result<Unit, std::string> createGraphicsPipeline(App& app)
@@ -76,9 +50,29 @@ namespace HelloTriangleApplication::Utilities
             .pDynamicStates = dynamicStates.data()
         };
 
-        // store programmable stages
-        std::array<vk::PipelineShaderStageCreateInfo, 2> shaderStages;
-        TRY_ASSIGN(shaderStages, makeProgrammableStages(app));
+        // make programmable stages
+        std::vector<char> shaderCode;
+        TRY_ASSIGN(shaderCode, readFile(SHADER_PATH));
+
+        vk::raii::ShaderModule shaderModule = nullptr;
+        TRY_ASSIGN(shaderModule, createShaderModule(app, std::move(shaderCode)));
+
+        vk::PipelineShaderStageCreateInfo vertShaderStageInfo {
+            .stage = vk::ShaderStageFlagBits::eVertex,
+            .module = shaderModule,
+            .pName = "vertMain"
+        };
+
+        vk::PipelineShaderStageCreateInfo fragShaderStageInfo {
+            .stage = vk::ShaderStageFlagBits::eFragment,
+            .module = shaderModule,
+            .pName = "fragMain"
+        };
+
+        std::array<vk::PipelineShaderStageCreateInfo, 2> shaderStages {
+            std::move(vertShaderStageInfo),
+            std::move(fragShaderStageInfo)
+        };
 
         // vertex input
         vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
@@ -151,6 +145,29 @@ namespace HelloTriangleApplication::Utilities
             app.pipelineLayout,
             castVkResult(app.device.createPipelineLayout(pipelineLayoutInfo))
         );
+
+        // make the pipeline
+        vk::PipelineRenderingCreateInfo pipelineRenderingInfo {
+            .colorAttachmentCount = 1,
+            .pColorAttachmentFormats = &app.swapChainFormat.format
+        };
+        vk::GraphicsPipelineCreateInfo graphicsPipelineInfo {
+            .pNext = &pipelineRenderingInfo,
+            .stageCount = static_cast<u32>(shaderStages.size()),
+            .pStages = shaderStages.data(),
+            .pVertexInputState = &vertexInputInfo,
+            .pInputAssemblyState = &inputAssemblyInfo,
+            .pViewportState = &viewportStateInfo,
+            .pRasterizationState = &rasterizationStateInfo,
+            .pMultisampleState = &multisampleStateInfo,
+            .pColorBlendState = &colorBlending,
+            .pDynamicState = &dynamicStateInfo,
+            .layout = app.pipelineLayout,
+            .renderPass = nullptr
+        };
+
+        vk::raii::Pipeline pipeline = nullptr;
+        TRY_ASSIGN(pipeline, castVkResult(app.device.createGraphicsPipeline(nullptr, graphicsPipelineInfo)));
 
         return Ok();
     }
