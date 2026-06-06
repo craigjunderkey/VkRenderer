@@ -8,6 +8,6 @@ add_definitions( -DVULKAN_HPP_NO_EXCEPTIONS )
 include("../CMake/VulkanSetup.cmake")
 
 # compile shaders
-set(SHADER_SLANG_SOURCES "shader.slang")
-add_slang_shader_target(foo SOURCES ${SHADER_SLANG_SOURCES})
-add_dependencies(${TEMPLATE_NAME} foo)
+set(SHADER_SLANG_SOURCES "shader")
+add_slang_shader_target(SHADER_TARGETS SOURCES ${SHADER_SLANG_SOURCES})
+add_dependencies(${TEMPLATE_NAME} ${SHADER_TARGETS})

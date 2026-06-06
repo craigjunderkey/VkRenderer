@@ -114,27 +114,34 @@ endif()
 #!file (COPY ${ASSET_DIR}/viking_room.obj DESTINATION ${TEMPLATE_DIR}/models)
 #!file (COPY ${ASSET_DIR}/viking_room.png DESTINATION ${TEMPLATE_DIR}/textures)
 
-function (add_slang_shader_target TARGET)
+function (add_slang_shader_target TARGETS_OUT)
   cmake_parse_arguments ("SHADER" "" "" "SOURCES" ${ARGN})
   set (SHADERS_DIR ${CMAKE_CURRENT_LIST_DIR}/shaders)
   set (ENTRY_POINTS -entry vertMain -entry fragMain)
+
   add_custom_command (
           OUTPUT ${SHADERS_DIR}
           COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADERS_DIR}
   )
   
-  set(DEPENDS_SOURCES "")
   foreach (source IN LISTS SHADER_SOURCES)
-    list(APPEND ${DEPENDS_SOURCES} "${SHADERS_DIR}/${source}")
+
+    add_custom_command(
+      OUTPUT "${SHADERS_DIR}/${source}.spv"
+      COMMAND ${SLANGC_EXECUTABLE} ${source}.slang -target spirv -profile spirv_1_4 -emit-spirv-directly -fvk-use-entrypoint-name ${ENTRY_POINTS} -o ${source}.spv
+      WORKING_DIRECTORY ${SHADERS_DIR}
+      DEPENDS "${SHADERS_DIR}/${source}.slang"
+      COMMENT "Compiling ${source}.slang"
+      VERBATIM
+    )
+
+    set(TARGET "SHADER_${source}")
+    list(APPEND ${TARGETS_OUT} ${TARGET})
+
+    add_custom_target(${TARGET} DEPENDS "${SHADERS_DIR}/${source}.spv")
+
   endforeach()
+
+  return(PROPAGATE ${TARGETS_OUT})
   
-  add_custom_command (
-          OUTPUT  ${SHADERS_DIR}/shader.spv
-          COMMAND ${SLANGC_EXECUTABLE} ${SHADER_SOURCES} -target spirv -profile spirv_1_4 -emit-spirv-directly -fvk-use-entrypoint-name ${ENTRY_POINTS} -o shader.spv
-          WORKING_DIRECTORY ${SHADERS_DIR}
-          DEPENDS ${DEPENDS_SOURCES}
-          COMMENT "Compiling Slang Shaders"
-          VERBATIM
-  )
-  add_custom_target (${TARGET} DEPENDS ${SHADERS_DIR}/shader.spv)
 endfunction()
