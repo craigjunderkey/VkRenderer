@@ -12,6 +12,16 @@ import vulkan_hpp;
 #include <vulkan/vk_enum_string_helper.h>
 #include "common.h"
 
+inline std::string vkResultToString(VkResult result)
+{
+    return std::string("Vulkan ") + std::string(string_VkResult(result));
+}
+
+inline std::string vkResultToString(vk::Result result)
+{
+    return std::string("Vulkan ") + std::string(string_VkResult((VkResult)result));
+}
+
 template<typename T>
 inline Result<T, std::string> castVkResult(vk::ResultValue<T> result)
 {
@@ -21,6 +31,6 @@ inline Result<T, std::string> castVkResult(vk::ResultValue<T> result)
     }
     else
     {
-        return Err<std::string>(std::string("Vulkan ") + std::string(string_VkResult((VkResult)result.result)));
+        return Err<std::string>(vkResultToString(result.result));
     }
 } 

@@ -16,12 +16,16 @@ namespace HelloTriangleApplication
     public:
         void run();
 
+        // setup
         GLFWwindow* window;
         vk::raii::Context context;
         vk::raii::Instance instance = nullptr;
         vk::raii::PhysicalDevice physicalDevice = nullptr;
         vk::raii::Device device = nullptr;
         vk::raii::Queue graphicsQueue = nullptr;
+
+        // presentation
+        vk::raii::SurfaceKHR surface = nullptr;
 
     private:
         void initWindow();

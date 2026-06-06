@@ -7,21 +7,30 @@ namespace HelloTriangleApplication::Utilities
 {
     Result<Unit, std::string> createLogicalDevice(App& app)
     {
-        // get index of first queue family that supports graphics
+        // get index of first queue family that supports graphics and presentation
         std::vector<vk::QueueFamilyProperties> queueFamilyProperties = app.physicalDevice.getQueueFamilyProperties();
-        
-        auto graphicsQueueFamilyProperty = std::ranges::find_if(
-            queueFamilyProperties,
-            [](const vk::QueueFamilyProperties& properties) {
-                return (bool)(properties.queueFlags & vk::QueueFlagBits::eGraphics);
+        Option<u32> familyIndex;
+        for (u32 i = 0; i < queueFamilyProperties.size(); i++)
+        {
+            const vk::QueueFamilyProperties& properties = queueFamilyProperties[i];
+            bool supportsGraphics = (bool)(properties.queueFlags & vk::QueueFlagBits::eGraphics);
+            
+            Result<u32, std::string> surfaceSupport = castVkResult(app.physicalDevice.getSurfaceSupportKHR(i, *app.surface));
+            bool supportsSurface = surfaceSupport.isOk() && surfaceSupport.value() != 0;
+
+            if (supportsGraphics && supportsSurface)
+            {
+                familyIndex = i;
+                break;
             }
-        );
-        u32 graphicsIndex = std::distance(queueFamilyProperties.begin(), graphicsQueueFamilyProperty);
+        }
+
+        if (!familyIndex) return Err<std::string>("Could not find a queue for graphics and present support.");
 
         // make device queue
         f32 queuePriority = 0.5f;
         vk::DeviceQueueCreateInfo deviceQueueCreateInfo {
-            .queueFamilyIndex = graphicsIndex, .queueCount = 1, .pQueuePriorities = &queuePriority
+            .queueFamilyIndex = familyIndex.value(), .queueCount = 1, .pQueuePriorities = &queuePriority
         };
 
         // specify used device features
@@ -51,7 +60,7 @@ namespace HelloTriangleApplication::Utilities
             castVkResult(app.physicalDevice.createDevice(deviceCreateInfo))
         );
 
-        app.graphicsQueue = app.device.getQueue(graphicsIndex, 0);
+        app.graphicsQueue = app.device.getQueue(familyIndex.value(), 0);
 
         return Ok();
     }

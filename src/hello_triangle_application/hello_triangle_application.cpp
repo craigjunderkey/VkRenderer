@@ -2,6 +2,7 @@
 #include "utilities/instance.h"
 #include "utilities/physical_device.h"
 #include "utilities/logical_device.h"
+#include "utilities/surface.h"
 
 namespace HelloTriangleApplication
 {
@@ -28,6 +29,7 @@ namespace HelloTriangleApplication
         std::cout << "Initializing Vulkan\n";
 
         Utilities::createInstance(*this).unwrap();
+        Utilities::createSurface(*this).unwrap();
         Utilities::pickPhysicalDevice(*this).unwrap();
         Utilities::createLogicalDevice(*this).unwrap();
     }

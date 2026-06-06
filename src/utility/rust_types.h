@@ -78,4 +78,3 @@ using Err = std::unexpected<E>;
 // option
 template <typename T>
 using Option = std::optional<T>;
-
