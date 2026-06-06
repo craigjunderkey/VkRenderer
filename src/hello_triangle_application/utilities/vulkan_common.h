@@ -12,6 +12,8 @@ import vulkan_hpp;
 #include <vulkan/vk_enum_string_helper.h>
 #include "common.h"
 
+constexpr u64 DISABLE_TIMEOUT = UINT64_MAX;
+
 inline std::string vkResultToString(VkResult result)
 {
     return std::string("Vulkan ") + std::string(string_VkResult(result));

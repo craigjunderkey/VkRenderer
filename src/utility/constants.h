@@ -23,3 +23,5 @@ constexpr bool VALIDATION_LAYERS_ENABLED = true;
 #else
 constexpr bool VALIDATION_LAYERS_ENABLED = false;
 #endif
+
+constexpr std::array<f32, 4> CLEAR_COLOR = {0.0f, 0.0f, 0.0f, 1.0f};

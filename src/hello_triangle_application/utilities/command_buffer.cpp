@@ -76,8 +76,7 @@ namespace HelloTriangleApplication::Utilities
         );
 
         // set up the color attachment
-        std::array<f32, 4> color {0.0f, 0.0f, 0.0f, 1.0f};
-        vk::ArrayWrapper1D<f32, 4> clearColor(color);
+        vk::ArrayWrapper1D<f32, 4> clearColor(CLEAR_COLOR);
         vk::ClearColorValue clearColorValue(std::move(clearColor));
         vk::ClearValue clearValue { .color = std::move(clearColorValue) };
 

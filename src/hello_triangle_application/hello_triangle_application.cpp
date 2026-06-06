@@ -8,6 +8,8 @@
 #include "utilities/graphics_pipeline.h"
 #include "utilities/command_pool.h"
 #include "utilities/command_buffer.h"
+#include "utilities/sync_objects.h"
+#include "utilities/draw.h"
 
 using namespace HelloTriangleApplication::Utilities;
 
@@ -44,8 +46,7 @@ namespace HelloTriangleApplication
         createGraphicsPipeline(*this).unwrap();
         createCommandPool(*this).unwrap();
         createCommandBuffer(*this).unwrap();
-
-        recordCommandBuffer(*this, 0);
+        createSyncObjects(*this).unwrap();
     }
 
     void App::mainLoop()
@@ -55,7 +56,10 @@ namespace HelloTriangleApplication
         while (!glfwWindowShouldClose(this->window))
         {
             glfwPollEvents();
+            drawFrame(*this).unwrap();
         }
+
+        this->device.waitIdle();
     }
 
     void App::cleanup()
