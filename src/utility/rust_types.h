@@ -37,7 +37,7 @@ public:
     Result(T&& val) : val_(std::expected<T, E>(std::move(val))) {}
 
     operator bool() const { return this->val_.has_value(); }
-    operator std::expected<T, E>() const { return this->val_; }
+    operator std::expected<T, E>() const { return this->val_; } // will this cause problems?
 
     T unwrap()
     {

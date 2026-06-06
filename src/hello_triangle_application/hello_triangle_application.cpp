@@ -1,5 +1,6 @@
 #include "hello_triangle_application.h"
 #include "utilities/instance.h"
+#include "utilities/physical_device.h"
 
 namespace HelloTriangleApplication
 {
@@ -26,6 +27,7 @@ namespace HelloTriangleApplication
         std::cout << "Initializing Vulkan\n";
 
         Utilities::createInstance(*this).unwrap();
+        Utilities::pickPhysicalDevice(*this).unwrap();
     }
 
     void App::mainLoop()
