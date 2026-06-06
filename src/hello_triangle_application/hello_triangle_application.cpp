@@ -5,6 +5,9 @@
 #include "utilities/surface.h"
 #include "utilities/swap_chain.h"
 #include "utilities/image_views.h"
+#include "utilities/graphics_pipeline.h"
+
+using namespace HelloTriangleApplication::Utilities;
 
 namespace HelloTriangleApplication
 {
@@ -30,12 +33,13 @@ namespace HelloTriangleApplication
     {
         std::cout << "Initializing Vulkan\n";
 
-        Utilities::createInstance(*this).unwrap();
-        Utilities::createSurface(*this).unwrap();
-        Utilities::pickPhysicalDevice(*this).unwrap();
-        Utilities::createLogicalDevice(*this).unwrap();
-        Utilities::createSwapChain(*this).unwrap();
-        Utilities::createImageViews(*this).unwrap();
+        createInstance(*this).unwrap();
+        createSurface(*this).unwrap();
+        pickPhysicalDevice(*this).unwrap();
+        createLogicalDevice(*this).unwrap();
+        createSwapChain(*this).unwrap();
+        createImageViews(*this).unwrap();
+        createGraphicsPipeline(*this).unwrap();
     }
 
     void App::mainLoop()
