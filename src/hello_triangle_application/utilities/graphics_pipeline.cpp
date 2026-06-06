@@ -166,8 +166,10 @@ namespace HelloTriangleApplication::Utilities
             .renderPass = nullptr
         };
 
-        vk::raii::Pipeline pipeline = nullptr;
-        TRY_ASSIGN(pipeline, castVkResult(app.device.createGraphicsPipeline(nullptr, graphicsPipelineInfo)));
+        TRY_ASSIGN(
+            app.graphicsPipeline,
+            castVkResult(app.device.createGraphicsPipeline(nullptr, graphicsPipelineInfo))
+        );
 
         return Ok();
     }

@@ -34,6 +34,7 @@ namespace HelloTriangleApplication
 
         // graphics pipeline
         vk::raii::PipelineLayout pipelineLayout = nullptr;
+        vk::raii::Pipeline graphicsPipeline = nullptr;
 
     private:
         void initWindow();
