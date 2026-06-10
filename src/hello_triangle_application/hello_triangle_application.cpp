@@ -29,8 +29,9 @@ namespace HelloTriangleApplication
         
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        this->window = glfwCreateWindow(WIDTH, HEIGHT, TITLE, nullptr, nullptr);
+        this->window.attachGlfwHandle(
+            glfwCreateWindow(WIDTH, HEIGHT, TITLE, nullptr, nullptr)
+        );
     }
 
     void App::initVulkan()
@@ -53,7 +54,7 @@ namespace HelloTriangleApplication
     {
         std::cout << "Entering main loop\n";
         
-        while (!glfwWindowShouldClose(this->window))
+        while (!glfwWindowShouldClose(*this->window))
         {
             glfwPollEvents();
             drawFrame(*this).unwrap();
@@ -66,7 +67,6 @@ namespace HelloTriangleApplication
     {
         std::cout << "Cleaning up\n";
 
-        glfwDestroyWindow(this->window);
         glfwTerminate();
     }
 }

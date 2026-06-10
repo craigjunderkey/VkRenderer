@@ -1,5 +1,6 @@
 #include "../hello_triangle_application.h"
 #include "swap_chain.h"
+#include "image_views.h"
 
 using HelloTriangleApplication::App;
 
@@ -59,7 +60,7 @@ vk::Extent2D chooseSwapExtent(App& app, const vk::SurfaceCapabilitiesKHR& capabi
     }
 
     i32 width, height;
-    glfwGetFramebufferSize(app.window, &width, &height);
+    glfwGetFramebufferSize(*app.window, &width, &height);
 
     return vk::Extent2D {
         .width = std::clamp<u32>(width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width),
@@ -79,6 +80,13 @@ u32 chooseSwapMinImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
     }
 
     return minImageCount;
+}
+
+Result<Unit, std::string> cleanupSwapChain(App& app)
+{
+    app.swapChainImageViews.clear();
+    app.swapChain = nullptr;
+    return Ok();
 }
 
 namespace HelloTriangleApplication::Utilities
@@ -122,6 +130,9 @@ namespace HelloTriangleApplication::Utilities
             .oldSwapchain = nullptr
         };
 
+        if (app.swapChain != VK_NULL_HANDLE)
+            swapChainCreateInfo.oldSwapchain = *app.swapChain;
+
         TRY_ASSIGN(
             app.swapChain,
             castVkResult(app.device.createSwapchainKHR(swapChainCreateInfo))
@@ -137,6 +148,22 @@ namespace HelloTriangleApplication::Utilities
         // store format and extent
         app.swapChainFormat = format;
         app.swapChainExtent = extent;
+
+        return Ok();
+    }
+
+    Result<Unit, std::string> recreateSwapChain(App& app)
+    {
+        while (app.window.status.isMinimized)
+        {
+            glfwWaitEvents();
+        }
+
+        app.device.waitIdle();
+
+        CHECK(cleanupSwapChain(app));
+        CHECK(createSwapChain(app));
+        CHECK(createImageViews(app));
 
         return Ok();
     }

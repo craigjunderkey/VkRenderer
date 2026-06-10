@@ -1,13 +1,13 @@
 #pragma once
 
 #include "utilities/vulkan_common.h"
-#include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <cstdlib>
 
 #include "../utility/types.h"
 #include "../utility/constants.h"
+#include "window.h"
 
 namespace HelloTriangleApplication
 {
@@ -17,7 +17,7 @@ namespace HelloTriangleApplication
         void run();
 
         // setup
-        GLFWwindow* window;
+        Window window;
         vk::raii::Context context;
         vk::raii::Instance instance = nullptr;
         vk::raii::PhysicalDevice physicalDevice = nullptr;

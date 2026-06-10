@@ -3,8 +3,8 @@
 #include "types.h"
 #include <vector>
 
-constexpr u32 WIDTH = 1600;
-constexpr u32 HEIGHT = 1200;
+constexpr u32 WIDTH = 800;
+constexpr u32 HEIGHT = 600;
 
 constexpr const char* TITLE = "HOUSE OF HENRY";
 
@@ -13,7 +13,7 @@ const std::vector<const char*> VALIDATION_LAYERS = {
 };
 
 const std::vector<const char*> REQUIRED_DEVICE_EXTENSIONS = {
-    vk::KHRSwapchainExtensionName
+    "VK_KHR_swapchain"
 };
 
 constexpr const char* SHADER_PATH = "shaders/shader.spv";
