@@ -14,7 +14,7 @@ namespace HelloTriangleApplication::Utilities
         };
 
         auto graphicsCommandPool = castVkResult(app.device.createCommandPool(commandPoolCreateInfo));
-        CHECK(graphicsCommandPool);
+        CHECK_KEEP(graphicsCommandPool);
 
         app.graphicsQueue.commandPool = std::make_shared<vk::raii::CommandPool>(graphicsCommandPool.take());
 

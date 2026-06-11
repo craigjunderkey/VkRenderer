@@ -3,10 +3,12 @@
 #define CHECK(result) \
     { \
     auto _crazyJerry = std::move(result); \
-    if (!_crazyJerry) return Err<std::string>(std::move(_crazyJerry.error())); }
+    if (!_crazyJerry) return Err<std::string>(_crazyJerry.error()); }
+
+#define CHECK_KEEP(result) if (!result) return Err<std::string>(result.error());
 
 #define TRY_ASSIGN(var, result) \
     { \
     auto _crazyJerry = std::move(result); \
-    if (!_crazyJerry) return Err<std::string>(std::move(_crazyJerry.error())); \
+    if (!_crazyJerry) return Err<std::string>(_crazyJerry.error()); \
     var = _crazyJerry.take(); }
