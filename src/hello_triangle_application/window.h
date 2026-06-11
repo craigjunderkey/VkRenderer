@@ -9,8 +9,8 @@ namespace HelloTriangleApplication
     public:
         struct Status
         {
-            bool framebufferResized;
-            bool isMinimized;
+            bool framebufferResized = false;
+            bool isMinimized = false;
         };
     
         GLFWwindow* handle = nullptr;
