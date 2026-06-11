@@ -9,4 +9,4 @@
     { \
     auto _crazyJerry = std::move(result); \
     if (!_crazyJerry) return Err<std::string>(std::move(_crazyJerry.error())); \
-    var = _crazyJerry.value(); }
+    var = _crazyJerry.take(); }

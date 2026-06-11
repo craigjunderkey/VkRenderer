@@ -60,7 +60,7 @@ namespace HelloTriangleApplication::Utilities
         app.device.resetFences(*app.inFlightFences[app.frameIndex]);
 
         // since we have the index of the incoming image, prepare our command buffer for drawing to it
-        app.commandBuffers[app.frameIndex].reset();
+        app.graphicsQueue.commandBuffers[app.frameIndex].reset();
         recordCommandBuffer(app, imageIndex);
 
         // submit draw call
@@ -70,12 +70,12 @@ namespace HelloTriangleApplication::Utilities
             .pWaitSemaphores = &*app.presentCompleteSemaphores[app.frameIndex],
             .pWaitDstStageMask = &waitDestinationStageMask,
             .commandBufferCount = 1,
-            .pCommandBuffers = &*app.commandBuffers[app.frameIndex],
+            .pCommandBuffers = &*app.graphicsQueue.commandBuffers[app.frameIndex],
             .signalSemaphoreCount = 1,
             .pSignalSemaphores = &*app.renderFinishedSemaphores[imageIndex]
         };
 
-        vk::Result submitResult = app.queue.submit(submitInfo, *app.inFlightFences[app.frameIndex]);
+        vk::Result submitResult = app.graphicsQueue.queue.submit(submitInfo, *app.inFlightFences[app.frameIndex]);
         if (submitResult != vk::Result::eSuccess)
             return Err<std::string>("Failed to submit render request.");
         
@@ -88,7 +88,7 @@ namespace HelloTriangleApplication::Utilities
             .pImageIndices = &imageIndex
         };
 
-        vk::Result presentResult = app.queue.presentKHR(presentInfo);
+        vk::Result presentResult = app.graphicsQueue.queue.presentKHR(presentInfo);
         bool shouldRecreateSwapChain = presentResult == vk::Result::eSuboptimalKHR
             || presentResult == vk::Result::eErrorOutOfDateKHR
             || app.window.status.framebufferResized

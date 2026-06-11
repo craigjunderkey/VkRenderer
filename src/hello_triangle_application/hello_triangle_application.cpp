@@ -47,7 +47,7 @@ namespace HelloTriangleApplication
         createSwapChain(*this).unwrap();
         createImageViews(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
-        createCommandPool(*this).unwrap();
+        createCommandPools(*this).unwrap();
         createVertexBuffer(*this).unwrap();
         createCommandBuffers(*this).unwrap();
         createSyncObjects(*this).unwrap();

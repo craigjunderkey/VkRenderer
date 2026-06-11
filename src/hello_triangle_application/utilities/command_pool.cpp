@@ -1,21 +1,22 @@
 #include "../hello_triangle_application.h"
 #include "command_pool.h"
+#include <memory>
 
 using HelloTriangleApplication::App;
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createCommandPool(App& app)
+    Result<Unit, std::string> createCommandPools(App& app)
     {
         vk::CommandPoolCreateInfo commandPoolCreateInfo {
             .flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
-            .queueFamilyIndex = app.queueIndex.value()
+            .queueFamilyIndex = app.graphicsQueue.familyIndex
         };
 
-        TRY_ASSIGN(
-            app.commandPool,
-            castVkResult(app.device.createCommandPool(commandPoolCreateInfo))
-        );
+        auto graphicsCommandPool = castVkResult(app.device.createCommandPool(commandPoolCreateInfo));
+        CHECK(graphicsCommandPool);
+
+        app.graphicsQueue.commandPool = std::make_shared<vk::raii::CommandPool>(graphicsCommandPool.take());
 
         return Ok();
     }

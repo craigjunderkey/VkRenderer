@@ -3,33 +3,43 @@
 
 using HelloTriangleApplication::App;
 
+Result<u32, std::string> getGraphicsFamilyIndex(App& app, const std::vector<vk::QueueFamilyProperties>& families)
+{
+    // get index of first queue family that supports graphics and presentation
+    Option<u32> index;
+    for (u32 i = 0; i < families.size(); i++)
+    {
+        const vk::QueueFamilyProperties& properties = families[i];
+        bool supportsGraphics = static_cast<bool>(properties.queueFlags & vk::QueueFlagBits::eGraphics);
+
+        Result<u32, std::string> surfaceSupport = castVkResult(app.physicalDevice.getSurfaceSupportKHR(i, *app.surface));
+        bool supportsSurfaces = surfaceSupport.isOk() && surfaceSupport.value() != 0;
+
+        if (supportsGraphics && supportsSurfaces)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if (!index) return Err<std::string>("Failed to find a queue family that supports graphics and presenting.");
+
+    return (u32)index.value();
+}
+
 namespace HelloTriangleApplication::Utilities
 {
     Result<Unit, std::string> createLogicalDevice(App& app)
     {
-        // get index of first queue family that supports graphics and presentation
-        std::vector<vk::QueueFamilyProperties> queueFamilyProperties = app.physicalDevice.getQueueFamilyProperties();
-        for (u32 i = 0; i < queueFamilyProperties.size(); i++)
-        {
-            const vk::QueueFamilyProperties& properties = queueFamilyProperties[i];
-            bool supportsGraphics = (bool)(properties.queueFlags & vk::QueueFlagBits::eGraphics);
-            
-            Result<u32, std::string> surfaceSupport = castVkResult(app.physicalDevice.getSurfaceSupportKHR(i, *app.surface));
-            bool supportsSurface = surfaceSupport.isOk() && surfaceSupport.value() != 0;
+        // get graphics queue index
+        std::vector<vk::QueueFamilyProperties> queueFamilies = app.physicalDevice.getQueueFamilyProperties();
+        auto graphicsFamilyIndex = getGraphicsFamilyIndex(app, queueFamilies);
+        CHECK(graphicsFamilyIndex);
 
-            if (supportsGraphics && supportsSurface)
-            {
-                app.queueIndex = i;
-                break;
-            }
-        }
-
-        if (!app.queueIndex) return Err<std::string>("Could not find a queue for graphics and present support.");
-
-        // make device queue
+        // prepare graphics queue
         f32 queuePriority = 0.5f;
-        vk::DeviceQueueCreateInfo deviceQueueCreateInfo {
-            .queueFamilyIndex = app.queueIndex.value(), .queueCount = 1, .pQueuePriorities = &queuePriority
+        vk::DeviceQueueCreateInfo graphicsQueueCreateInfo {
+            .queueFamilyIndex = graphicsFamilyIndex.value(), .queueCount = 1, .pQueuePriorities = &queuePriority
         };
 
         // specify used device features
@@ -49,7 +59,7 @@ namespace HelloTriangleApplication::Utilities
         vk::DeviceCreateInfo deviceCreateInfo = {
             .pNext = &featureChain.get<vk::PhysicalDeviceFeatures2>(),
             .queueCreateInfoCount = 1,
-            .pQueueCreateInfos = &deviceQueueCreateInfo,
+            .pQueueCreateInfos = &graphicsQueueCreateInfo,
             .enabledExtensionCount = (u32)REQUIRED_DEVICE_EXTENSIONS.size(),
             .ppEnabledExtensionNames = REQUIRED_DEVICE_EXTENSIONS.data()
         };
@@ -59,7 +69,8 @@ namespace HelloTriangleApplication::Utilities
             castVkResult(app.physicalDevice.createDevice(deviceCreateInfo))
         );
 
-        app.queue = app.device.getQueue(app.queueIndex.value(), 0);
+        vk::raii::Queue graphicsQueue = app.device.getQueue(graphicsFamilyIndex.value(), 0);
+        app.graphicsQueue = FatQueue { .queue = std::move(graphicsQueue), .familyIndex = graphicsFamilyIndex.value() };
 
         return Ok();
     }

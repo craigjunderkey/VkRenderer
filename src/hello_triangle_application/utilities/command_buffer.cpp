@@ -40,7 +40,7 @@ void transitionImageLayout(
         .pImageMemoryBarriers = &barrier,
     };
 
-    app.commandBuffers[app.frameIndex].pipelineBarrier2(dependencyInfo);
+    app.graphicsQueue.commandBuffers[app.frameIndex].pipelineBarrier2(dependencyInfo);
 }
 
 namespace HelloTriangleApplication::Utilities
@@ -48,13 +48,13 @@ namespace HelloTriangleApplication::Utilities
     Result<Unit, std::string> createCommandBuffers(App& app)
     {
         vk::CommandBufferAllocateInfo allocInfo {
-            .commandPool = app.commandPool,
+            .commandPool = **app.graphicsQueue.commandPool,
             .level = vk::CommandBufferLevel::ePrimary,
             .commandBufferCount = MAX_FRAMES_IN_FLIGHT
         };
 
         TRY_ASSIGN(
-            app.commandBuffers,
+            app.graphicsQueue.commandBuffers,
             castVkResult(app.device.allocateCommandBuffers(allocInfo))
         );
 
@@ -63,7 +63,7 @@ namespace HelloTriangleApplication::Utilities
 
     void recordCommandBuffer(App& app, u32 imageIndex)
     {
-        const vk::raii::CommandBuffer& commandBuffer = app.commandBuffers[app.frameIndex];
+        const vk::raii::CommandBuffer& commandBuffer = app.graphicsQueue.commandBuffers[app.frameIndex];
         
         commandBuffer.begin({});
 

@@ -8,6 +8,9 @@
 #include "../utility/types.h"
 #include "../utility/constants.h"
 #include "window.h"
+#include "utilities/queue.h"
+
+using HelloTriangleApplication::Utilities::FatQueue;
 
 namespace HelloTriangleApplication
 {
@@ -22,8 +25,7 @@ namespace HelloTriangleApplication
         vk::raii::Instance instance = nullptr;
         vk::raii::PhysicalDevice physicalDevice = nullptr;
         vk::raii::Device device = nullptr;
-        Option<u32> queueIndex;
-        vk::raii::Queue queue = nullptr;
+        FatQueue graphicsQueue;
 
         // presentation
         vk::raii::SurfaceKHR surface = nullptr;
@@ -38,8 +40,6 @@ namespace HelloTriangleApplication
         vk::raii::Pipeline graphicsPipeline = nullptr;
 
         // drawing
-        vk::raii::CommandPool commandPool = nullptr;
-        std::vector<vk::raii::CommandBuffer> commandBuffers;
         std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
         std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
         std::vector<vk::raii::Fence> inFlightFences;
