@@ -13,7 +13,7 @@ namespace HelloTriangleApplication
             bool isMinimized;
         };
     
-        GLFWwindow* handle;
+        GLFWwindow* handle = nullptr;
         Status status;
 
         Window() = default;

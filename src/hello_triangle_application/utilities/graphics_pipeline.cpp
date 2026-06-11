@@ -1,8 +1,10 @@
 #include "../hello_triangle_application.h"
 #include "graphics_pipeline.h"
+#include "../geometry/vertex.h"
 #include <fstream>
 
 using HelloTriangleApplication::App;
+using HelloTriangleApplication::Geometry::Vertex;
 
 Result<std::vector<char>, std::string> readFile(const std::string& fileName)
 {
@@ -75,7 +77,14 @@ namespace HelloTriangleApplication::Utilities
         };
 
         // vertex input
-        vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
+        auto bindingDesc = Vertex::bindingDescription();
+        auto attributeDesc = Vertex::attributeDescriptions();
+        vk::PipelineVertexInputStateCreateInfo vertexInputInfo {
+            .vertexBindingDescriptionCount = 1,
+            .pVertexBindingDescriptions = &bindingDesc,
+            .vertexAttributeDescriptionCount = (u32)attributeDesc.size(),
+            .pVertexAttributeDescriptions = attributeDesc.data()
+        };
 
         // input assembly
         vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo {
