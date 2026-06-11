@@ -9,8 +9,10 @@
 #include "../utility/constants.h"
 #include "window.h"
 #include "utilities/queue.h"
+#include "geometry/buffer.h"
 
 using HelloTriangleApplication::Utilities::FatQueue;
+using HelloTriangleApplication::Geometry::FatBuffer;
 
 namespace HelloTriangleApplication
 {
@@ -48,9 +50,7 @@ namespace HelloTriangleApplication
         u32 frameIndex = 0;
 
         // geometry
-        vk::raii::Buffer vertexBuffer = nullptr;
-        vk::raii::DeviceMemory vertexBufferMemory = nullptr;
-        std::vector<u32> vertexBufferFamilies;
+        FatBuffer vertexBuffer;
 
     private:
         void initWindow();

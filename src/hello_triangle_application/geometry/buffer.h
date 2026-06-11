@@ -1,0 +1,29 @@
+#pragma once
+#include "../utilities/vulkan_common.h"
+#include "../utilities/common.h"
+
+namespace HelloTriangleApplication
+{
+    class App;
+}
+
+namespace HelloTriangleApplication::Geometry
+{
+    struct FatBuffer
+    {
+        vk::raii::Buffer buffer = nullptr;
+        vk::raii::DeviceMemory memory = nullptr;
+        vk::DeviceSize size = 0;
+        std::unique_ptr<std::vector<u32>> families = nullptr;
+
+        vk::raii::Buffer& operator*() { return this->buffer; }
+
+        static Result<FatBuffer, std::string> create(
+            App& app,
+            vk::DeviceSize size,
+            vk::BufferUsageFlags usage,
+            vk::MemoryPropertyFlags properties,
+            Option<std::vector<u32>> families = None()
+        );
+    };
+}

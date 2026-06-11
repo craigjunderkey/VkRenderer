@@ -123,7 +123,7 @@ namespace HelloTriangleApplication::Utilities
         );
 
         // draw the damn thing
-        commandBuffer.bindVertexBuffers(0, *app.vertexBuffer, {0});
+        commandBuffer.bindVertexBuffers(0, *app.vertexBuffer.buffer, {0});
         commandBuffer.draw(Geometry::VERTICES.size(), 1, 0, 0);
 
         // stop rendering

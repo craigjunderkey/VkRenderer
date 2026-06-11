@@ -11,6 +11,6 @@ namespace HelloTriangleApplication::Utilities
         std::shared_ptr<vk::raii::CommandPool> commandPool = nullptr;
         std::vector<vk::raii::CommandBuffer> commandBuffers = {};
 
-        vk::Queue operator*() { return *this->queue; }
+        vk::raii::Queue& operator*() { return this->queue; }
     };
 }

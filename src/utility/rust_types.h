@@ -105,3 +105,8 @@ using Err = std::unexpected<E>;
 // option
 template <typename T>
 using Option = std::optional<T>;
+
+inline constexpr std::nullopt_t None()
+{
+    return std::nullopt;
+}
