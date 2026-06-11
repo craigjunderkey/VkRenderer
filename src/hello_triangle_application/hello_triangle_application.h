@@ -26,14 +26,16 @@ namespace HelloTriangleApplication
         vk::raii::PhysicalDevice physicalDevice = nullptr;
         vk::raii::Device device = nullptr;
         FatQueue graphicsQueue;
+        FatQueue transferQueue;
 
         // presentation
         vk::raii::SurfaceKHR surface = nullptr;
-        vk::raii::SwapchainKHR swapChain = nullptr;
+        vk::raii::SwapchainKHR swapChain = nullptr; // TODO: make FatSwapchain
         std::vector<vk::Image> swapChainImages;
         std::vector<vk::raii::ImageView> swapChainImageViews;
         vk::SurfaceFormatKHR swapChainFormat;
         vk::Extent2D swapChainExtent;
+        std::vector<u32> swapChainFamilies;
 
         // graphics pipeline
         vk::raii::PipelineLayout pipelineLayout = nullptr;
@@ -48,6 +50,7 @@ namespace HelloTriangleApplication
         // geometry
         vk::raii::Buffer vertexBuffer = nullptr;
         vk::raii::DeviceMemory vertexBufferMemory = nullptr;
+        std::vector<u32> vertexBufferFamilies;
 
     private:
         void initWindow();

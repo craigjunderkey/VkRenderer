@@ -70,10 +70,17 @@ namespace HelloTriangleApplication::Geometry
 {
     Result<Unit, std::string> createVertexBuffer(App& app)
     {
+        app.vertexBufferFamilies = {
+            app.graphicsQueue.familyIndex,
+            app.transferQueue.familyIndex
+        };
+
         vk::BufferCreateInfo bufferCreateInfo {
             .size = sizeof(VERTICES[0]) * VERTICES.size(),
             .usage = vk::BufferUsageFlagBits::eVertexBuffer,
-            .sharingMode = vk::SharingMode::eExclusive
+            .sharingMode = vk::SharingMode::eConcurrent,
+            .queueFamilyIndexCount = (u32)app.vertexBufferFamilies.size(),
+            .pQueueFamilyIndices = app.vertexBufferFamilies.data()
         };
 
         TRY_ASSIGN(

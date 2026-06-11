@@ -27,19 +27,48 @@ Result<u32, std::string> getGraphicsFamilyIndex(App& app, const std::vector<vk::
     return (u32)index.value();
 }
 
+Result<u32, std::string> getTransferFamilyIndex(App& app, const std::vector<vk::QueueFamilyProperties>& families)
+{
+    // get index of first queue family that supports transfer but not graphics
+    Option<u32> index;
+    for (u32 i = 0; i < families.size(); i++)
+    {
+        const vk::QueueFamilyProperties& properties = families[i];
+        bool supportsTransfer = static_cast<bool>(properties.queueFlags & vk::QueueFlagBits::eTransfer);
+        bool supportsGraphics = static_cast<bool>(properties.queueFlags & vk::QueueFlagBits::eGraphics);
+
+        if (supportsTransfer & !supportsGraphics)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if (!index) return Err<std::string>("Failed to find a queue family that supports transfer but not graphics.");
+
+    return (u32)index.value();
+}
+
 namespace HelloTriangleApplication::Utilities
 {
     Result<Unit, std::string> createLogicalDevice(App& app)
     {
-        // get graphics queue index
         std::vector<vk::QueueFamilyProperties> queueFamilies = app.physicalDevice.getQueueFamilyProperties();
-        auto graphicsFamilyIndex = getGraphicsFamilyIndex(app, queueFamilies);
-        CHECK(graphicsFamilyIndex);
+        std::array<vk::DeviceQueueCreateInfo, 2> queueCreateInfos = {};
+        f32 queuePriority = 0.5f;
 
         // prepare graphics queue
-        f32 queuePriority = 0.5f;
-        vk::DeviceQueueCreateInfo graphicsQueueCreateInfo {
+        auto graphicsFamilyIndex = getGraphicsFamilyIndex(app, queueFamilies);
+        CHECK_KEEP(graphicsFamilyIndex);
+        queueCreateInfos[0] = vk::DeviceQueueCreateInfo {
             .queueFamilyIndex = graphicsFamilyIndex.value(), .queueCount = 1, .pQueuePriorities = &queuePriority
+        };
+
+        // prepare transfer queue
+        auto transferFamilyIndex = getTransferFamilyIndex(app, queueFamilies);
+        CHECK_KEEP(transferFamilyIndex);
+        queueCreateInfos[1] = vk::DeviceQueueCreateInfo {
+            .queueFamilyIndex = transferFamilyIndex.value(), .queueCount = 1, .pQueuePriorities = &queuePriority
         };
 
         // specify used device features
@@ -58,8 +87,8 @@ namespace HelloTriangleApplication::Utilities
         // make logical device
         vk::DeviceCreateInfo deviceCreateInfo = {
             .pNext = &featureChain.get<vk::PhysicalDeviceFeatures2>(),
-            .queueCreateInfoCount = 1,
-            .pQueueCreateInfos = &graphicsQueueCreateInfo,
+            .queueCreateInfoCount = (u32)queueCreateInfos.size(),
+            .pQueueCreateInfos = queueCreateInfos.data(),
             .enabledExtensionCount = (u32)REQUIRED_DEVICE_EXTENSIONS.size(),
             .ppEnabledExtensionNames = REQUIRED_DEVICE_EXTENSIONS.data()
         };
@@ -69,8 +98,12 @@ namespace HelloTriangleApplication::Utilities
             castVkResult(app.physicalDevice.createDevice(deviceCreateInfo))
         );
 
+        // create graphics and transfer queues
         vk::raii::Queue graphicsQueue = app.device.getQueue(graphicsFamilyIndex.value(), 0);
         app.graphicsQueue = FatQueue { .queue = std::move(graphicsQueue), .familyIndex = graphicsFamilyIndex.value() };
+
+        vk::raii::Queue transferQueue = app.device.getQueue(transferFamilyIndex.value(), 0);
+        app.transferQueue = FatQueue { .queue = std::move(transferQueue), .familyIndex = transferFamilyIndex.value() };
 
         return Ok();
     }

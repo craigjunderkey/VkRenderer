@@ -113,6 +113,12 @@ namespace HelloTriangleApplication::Utilities
         vk::Extent2D extent = chooseSwapExtent(app, surfaceCapabilities);
         u32 minImageCount = chooseSwapMinImageCount(surfaceCapabilities);
 
+        // decide which queue families can access the swapchain
+        app.swapChainFamilies = {
+            app.graphicsQueue.familyIndex,
+            app.transferQueue.familyIndex
+        };
+        
         // create the swap chain
         vk::SwapchainCreateInfoKHR swapChainCreateInfo {
             .surface = *app.surface,
@@ -122,7 +128,9 @@ namespace HelloTriangleApplication::Utilities
             .imageExtent = extent,
             .imageArrayLayers = 1,
             .imageUsage = vk::ImageUsageFlagBits::eColorAttachment,
-            .imageSharingMode = vk::SharingMode::eExclusive,
+            .imageSharingMode = vk::SharingMode::eConcurrent,
+            .queueFamilyIndexCount = (u32)app.swapChainFamilies.size(),
+            .pQueueFamilyIndices = app.swapChainFamilies.data(),
             .preTransform = surfaceCapabilities.currentTransform,
             .compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
             .presentMode = presentMode,
