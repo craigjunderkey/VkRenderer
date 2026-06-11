@@ -10,8 +10,10 @@
 #include "utilities/command_buffer.h"
 #include "utilities/sync_objects.h"
 #include "utilities/draw.h"
+#include "geometry/vertex_buffer.h"
 
 using namespace HelloTriangleApplication::Utilities;
+using namespace HelloTriangleApplication::Geometry;
 
 namespace HelloTriangleApplication
 {
@@ -46,6 +48,7 @@ namespace HelloTriangleApplication
         createImageViews(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPool(*this).unwrap();
+        createVertexBuffer(*this).unwrap();
         createCommandBuffers(*this).unwrap();
         createSyncObjects(*this).unwrap();
     }

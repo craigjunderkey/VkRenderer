@@ -45,6 +45,10 @@ namespace HelloTriangleApplication
         std::vector<vk::raii::Fence> inFlightFences;
         u32 frameIndex = 0;
 
+        // geometry
+        vk::raii::Buffer vertexBuffer = nullptr;
+        vk::raii::DeviceMemory vertexBufferMemory = nullptr;
+
     private:
         void initWindow();
         void initVulkan();

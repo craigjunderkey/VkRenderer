@@ -1,5 +1,6 @@
 #include "../hello_triangle_application.h"
 #include "command_buffer.h"
+#include "../geometry/vertex.h"
 
 using HelloTriangleApplication::App;
 
@@ -122,7 +123,8 @@ namespace HelloTriangleApplication::Utilities
         );
 
         // draw the damn thing
-        commandBuffer.draw(3, 1, 0, 0);
+        commandBuffer.bindVertexBuffers(0, *app.vertexBuffer, {0});
+        commandBuffer.draw(Geometry::VERTICES.size(), 1, 0, 0);
 
         // stop rendering
         commandBuffer.endRendering();
