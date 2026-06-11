@@ -10,7 +10,7 @@ Result<u32, std::string> findMemoryType(App& app, u32 typeFilter, vk::MemoryProp
     for (u32 i = 0; i < availableTypes.memoryTypeCount; i++)
     {
         bool satisfiesTypeFilter = typeFilter & (1 << i);
-        bool hasRequiredFeatures = availableTypes.memoryTypes[i].propertyFlags == properties;
+        bool hasRequiredFeatures = (availableTypes.memoryTypes[i].propertyFlags & properties) == properties;
 
         if (satisfiesTypeFilter && hasRequiredFeatures)
         {

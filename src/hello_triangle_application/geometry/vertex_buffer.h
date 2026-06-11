@@ -3,5 +3,5 @@
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<Unit, std::string> createVertexBuffer(App& app);
+    Result<Unit, std::string> createBuffers(App& app);
 }

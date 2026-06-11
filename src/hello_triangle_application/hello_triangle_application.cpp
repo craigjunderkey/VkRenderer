@@ -12,6 +12,8 @@
 #include "utilities/draw.h"
 #include "geometry/vertex_buffer.h"
 
+#include <chrono>
+
 using namespace HelloTriangleApplication::Utilities;
 using namespace HelloTriangleApplication::Geometry;
 
@@ -48,15 +50,17 @@ namespace HelloTriangleApplication
         createImageViews(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();
-        createVertexBuffer(*this).unwrap();
+        createBuffers(*this).unwrap();
         createCommandBuffers(*this).unwrap();
         createSyncObjects(*this).unwrap();
+
+        std::cout << "Family index: g -> " << this->graphicsQueue.familyIndex << ", t ->" << this->transferQueue.familyIndex << std::endl;
     }
 
     void App::mainLoop()
     {
         std::cout << "Entering main loop\n";
-        
+
         while (!glfwWindowShouldClose(*this->window))
         {
             glfwPollEvents();

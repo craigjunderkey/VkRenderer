@@ -22,7 +22,7 @@ Result<Unit, std::string> createGraphicsCommandPool(App& app)
 Result<Unit, std::string> createTransferCommandPool(App& app)
 {
     vk::CommandPoolCreateInfo commandPoolCreateInfo {
-        .flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+        .flags = vk::CommandPoolCreateFlagBits::eTransient,
         .queueFamilyIndex = app.transferQueue.familyIndex
     };
 
