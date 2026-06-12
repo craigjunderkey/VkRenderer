@@ -7,8 +7,9 @@ using HelloTriangleApplication::App;
 using HelloTriangleApplication::Geometry::Vertex;
 using HelloTriangleApplication::Geometry::FatBuffer;
 using HelloTriangleApplication::Geometry::VERTICES;
+using HelloTriangleApplication::Geometry::INDICES;
 
-Result<Unit, std::string> createStagingBuffer(App& app)
+Result<FatBuffer, std::string> createStagingBuffer(App& app, void* sourceData, vk::DeviceSize size)
 {
     std::vector<u32> families = {
         app.graphicsQueue.familyIndex,
@@ -21,7 +22,7 @@ Result<Unit, std::string> createStagingBuffer(App& app)
         stagingBuffer,
         FatBuffer::create(
             app,
-            sizeof(VERTICES[0]) * VERTICES.size(),
+            size,
             vk::BufferUsageFlagBits::eTransferSrc,
             vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
             std::move(families)
@@ -32,17 +33,14 @@ Result<Unit, std::string> createStagingBuffer(App& app)
     void* data;
     TRY_ASSIGN(
         data,
-        castVkResult(stagingBuffer.memory.mapMemory(0, stagingBuffer.size))
+        castVkResult(stagingBuffer.memory.mapMemory(0, size))
     );
 
-    memcpy(data, VERTICES.data(), stagingBuffer.size);
+    memcpy(data, sourceData, size);
 
     stagingBuffer.memory.unmapMemory();
 
-    // store it in the app
-    app.stagingBuffer = std::move(stagingBuffer);
-
-    return Ok();
+    return std::move(stagingBuffer);
 }
 
 Result<Unit, std::string> createVertexBuffer(App& app)
@@ -67,6 +65,32 @@ Result<Unit, std::string> createVertexBuffer(App& app)
 
     // store it in the app
     app.vertexBuffer = std::move(vertexBuffer);
+
+    return Ok();
+}
+
+Result<Unit, std::string> createIndexBuffer(App& app)
+{
+    std::vector<u32> families = {
+        app.graphicsQueue.familyIndex,
+        app.transferQueue.familyIndex
+    };
+
+    // create the index buffer
+    FatBuffer indexBuffer;
+    TRY_ASSIGN(
+        indexBuffer,
+        FatBuffer::create(
+            app,
+            sizeof(u16) * INDICES.size(),
+            vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+            vk::MemoryPropertyFlagBits::eDeviceLocal,
+            std::move(families)
+        )
+    );
+
+    // store it in the app
+    app.indexBuffer = std::move(indexBuffer);
 
     return Ok();
 }
@@ -102,9 +126,23 @@ namespace HelloTriangleApplication::Geometry
 {
     Result<Unit, std::string> createBuffers(App& app)
     {
-        CHECK(createStagingBuffer(app));
+        // create vertex buffer
+        FatBuffer stagingBuffer;
+        TRY_ASSIGN(
+            stagingBuffer,
+            createStagingBuffer(app, (void*)VERTICES.data(), sizeof(VERTICES[0]) * VERTICES.size())
+        );
         CHECK(createVertexBuffer(app));
-        CHECK(copyBuffer(app, app.stagingBuffer, app.vertexBuffer));
+        CHECK(copyBuffer(app, stagingBuffer, app.vertexBuffer));
+
+        // create the index buffer
+        TRY_ASSIGN(
+            stagingBuffer,
+            createStagingBuffer(app, (void*)INDICES.data(), sizeof(u16) * INDICES.size())
+        );
+        CHECK(createIndexBuffer(app));
+        CHECK(copyBuffer(app, stagingBuffer, app.indexBuffer));
+
         return Ok();
     }
 }

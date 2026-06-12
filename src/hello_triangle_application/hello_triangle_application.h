@@ -50,8 +50,8 @@ namespace HelloTriangleApplication
         u32 frameIndex = 0;
 
         // geometry
-        FatBuffer stagingBuffer;
         FatBuffer vertexBuffer;
+        FatBuffer indexBuffer;
 
     private:
         void initWindow();
