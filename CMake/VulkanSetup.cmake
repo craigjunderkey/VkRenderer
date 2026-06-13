@@ -8,7 +8,7 @@ if(ENABLE_CPP20_MODULE)
   set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../CMake")
 
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
@@ -65,8 +65,8 @@ else()
   )
 endif()
 
-#!find_package(stb REQUIRED)
-#!set(STB_INCLUDEDIR ${stb_INCLUDE_DIRS})
+find_package(stb REQUIRED)
+set(STB_INCLUDEDIR ${stb_INCLUDE_DIRS})
 
 find_program(SLANGC_EXECUTABLE slangc HINTS $ENV{VULKAN_SDK}/bin REQUIRED)
 

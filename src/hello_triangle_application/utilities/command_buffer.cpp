@@ -4,47 +4,47 @@
 
 using HelloTriangleApplication::App;
 
-void transitionImageLayout(
-    App& app,
-    u32 imageIndex,
-    vk::ImageLayout oldLayout,
-    vk::ImageLayout newLayout,
-    vk::AccessFlags2 srcAccessMask,
-    vk::AccessFlags2 dstAccessMask,
-    vk::PipelineStageFlags2 srcStageMask,
-    vk::PipelineStageFlags2 dstStageMask
-)
-{
-    vk::ImageMemoryBarrier2 barrier {
-        .srcStageMask = srcStageMask,
-        .srcAccessMask = srcAccessMask,
-        .dstStageMask = dstStageMask,
-        .dstAccessMask = dstAccessMask,
-        .oldLayout = oldLayout,
-        .newLayout = newLayout,
-        .srcQueueFamilyIndex = vk::QueueFamilyIgnored,
-        .dstQueueFamilyIndex = vk::QueueFamilyIgnored,
-        .image = app.swapChainImages[imageIndex],
-        .subresourceRange = {
-            .aspectMask = vk::ImageAspectFlagBits::eColor,
-            .baseMipLevel = 0,
-            .levelCount = 1,
-            .baseArrayLayer = 0,
-            .layerCount = 1
-        }
-    };
-
-    vk::DependencyInfo dependencyInfo {
-        .dependencyFlags = {},
-        .imageMemoryBarrierCount = 1,
-        .pImageMemoryBarriers = &barrier,
-    };
-
-    app.graphicsQueue.commandBuffers[app.frameIndex].pipelineBarrier2(dependencyInfo);
-}
-
 namespace HelloTriangleApplication::Utilities
 {
+    void transitionImageLayout(
+        App& app,
+        u32 imageIndex,
+        vk::ImageLayout oldLayout,
+        vk::ImageLayout newLayout,
+        vk::AccessFlags2 srcAccessMask,
+        vk::AccessFlags2 dstAccessMask,
+        vk::PipelineStageFlags2 srcStageMask,
+        vk::PipelineStageFlags2 dstStageMask
+    )
+    {
+        vk::ImageMemoryBarrier2 barrier {
+            .srcStageMask = srcStageMask,
+            .srcAccessMask = srcAccessMask,
+            .dstStageMask = dstStageMask,
+            .dstAccessMask = dstAccessMask,
+            .oldLayout = oldLayout,
+            .newLayout = newLayout,
+            .srcQueueFamilyIndex = vk::QueueFamilyIgnored,
+            .dstQueueFamilyIndex = vk::QueueFamilyIgnored,
+            .image = app.swapChainImages[imageIndex],
+            .subresourceRange = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1
+            }
+        };
+
+        vk::DependencyInfo dependencyInfo {
+            .dependencyFlags = {},
+            .imageMemoryBarrierCount = 1,
+            .pImageMemoryBarriers = &barrier,
+        };
+
+        app.graphicsQueue.commandBuffers[app.frameIndex].pipelineBarrier2(dependencyInfo);
+    }
+    
     Result<Unit, std::string> createCommandBuffers(App& app)
     {
         vk::CommandBufferAllocateInfo allocInfo {
@@ -145,5 +145,81 @@ namespace HelloTriangleApplication::Utilities
         );
 
         commandBuffer.end();
+    }
+
+    Result<vk::raii::CommandBuffer, std::string> beginSingleTimeCommands(App& app, FatQueue& queue)
+    {
+        vk::CommandBufferAllocateInfo allocInfo {
+            .commandPool = *queue.commandPool,
+            .level = vk::CommandBufferLevel::ePrimary,
+            .commandBufferCount = 1
+        };
+
+        auto buffersResult = castVkResult(app.device.allocateCommandBuffers(allocInfo));
+        if (!buffersResult)
+            return Err<std::string>(buffersResult.error());
+        vk::raii::CommandBuffer commandBuffer = std::move(buffersResult.take().front());
+
+        vk::CommandBufferBeginInfo beginInfo {
+            .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit
+        };
+        commandBuffer.begin(beginInfo);
+
+        return std::move(commandBuffer);
+    }
+
+    void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer, FatQueue& queue)
+    {
+        commandBuffer.end();
+        vk::SubmitInfo submitInfo {
+            .commandBufferCount = 1,
+            .pCommandBuffers = &*commandBuffer
+        };
+        queue.queue.submit(submitInfo, nullptr);
+        queue.queue.waitIdle();
+    }
+
+    Result<Unit, std::string> transitionImageLayout(vk::raii::CommandBuffer &commandBuffer, const vk::raii::Image &image,
+        vk::ImageLayout oldLayout, vk::ImageLayout newLayout, u32 srcFamily, u32 dstFamily)
+    {
+        vk::ImageMemoryBarrier barrier {
+            .oldLayout = oldLayout,
+            .newLayout = newLayout,
+            .srcQueueFamilyIndex = vk::QueueFamilyIgnored,
+            .dstQueueFamilyIndex = vk::QueueFamilyIgnored,
+            .image = image,
+            .subresourceRange = {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .levelCount = 1,
+                .layerCount = 1
+            }
+        };
+
+        vk::PipelineStageFlags sourceStage, destinationStage;
+
+        if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eTransferDstOptimal)
+        {
+            barrier.srcAccessMask = {};
+            barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+
+            sourceStage      = vk::PipelineStageFlagBits::eTopOfPipe;
+            destinationStage = vk::PipelineStageFlagBits::eTransfer;
+        }
+        else if (oldLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal)
+        {
+            barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+            barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+
+            sourceStage      = vk::PipelineStageFlagBits::eTransfer;
+            destinationStage = vk::PipelineStageFlagBits::eFragmentShader;
+        }
+        else
+        {
+            return Err<std::string>("Unsupported layout transition.");
+        }
+
+        commandBuffer.pipelineBarrier(sourceStage, destinationStage, {}, {}, nullptr, barrier);
+
+        return Ok();
     }
 }

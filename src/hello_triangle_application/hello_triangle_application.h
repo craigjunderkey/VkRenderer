@@ -10,10 +10,12 @@
 #include "window.h"
 #include "utilities/queue.h"
 #include "geometry/buffer.h"
+#include "geometry/texture.h"
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Geometry::FatBuffer;
 using HelloTriangleApplication::Geometry::MappedBuffer;
+using HelloTriangleApplication::Geometry::Texture;
 
 namespace HelloTriangleApplication
 {
@@ -57,6 +59,7 @@ namespace HelloTriangleApplication
         std::vector<MappedBuffer> uniformBuffers = {};
         vk::raii::DescriptorPool descriptorPool = nullptr;
         std::vector<vk::raii::DescriptorSet> descriptorSets = {};
+        Texture texture;
 
     private:
         void initWindow();

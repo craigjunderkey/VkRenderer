@@ -40,4 +40,7 @@ namespace HelloTriangleApplication::Geometry
 
         static Result<MappedBuffer, std::string> fromFatBufferResult(Result<FatBuffer, std::string>&& fatBufferResult);
     };
+
+    Result<vk::raii::DeviceMemory, std::string> allocateMemory(App& app, vk::raii::Buffer& buffer, vk::MemoryPropertyFlags properties);
+    Result<u32, std::string> findMemoryType(App& app, u32 typeFilter, vk::MemoryPropertyFlags properties);
 }

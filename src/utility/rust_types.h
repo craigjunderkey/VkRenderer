@@ -18,7 +18,7 @@ inline void panic(std::string message)
     std::exit(EXIT_FAILURE);
 }
 
-inline void print(const char* message)
+inline void println(const char* message)
 {
     std::cout << message << std::endl;
 }

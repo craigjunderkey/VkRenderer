@@ -3,47 +3,47 @@
 
 using HelloTriangleApplication::App;
 
-Result<u32, std::string> findMemoryType(App& app, u32 typeFilter, vk::MemoryPropertyFlags properties)
-{
-    vk::PhysicalDeviceMemoryProperties availableTypes = app.physicalDevice.getMemoryProperties();
-
-    for (u32 i = 0; i < availableTypes.memoryTypeCount; i++)
-    {
-        bool satisfiesTypeFilter = typeFilter & (1 << i);
-        bool hasRequiredFeatures = (availableTypes.memoryTypes[i].propertyFlags & properties) == properties;
-
-        if (satisfiesTypeFilter && hasRequiredFeatures)
-        {
-            return i;
-        }
-    }
-
-    return Err<std::string>("Failed to find suitable memory type.");
-}
-
-Result<vk::raii::DeviceMemory, std::string> allocateMemory(App& app, vk::raii::Buffer& buffer, vk::MemoryPropertyFlags properties)
-{
-    vk::MemoryRequirements memRequirements = buffer.getMemoryRequirements();
-
-    Result<u32, std::string> memTypeIndex = findMemoryType(
-        app,
-        memRequirements.memoryTypeBits,
-        properties
-    );
-
-    if (!memTypeIndex)
-        return Err<std::string>(memTypeIndex.error());
-
-    vk::MemoryAllocateInfo memAllocateInfo {
-        .allocationSize = memRequirements.size,
-        .memoryTypeIndex = memTypeIndex.value()
-    };
-
-    return std::move(castVkResult(app.device.allocateMemory(memAllocateInfo)));
-}
-
 namespace HelloTriangleApplication::Geometry
 {
+    Result<u32, std::string> findMemoryType(App& app, u32 typeFilter, vk::MemoryPropertyFlags properties)
+    {
+        vk::PhysicalDeviceMemoryProperties availableTypes = app.physicalDevice.getMemoryProperties();
+
+        for (u32 i = 0; i < availableTypes.memoryTypeCount; i++)
+        {
+            bool satisfiesTypeFilter = typeFilter & (1 << i);
+            bool hasRequiredFeatures = (availableTypes.memoryTypes[i].propertyFlags & properties) == properties;
+
+            if (satisfiesTypeFilter && hasRequiredFeatures)
+            {
+                return i;
+            }
+        }
+
+        return Err<std::string>("Failed to find suitable memory type.");
+    }
+
+    Result<vk::raii::DeviceMemory, std::string> allocateMemory(App& app, vk::raii::Buffer& buffer, vk::MemoryPropertyFlags properties)
+    {
+        vk::MemoryRequirements memRequirements = buffer.getMemoryRequirements();
+
+        Result<u32, std::string> memTypeIndex = findMemoryType(
+            app,
+            memRequirements.memoryTypeBits,
+            properties
+        );
+
+        if (!memTypeIndex)
+            return Err<std::string>(memTypeIndex.error());
+
+        vk::MemoryAllocateInfo memAllocateInfo {
+            .allocationSize = memRequirements.size,
+            .memoryTypeIndex = memTypeIndex.value()
+        };
+
+        return std::move(castVkResult(app.device.allocateMemory(memAllocateInfo)));
+    }
+    
     Result<FatBuffer, std::string> FatBuffer::create(
         App& app,
         vk::DeviceSize size,
