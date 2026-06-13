@@ -179,7 +179,7 @@ namespace HelloTriangleApplication::Utilities
         queue.queue.waitIdle();
     }
 
-    Result<Unit, std::string> transitionImageLayout(vk::raii::CommandBuffer &commandBuffer, const vk::raii::Image &image,
+    Result<Unit, std::string> transitionImageLayout(vk::raii::CommandBuffer &commandBuffer, const vk::Image &image,
         vk::ImageLayout oldLayout, vk::ImageLayout newLayout, u32 srcFamily, u32 dstFamily)
     {
         vk::ImageMemoryBarrier barrier {

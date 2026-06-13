@@ -54,6 +54,7 @@ namespace HelloTriangleApplication
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();
         this->texture = Texture::load(*this, TEXTURE_PATH).unwrap();
+        this->texture.makeSampler(*this).unwrap();
         createBuffers(*this).unwrap();
         createUniformBuffers(*this).unwrap();
         createDescriptorPool(*this).unwrap();

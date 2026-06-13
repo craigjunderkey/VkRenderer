@@ -78,7 +78,7 @@ namespace HelloTriangleApplication::Utilities
             vk::PhysicalDeviceVulkan13Features,
             vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT> featureChain =
         {
-            {},                                                     // vk::PhysicalDeviceFeatures2 (empty for now)
+            {.features = { .samplerAnisotropy = true }},            // vk::PhysicalDeviceFeatures2
             {.shaderDrawParameters = true},                         // enable shader draw parameters from Vulkan 1.1
             {.synchronization2 = true, .dynamicRendering = true},   // enable dynamic rendering from Vulkan 1.3
             {.extendedDynamicState = true}                          // enable extended dynamic state from the extension

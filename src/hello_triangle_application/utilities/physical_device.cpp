@@ -44,7 +44,8 @@ Result<bool, std::string> isDeviceSuitable(const vk::raii::PhysicalDevice& devic
     bool supportsAllRequiredFeatures =
         features.get<vk::PhysicalDeviceVulkan11Features>().shaderDrawParameters &&
         features.get<vk::PhysicalDeviceVulkan13Features>().dynamicRendering &&
-        features.get<vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>().extendedDynamicState;
+        features.get<vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>().extendedDynamicState &&
+        features.get<vk::PhysicalDeviceFeatures2>().features.samplerAnisotropy;
     if (!supportsAllRequiredFeatures) return false;
 
     return true;

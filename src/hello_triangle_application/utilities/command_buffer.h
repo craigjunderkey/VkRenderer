@@ -10,6 +10,6 @@ namespace HelloTriangleApplication::Utilities
     Result<vk::raii::CommandBuffer, std::string> beginSingleTimeCommands(App& app, FatQueue& queue);
     void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer, FatQueue& queue);
     Result<Unit, std::string> transitionImageLayout(vk::raii::CommandBuffer &commandBuffer, 
-        const vk::raii::Image &image, vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
+        const vk::Image &image, vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
         u32 srcFamily = vk::QueueFamilyIgnored, u32 dstFamily = vk::QueueFamilyIgnored);
 }

@@ -5,11 +5,43 @@
 #include "buffer.h"
 #include "../utilities/command_buffer.h"
 #include "vertex_buffer.h"
+#include "../utilities/image_views.h"
 
 using namespace HelloTriangleApplication::Utilities;
 
 namespace HelloTriangleApplication::Geometry
 {
+    Result<Unit, std::string> Texture::makeSampler(App& app)
+    {
+        vk::PhysicalDeviceProperties deviceProperties = app.physicalDevice.getProperties();
+
+        vk::SamplerCreateInfo samplerInfo {
+            .magFilter = vk::Filter::eLinear,
+            .minFilter = vk::Filter::eLinear,
+            .mipmapMode = vk::SamplerMipmapMode::eLinear,
+            .addressModeU = vk::SamplerAddressMode::eRepeat,
+            .addressModeV = vk::SamplerAddressMode::eRepeat,
+            .addressModeW = vk::SamplerAddressMode::eRepeat,
+            .mipLodBias = 0.0f,
+            .anisotropyEnable = vk::True,
+            .maxAnisotropy = deviceProperties.limits.maxSamplerAnisotropy,
+            .compareEnable = vk::False,
+            .compareOp = vk::CompareOp::eAlways,
+            .minLod = 0.0f,
+            .maxLod = 0.0f,
+            .borderColor = vk::BorderColor::eIntOpaqueBlack,
+            .unnormalizedCoordinates = vk::False
+        };
+
+        auto samplerResult = castVkResult(app.device.createSampler(samplerInfo));
+        if (!samplerResult)
+            return Err<std::string>("Failed to create texture sampler.");
+        
+        this->sampler = std::make_shared<vk::raii::Sampler>(samplerResult.take());
+
+        return Ok();
+    }
+
     Result<Texture, std::string> Texture::load(App& app, std::string path, vk::Format format,
         vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties)
     {
@@ -97,6 +129,12 @@ namespace HelloTriangleApplication::Geometry
         transitionImageLayout(copyCommand, texture.image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
         
         endSingleTimeCommands(std::move(copyCommand), app.graphicsQueue);
+
+        // create image view
+        TRY_ASSIGN(
+            texture.view,
+            createImageView(app, texture.image, format)
+        );
 
         return std::move(texture);
     }
