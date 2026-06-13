@@ -2,19 +2,33 @@ struct VSInput
 {
     float2 inPosition;
     float3 inColor;
-}
+};
+
+struct MVP
+{
+    float4x4 model;
+    float4x4 view;
+    float4x4 projection;
+};
+ConstantBuffer<MVP> mvp;
 
 struct VSOutput
 {
     float4 pos : SV_POSITION;
     float3 color;
-}
+};
 
 [shader("vertex")]
 VSOutput vertMain(VSInput input)
 {
     VSOutput output;
-    output.pos = float4(input.inPosition, 0.0, 1.0);
+    
+    output.pos = mul(mvp.projection,
+        mul(mvp.view,
+            mul(mvp.model, float4(input.inPosition, 0.0, 1.0))
+        )
+    );
+
     output.color = input.inColor;
     return output;
 }

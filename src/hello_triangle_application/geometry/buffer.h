@@ -9,6 +9,8 @@ namespace HelloTriangleApplication
 
 namespace HelloTriangleApplication::Geometry
 {
+    struct MappedBuffer;
+    
     struct FatBuffer
     {
         vk::raii::Buffer buffer = nullptr;
@@ -25,5 +27,17 @@ namespace HelloTriangleApplication::Geometry
             vk::MemoryPropertyFlags properties,
             Option<std::vector<u32>> families = None()
         );
+
+        Result<MappedBuffer, std::string> makeMapped();
+    };
+
+    struct MappedBuffer
+    {
+        FatBuffer buffer = {};
+        void* data = nullptr;
+
+        FatBuffer& operator*() { return this->buffer; }
+
+        static Result<MappedBuffer, std::string> fromFatBufferResult(Result<FatBuffer, std::string>&& fatBufferResult);
     };
 }

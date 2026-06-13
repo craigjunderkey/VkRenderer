@@ -13,6 +13,7 @@
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Geometry::FatBuffer;
+using HelloTriangleApplication::Geometry::MappedBuffer;
 
 namespace HelloTriangleApplication
 {
@@ -40,6 +41,7 @@ namespace HelloTriangleApplication
         std::vector<u32> swapChainFamilies;
 
         // graphics pipeline
+        vk::raii::DescriptorSetLayout descriptorSetLayout = nullptr;
         vk::raii::PipelineLayout pipelineLayout = nullptr;
         vk::raii::Pipeline graphicsPipeline = nullptr;
 
@@ -52,6 +54,9 @@ namespace HelloTriangleApplication
         // geometry
         FatBuffer vertexBuffer;
         FatBuffer indexBuffer;
+        std::vector<MappedBuffer> uniformBuffers = {};
+        vk::raii::DescriptorPool descriptorPool = nullptr;
+        std::vector<vk::raii::DescriptorSet> descriptorSets = {};
 
     private:
         void initWindow();

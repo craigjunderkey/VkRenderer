@@ -115,7 +115,7 @@ namespace HelloTriangleApplication::Utilities
             .rasterizerDiscardEnable = false,
             .polygonMode = vk::PolygonMode::eFill,
             .cullMode = vk::CullModeFlagBits::eBack,
-            .frontFace = vk::FrontFace::eClockwise,
+            .frontFace = vk::FrontFace::eCounterClockwise,
             .depthBiasEnable = false,
             .lineWidth = 1.0f
         };
@@ -147,7 +147,8 @@ namespace HelloTriangleApplication::Utilities
 
         // pipeline layout
         vk::PipelineLayoutCreateInfo pipelineLayoutInfo {
-            .setLayoutCount = 0,
+            .setLayoutCount = 1,
+            .pSetLayouts = &*app.descriptorSetLayout,
             .pushConstantRangeCount = 0
         };
         TRY_ASSIGN(

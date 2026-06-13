@@ -18,6 +18,11 @@ inline void panic(std::string message)
     std::exit(EXIT_FAILURE);
 }
 
+inline void print(const char* message)
+{
+    std::cout << message << std::endl;
+}
+
 
 // result
 template <typename T, typename E>

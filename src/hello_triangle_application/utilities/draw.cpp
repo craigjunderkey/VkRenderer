@@ -2,6 +2,7 @@
 #include "draw.h"
 #include "command_buffer.h"
 #include "swap_chain.h"
+#include "../geometry/uniform_buffer.h"
 
 using HelloTriangleApplication::App;
 
@@ -61,6 +62,8 @@ namespace HelloTriangleApplication::Utilities
 
         // since we have the index of the incoming image, prepare our command buffer for drawing to it
         app.graphicsQueue.commandBuffers[app.frameIndex].reset();
+
+        HelloTriangleApplication::Geometry::updateUniformBuffer(app, app.frameIndex);
         recordCommandBuffer(app, imageIndex);
 
         // submit draw call
@@ -78,7 +81,7 @@ namespace HelloTriangleApplication::Utilities
         vk::Result submitResult = app.graphicsQueue.queue.submit(submitInfo, *app.inFlightFences[app.frameIndex]);
         if (submitResult != vk::Result::eSuccess)
             return Err<std::string>("Failed to submit render request.");
-        
+
         // present the frame
         vk::PresentInfoKHR presentInfo = {
             .waitSemaphoreCount = 1,

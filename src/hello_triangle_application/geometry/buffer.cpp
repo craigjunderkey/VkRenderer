@@ -81,4 +81,26 @@ namespace HelloTriangleApplication::Geometry
 
         return std::move(buffer);
     }
+
+    Result<MappedBuffer, std::string> FatBuffer::makeMapped()
+    {
+        void* data;
+        TRY_ASSIGN(
+            data,
+            castVkResult(this->memory.mapMemory(0, this->size))
+        );
+        
+        return MappedBuffer {
+            .buffer = std::move(*this),
+            .data = data
+        };
+    }
+
+    Result<MappedBuffer, std::string> MappedBuffer::fromFatBufferResult(Result<FatBuffer, std::string>&& fatBufferResult)
+    {
+        if (!fatBufferResult)
+            return Err<std::string>(fatBufferResult.error());
+        
+        return fatBufferResult.take().makeMapped();
+    }
 }
