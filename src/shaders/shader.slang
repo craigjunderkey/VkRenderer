@@ -1,6 +1,6 @@
 struct VSInput
 {
-    float2 inPosition;
+    float3 inPosition;
     float3 inColor;
     float2 texCoord;
 };
@@ -29,7 +29,7 @@ VSOutput vertMain(VSInput input)
     
     output.pos = mul(mvp.projection,
         mul(mvp.view,
-            mul(mvp.model, float4(input.inPosition, 0.0, 1.0))
+            mul(mvp.model, float4(input.inPosition, 1.0))
         )
     );
 

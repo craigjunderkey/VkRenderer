@@ -9,6 +9,8 @@ import vulkan_hpp;
 
 #define GLFW_INCLUDE_VULKAN
 
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
 #include <vulkan/vk_enum_string_helper.h>
 #include "common.h"
 

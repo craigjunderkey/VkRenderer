@@ -60,6 +60,7 @@ namespace HelloTriangleApplication
         vk::raii::DescriptorPool descriptorPool = nullptr;
         std::vector<vk::raii::DescriptorSet> descriptorSets = {};
         Texture texture;
+        Texture depthTexture;
 
     private:
         void initWindow();

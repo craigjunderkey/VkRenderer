@@ -42,7 +42,7 @@ namespace HelloTriangleApplication::Geometry
         return Ok();
     }
 
-    Result<Texture, std::string> Texture::load(App& app, std::string path, vk::Format format,
+    Result<Texture, std::string> Texture::loadFromFile(App& app, std::string path, vk::Format format,
         vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties)
     {
         // load image into main memory
@@ -76,11 +76,44 @@ namespace HelloTriangleApplication::Geometry
         // free copy of image in main memory
         stbi_image_free(pixels);
 
-        return Texture::create(app, texWidth, texHeight, imageBuffer, format, tiling, usage, properties);
+        return Texture::loadFromBuffer(app, texWidth, texHeight, imageBuffer, format, tiling, usage, properties);
     }
 
-    Result<Texture, std::string> Texture::create(App& app, u32 width, u32 height, FatBuffer& imageBuffer,
+    Result<Texture, std::string> Texture::loadFromBuffer(App& app, u32 width, u32 height, FatBuffer& imageBuffer,
         vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties)
+    {
+        // create GPU-backed image
+        Texture texture;
+        TRY_ASSIGN(
+            texture,
+            Texture::create(app, width, height, format, tiling, usage, properties)
+        );
+
+        // copy buffer to image
+        // TODO: use transfer queue
+        vk::raii::CommandBuffer copyCommand = nullptr;
+        TRY_ASSIGN(
+            copyCommand,
+            beginSingleTimeCommands(app, app.graphicsQueue)
+        );
+
+        transitionImageLayout(copyCommand, texture.image, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
+        copyBufferToImage(copyCommand, imageBuffer.buffer, texture.image, width, height);
+        transitionImageLayout(copyCommand, texture.image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+        
+        endSingleTimeCommands(std::move(copyCommand), app.graphicsQueue);
+
+        // create image view
+        TRY_ASSIGN(
+            texture.view,
+            createImageView(app, texture.image, format)
+        );
+
+        return std::move(texture);
+    }
+
+    Result<Texture, std::string> Texture::create(App& app, u32 width, u32 height, vk::Format format,
+            vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties)
     {
         // create GPU-backed image
         vk::ImageCreateInfo imageInfo {
@@ -115,26 +148,6 @@ namespace HelloTriangleApplication::Geometry
         );
 
         texture.image.bindMemory(texture.memory, 0);
-
-        // copy buffer to image
-        // TODO: use transfer queue
-        vk::raii::CommandBuffer copyCommand = nullptr;
-        TRY_ASSIGN(
-            copyCommand,
-            beginSingleTimeCommands(app, app.graphicsQueue)
-        );
-
-        transitionImageLayout(copyCommand, texture.image, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
-        copyBufferToImage(copyCommand, imageBuffer.buffer, texture.image, width, height);
-        transitionImageLayout(copyCommand, texture.image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
-        
-        endSingleTimeCommands(std::move(copyCommand), app.graphicsQueue);
-
-        // create image view
-        TRY_ASSIGN(
-            texture.view,
-            createImageView(app, texture.image, format)
-        );
 
         return std::move(texture);
     }
