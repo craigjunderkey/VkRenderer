@@ -2,6 +2,14 @@ struct VSInput
 {
     float2 inPosition;
     float3 inColor;
+    float2 texCoord;
+};
+
+struct VSOutput
+{
+    float4 pos : SV_POSITION;
+    float3 color;
+    float2 fragTexCoord;
 };
 
 struct MVP
@@ -12,11 +20,7 @@ struct MVP
 };
 ConstantBuffer<MVP> mvp;
 
-struct VSOutput
-{
-    float4 pos : SV_POSITION;
-    float3 color;
-};
+Sampler2D texture;
 
 [shader("vertex")]
 VSOutput vertMain(VSInput input)
@@ -30,11 +34,13 @@ VSOutput vertMain(VSInput input)
     );
 
     output.color = input.inColor;
+    output.fragTexCoord = input.texCoord;
+
     return output;
 }
 
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_Target
 {
-    return float4(vertIn.color, 1.0);
+    return float4(vertIn.color * texture.Sample(vertIn.fragTexCoord).rgb, 1.0);
 }

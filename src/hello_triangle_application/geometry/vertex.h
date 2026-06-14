@@ -8,16 +8,17 @@ namespace HelloTriangleApplication::Geometry
     {
         vec2 pos;
         vec3 color;
+        vec2 texCoord;
 
         static vk::VertexInputBindingDescription bindingDescription();
-        static std::array<vk::VertexInputAttributeDescription, 2> attributeDescriptions();
+        static std::array<vk::VertexInputAttributeDescription, 3> attributeDescriptions();
     };
 
     const std::vector<Vertex> VERTICES = {
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+        {{-0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+        {{0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
+        {{0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
     };
 
     const std::vector<u16> INDICES = {

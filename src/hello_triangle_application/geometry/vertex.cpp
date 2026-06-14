@@ -16,7 +16,7 @@ namespace HelloTriangleApplication::Geometry
         };
     }
 
-    std::array<vk::VertexInputAttributeDescription, 2> Vertex::attributeDescriptions()
+    std::array<vk::VertexInputAttributeDescription, 3> Vertex::attributeDescriptions()
     {
         return {
             vk::VertexInputAttributeDescription {
@@ -30,6 +30,12 @@ namespace HelloTriangleApplication::Geometry
                 .binding = 0,
                 .format = vkFloat3,
                 .offset = offsetof(Vertex, color)
+            },
+            vk::VertexInputAttributeDescription {
+                .location = 2,
+                .binding = 0,
+                .format = vkFloat2,
+                .offset = offsetof(Vertex, texCoord)
             }
         };
     }

@@ -6,16 +6,22 @@ namespace HelloTriangleApplication::Geometry
 {
     Result<Unit, std::string> createDescriptorPool(App& app)
     {
-        vk::DescriptorPoolSize poolSize {
-            .type = vk::DescriptorType::eUniformBuffer,
-            .descriptorCount = MAX_FRAMES_IN_FLIGHT
+        std::array<vk::DescriptorPoolSize, 2> poolSizes {
+            vk::DescriptorPoolSize {
+                .type = vk::DescriptorType::eUniformBuffer,
+                .descriptorCount = MAX_FRAMES_IN_FLIGHT
+            },
+            vk::DescriptorPoolSize {
+                .type = vk::DescriptorType::eCombinedImageSampler,
+                .descriptorCount = MAX_FRAMES_IN_FLIGHT
+            }
         };
 
         vk::DescriptorPoolCreateInfo poolInfo {
             .flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
             .maxSets = MAX_FRAMES_IN_FLIGHT,
-            .poolSizeCount = 1,
-            .pPoolSizes = &poolSize
+            .poolSizeCount = (u32)poolSizes.size(),
+            .pPoolSizes = poolSizes.data()
         };
 
         TRY_ASSIGN(
@@ -48,15 +54,33 @@ namespace HelloTriangleApplication::Geometry
                 .offset = 0,
                 .range = vk::WholeSize
             };
-            vk::WriteDescriptorSet descriptorWrite {
-                .dstSet = *app.descriptorSets[i],
-                .dstBinding = 0,
-                .dstArrayElement = 0,
-                .descriptorCount = 1,
-                .descriptorType = vk::DescriptorType::eUniformBuffer,
-                .pBufferInfo = &bufferInfo
+
+            vk::DescriptorImageInfo imageInfo {
+                .sampler = *app.texture.sampler,
+                .imageView = *app.texture.view,
+                .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
             };
-            app.device.updateDescriptorSets(descriptorWrite, {});
+
+            std::array<vk::WriteDescriptorSet, 2> descriptorWrites {
+                vk::WriteDescriptorSet {
+                    .dstSet = *app.descriptorSets[i],
+                    .dstBinding = 0,
+                    .dstArrayElement = 0,
+                    .descriptorCount = 1,
+                    .descriptorType = vk::DescriptorType::eUniformBuffer,
+                    .pBufferInfo = &bufferInfo
+                },
+                vk::WriteDescriptorSet {
+                    .dstSet = *app.descriptorSets[i],
+                    .dstBinding = 1,
+                    .dstArrayElement = 0,
+                    .descriptorCount = 1,
+                    .descriptorType = vk::DescriptorType::eCombinedImageSampler,
+                    .pImageInfo = &imageInfo
+                }
+            };
+
+            app.device.updateDescriptorSets(descriptorWrites, {});
         }
 
         return Ok();
