@@ -6,15 +6,17 @@ using HelloTriangleApplication::App;
 
 namespace HelloTriangleApplication::Utilities
 {
-    void transitionImageLayout(
+    void stageTransitionImageLayout(
         App& app,
-        u32 imageIndex,
+        const vk::Image& image,
+        vk::raii::CommandBuffer& commandBuffer,
         vk::ImageLayout oldLayout,
         vk::ImageLayout newLayout,
         vk::AccessFlags2 srcAccessMask,
         vk::AccessFlags2 dstAccessMask,
         vk::PipelineStageFlags2 srcStageMask,
-        vk::PipelineStageFlags2 dstStageMask
+        vk::PipelineStageFlags2 dstStageMask,
+        vk::ImageAspectFlags imageAspectFlags
     )
     {
         vk::ImageMemoryBarrier2 barrier {
@@ -26,9 +28,9 @@ namespace HelloTriangleApplication::Utilities
             .newLayout = newLayout,
             .srcQueueFamilyIndex = vk::QueueFamilyIgnored,
             .dstQueueFamilyIndex = vk::QueueFamilyIgnored,
-            .image = app.swapChainImages[imageIndex],
+            .image = image,
             .subresourceRange = {
-                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .aspectMask = imageAspectFlags,
                 .baseMipLevel = 0,
                 .levelCount = 1,
                 .baseArrayLayer = 0,
@@ -42,7 +44,7 @@ namespace HelloTriangleApplication::Utilities
             .pImageMemoryBarriers = &barrier,
         };
 
-        app.graphicsQueue.commandBuffers[app.frameIndex].pipelineBarrier2(dependencyInfo);
+        commandBuffer.pipelineBarrier2(dependencyInfo);
     }
     
     Result<Unit, std::string> createCommandBuffers(App& app)
@@ -67,29 +69,48 @@ namespace HelloTriangleApplication::Utilities
         
         commandBuffer.begin({});
 
-        // before we start rendering, transition to color attachment optimal image layout
-        transitionImageLayout(
+        // before we start rendering, color attachment image to optimal layout
+        stageTransitionImageLayout(
             app,
-            imageIndex,
+            app.swapChainImages[imageIndex],
+            app.graphicsQueue.commandBuffers[app.frameIndex],
             vk::ImageLayout::eUndefined,
             vk::ImageLayout::eColorAttachmentOptimal,
             {},
             vk::AccessFlagBits2::eColorAttachmentWrite,
             vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-            vk::PipelineStageFlagBits2::eColorAttachmentOutput
+            vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+            vk::ImageAspectFlagBits::eColor
+        );
+
+        // then transition depth image to optimal layout
+        stageTransitionImageLayout(
+            app, app.depthTexture.image, app.graphicsQueue.commandBuffers[app.frameIndex],
+            vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthAttachmentOptimal,
+            vk::AccessFlagBits2::eDepthStencilAttachmentWrite, vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
+            vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+            vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+            vk::ImageAspectFlagBits::eDepth
         );
 
         // set up the color attachment
-        vk::ArrayWrapper1D<f32, 4> clearColor(CLEAR_COLOR);
-        vk::ClearColorValue clearColorValue(std::move(clearColor));
-        vk::ClearValue clearValue { .color = std::move(clearColorValue) };
-
-        vk::RenderingAttachmentInfo attachmentInfo {
+        vk::ClearValue clearColor { .color = vk::ClearColorValue(CLEAR_COLOR) };
+        vk::RenderingAttachmentInfo colorAttachment {
             .imageView = app.swapChainImageViews[imageIndex],
             .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
             .loadOp = vk::AttachmentLoadOp::eClear,
             .storeOp = vk::AttachmentStoreOp::eStore,
-            .clearValue = clearValue
+            .clearValue = clearColor
+        };
+
+        // set up the depth attachment
+        vk::ClearValue clearDepth { .depthStencil = {1.0f, 0} };
+        vk::RenderingAttachmentInfo depthAttachment {
+            .imageView = app.depthTexture.view,
+            .imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
+            .loadOp = vk::AttachmentLoadOp::eClear,
+            .storeOp = vk::AttachmentStoreOp::eDontCare,
+            .clearValue = clearDepth
         };
 
         // set up rendering info
@@ -100,7 +121,8 @@ namespace HelloTriangleApplication::Utilities
             },
             .layerCount = 1,
             .colorAttachmentCount = 1,
-            .pColorAttachments = &attachmentInfo
+            .pColorAttachments = &colorAttachment,
+            .pDepthAttachment = &depthAttachment
         };
 
         // begin rendering
@@ -133,15 +155,17 @@ namespace HelloTriangleApplication::Utilities
         commandBuffer.endRendering();
 
         // after rendering, transition the image layout to one that can be presented
-        transitionImageLayout(
+        stageTransitionImageLayout(
             app,
-            imageIndex,
+            app.swapChainImages[imageIndex],
+            app.graphicsQueue.commandBuffers[app.frameIndex],
             vk::ImageLayout::eColorAttachmentOptimal,
             vk::ImageLayout::ePresentSrcKHR,
             vk::AccessFlagBits2::eColorAttachmentWrite,
             {},
             vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-            vk::PipelineStageFlagBits2::eBottomOfPipe
+            vk::PipelineStageFlagBits2::eBottomOfPipe,
+            vk::ImageAspectFlagBits::eColor
         );
 
         commandBuffer.end();
@@ -179,7 +203,7 @@ namespace HelloTriangleApplication::Utilities
         queue.queue.waitIdle();
     }
 
-    Result<Unit, std::string> transitionImageLayout(vk::raii::CommandBuffer &commandBuffer, const vk::Image &image,
+    Result<Unit, std::string> transitionImageLayout(vk::raii::CommandBuffer& commandBuffer, const vk::Image& image,
         vk::ImageLayout oldLayout, vk::ImageLayout newLayout, u32 srcFamily, u32 dstFamily)
     {
         vk::ImageMemoryBarrier barrier {

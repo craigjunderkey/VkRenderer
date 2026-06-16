@@ -52,9 +52,9 @@ namespace HelloTriangleApplication
         createSwapChain(*this).unwrap();
         createImageViews(*this).unwrap();
         createDescriptorSetLayout(*this).unwrap();
+        createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();
-        createDepthTexture(*this).unwrap();
         this->texture = Texture::loadFromFile(*this, TEXTURE_PATH).unwrap();
         this->texture.makeSampler(*this).unwrap();
         createBuffers(*this).unwrap();

@@ -55,10 +55,10 @@ namespace HelloTriangleApplication::Utilities
         // make programmable stages
         std::vector<char> shaderCode;
         TRY_ASSIGN(shaderCode, readFile(SHADER_PATH));
-
+        
         vk::raii::ShaderModule shaderModule = nullptr;
         TRY_ASSIGN(shaderModule, createShaderModule(app, std::move(shaderCode)));
-
+        
         vk::PipelineShaderStageCreateInfo vertShaderStageInfo {
             .stage = vk::ShaderStageFlagBits::eVertex,
             .module = shaderModule,
@@ -126,6 +126,15 @@ namespace HelloTriangleApplication::Utilities
             .sampleShadingEnable = false
         };
 
+        // depth stencil state
+        vk::PipelineDepthStencilStateCreateInfo depthStencilStateInfo {
+            .depthTestEnable = vk::True,
+            .depthWriteEnable = vk::True,
+            .depthCompareOp = vk::CompareOp::eLess,
+            .depthBoundsTestEnable = vk::False,
+            .stencilTestEnable = vk::False
+        };
+
         // color blending
         vk::PipelineColorBlendAttachmentState colorBlendAttachment {
             .blendEnable = true,
@@ -159,7 +168,9 @@ namespace HelloTriangleApplication::Utilities
         // make the pipeline
         vk::PipelineRenderingCreateInfo pipelineRenderingInfo {
             .colorAttachmentCount = 1,
-            .pColorAttachmentFormats = &app.swapChainFormat.format
+            .pColorAttachmentFormats = &app.swapChainFormat.format,
+            .depthAttachmentFormat = app.depthTexture.format,
+            .stencilAttachmentFormat = vk::Format::eUndefined
         };
         vk::GraphicsPipelineCreateInfo graphicsPipelineInfo {
             .pNext = &pipelineRenderingInfo,
@@ -170,6 +181,7 @@ namespace HelloTriangleApplication::Utilities
             .pViewportState = &viewportStateInfo,
             .pRasterizationState = &rasterizationStateInfo,
             .pMultisampleState = &multisampleStateInfo,
+            .pDepthStencilState = &depthStencilStateInfo,
             .pColorBlendState = &colorBlending,
             .pDynamicState = &dynamicStateInfo,
             .layout = app.pipelineLayout,

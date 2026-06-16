@@ -1,6 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "swap_chain.h"
 #include "image_views.h"
+#include "../geometry/depth_resources.h"
 
 using HelloTriangleApplication::App;
 
@@ -172,6 +173,7 @@ namespace HelloTriangleApplication::Utilities
         CHECK(cleanupSwapChain(app));
         CHECK(createSwapChain(app));
         CHECK(createImageViews(app));
+        CHECK(Geometry::createDepthTexture(app));
 
         return Ok();
     }

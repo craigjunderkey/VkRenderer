@@ -43,7 +43,7 @@ namespace HelloTriangleApplication::Geometry
     }
 
     Result<Texture, std::string> Texture::loadFromFile(App& app, std::string path, vk::Format format,
-        vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties)
+        vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags)
     {
         // load image into main memory
         i32 texWidth, texHeight, texChannels;
@@ -76,17 +76,17 @@ namespace HelloTriangleApplication::Geometry
         // free copy of image in main memory
         stbi_image_free(pixels);
 
-        return Texture::loadFromBuffer(app, texWidth, texHeight, imageBuffer, format, tiling, usage, properties);
+        return Texture::loadFromBuffer(app, texWidth, texHeight, imageBuffer, format, tiling, usage, properties, aspectFlags);
     }
 
     Result<Texture, std::string> Texture::loadFromBuffer(App& app, u32 width, u32 height, FatBuffer& imageBuffer,
-        vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties)
+        vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags)
     {
         // create GPU-backed image
         Texture texture;
         TRY_ASSIGN(
             texture,
-            Texture::create(app, width, height, format, tiling, usage, properties)
+            Texture::create(app, width, height, format, tiling, usage, properties, aspectFlags)
         );
 
         // copy buffer to image
@@ -103,17 +103,11 @@ namespace HelloTriangleApplication::Geometry
         
         endSingleTimeCommands(std::move(copyCommand), app.graphicsQueue);
 
-        // create image view
-        TRY_ASSIGN(
-            texture.view,
-            createImageView(app, texture.image, format)
-        );
-
         return std::move(texture);
     }
 
     Result<Texture, std::string> Texture::create(App& app, u32 width, u32 height, vk::Format format,
-            vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties)
+            vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags)
     {
         // create GPU-backed image
         vk::ImageCreateInfo imageInfo {
@@ -129,7 +123,7 @@ namespace HelloTriangleApplication::Geometry
             .initialLayout = vk::ImageLayout::eUndefined
         };
 
-        Texture texture {};
+        Texture texture { .format = format };
         TRY_ASSIGN(
             texture.image,
             castVkResult(app.device.createImage(imageInfo))
@@ -148,6 +142,12 @@ namespace HelloTriangleApplication::Geometry
         );
 
         texture.image.bindMemory(texture.memory, 0);
+
+        // create image view
+        TRY_ASSIGN(
+            texture.view,
+            createImageView(app, texture.image, format, aspectFlags)
+        );
 
         return std::move(texture);
     }
