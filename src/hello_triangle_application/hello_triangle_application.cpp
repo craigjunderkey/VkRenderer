@@ -16,6 +16,8 @@
 #include "geometry/descriptor_pool.h"
 #include "geometry/texture.h"
 #include "geometry/depth_resources.h"
+#include "geometry/mesh.h"
+#include "geometry/model_loader.h"
 
 using namespace HelloTriangleApplication::Utilities;
 using namespace HelloTriangleApplication::Geometry;
@@ -57,6 +59,7 @@ namespace HelloTriangleApplication
         createCommandPools(*this).unwrap();
         this->texture = Texture::loadFromFile(*this, TEXTURE_PATH).unwrap();
         this->texture.makeSampler(*this).unwrap();
+        this->mesh = Mesh<u32>::fromData(loadMeshData<u32>(MODEL_PATH).unwrap());
         createBuffers(*this).unwrap();
         createUniformBuffers(*this).unwrap();
         createDescriptorPool(*this).unwrap();

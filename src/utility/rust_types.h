@@ -23,6 +23,11 @@ inline void println(const char* message)
     std::cout << message << std::endl;
 }
 
+inline void warn(std::string message)
+{
+    std::cerr << "WARNING: " << message << std::endl;
+}
+
 
 // result
 template <typename T, typename E>

@@ -137,10 +137,6 @@ namespace HelloTriangleApplication::Geometry
 
     Result<Unit, std::string> createBuffers(App& app)
     {
-        // TODO: remove this
-        app.mesh.indices = INDICES;
-        app.mesh.vertices = VERTICES;
-
         // create vertex buffer
         FatBuffer stagingBuffer;
         TRY_ASSIGN(

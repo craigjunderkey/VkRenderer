@@ -17,8 +17,8 @@ const std::vector<const char*> REQUIRED_DEVICE_EXTENSIONS = {
 };
 
 constexpr const char* SHADER_PATH = "shaders/shader.spv";
-constexpr const char* TEXTURE_PATH = "src/textures/rcoulter.jpg"; //"src/textures/viking_room.png";
-constexpr const char* MODEL_PATH = "src/models/viking_room.obj";
+constexpr const char* TEXTURE_PATH = "src/textures/rcoulter.jpg";
+constexpr const char* MODEL_PATH = "src/models/utah_teapot.obj";
 
 #ifndef NDEBUG
 constexpr bool VALIDATION_LAYERS_ENABLED = true;
