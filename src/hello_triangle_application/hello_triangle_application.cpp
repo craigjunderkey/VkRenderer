@@ -60,7 +60,7 @@ namespace HelloTriangleApplication
         this->texture = Texture::loadFromFile(*this, TEXTURE_PATH).unwrap();
         this->texture.makeSampler(*this).unwrap();
         this->mesh = Mesh<u32>::fromData(loadMeshData<u32>(MODEL_PATH).unwrap());
-        createBuffers(*this).unwrap();
+        this->mesh.makeBuffers(*this).unwrap();
         createUniformBuffers(*this).unwrap();
         createDescriptorPool(*this).unwrap();
         createDescriptorSets(*this).unwrap();
