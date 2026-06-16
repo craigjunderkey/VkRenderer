@@ -38,12 +38,11 @@ namespace HelloTriangleApplication::Geometry
         f32 time = std::chrono::duration<f32, std::chrono::seconds::period>(currentTime - startTime).count();
 
         // compute MVP
-        constexpr f32 HALF_PI = std::numbers::pi / 2.0f;
         constexpr f32 QUARTER_PI = std::numbers::pi / 4.0f;
 
         MVP ubo {
-            .model = glm::rotate(mat4(1.0f), time * HALF_PI, vec3(0.0f, 0.0f, 1.0f)) * glm::scale(mat4(1.0f), {0.4f, 0.4f, 0.4f}),
-            .view = glm::lookAt(vec3(2.0f, 2.0f, 3.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f)),
+            .model = glm::rotate(mat4(1.0f), time * QUARTER_PI, vec3(0.0f, 1.0f, 0.0f)) * glm::scale(mat4(1.0f), {0.4f, 0.4f, 0.4f}),
+            .view = glm::lookAt(vec3(0, 2.0f, 3.0f), vec3(0.0f, 0, -1.0f), vec3(0.0f, 1.0f, 0.0f)),
             .projection = glm::perspective(
                 QUARTER_PI,
                 static_cast<f32>(app.swapChainExtent.width) / static_cast<f32>(app.swapChainExtent.height),

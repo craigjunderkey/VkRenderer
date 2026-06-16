@@ -12,9 +12,11 @@ Result<const vk::SurfaceFormatKHR, std::string> chooseSwapSurfaceFormat(const st
     const auto formatIt = std::ranges::find_if(
         availableFormats,
         [] (const vk::SurfaceFormatKHR& format) {
-            return format.format == vk::Format::eR8G8B8A8Srgb && format.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear;
+            return (format.format == vk::Format::eR8G8B8A8Srgb || format.format == vk::Format::eB8G8R8A8Srgb)
+                && format.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear;
         }
     );
+
     bool foundIdealFormat = formatIt != availableFormats.end();
 
     vk::SurfaceFormatKHR format;

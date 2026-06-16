@@ -12,9 +12,19 @@ inline Unit Ok()
 
 
 // control flow
-inline void panic(std::string message)
+inline void err(std::string message)
 {
     std::cerr << "ERROR: " << message << std::endl;
+}
+
+inline void panic(std::string message)
+{
+    err(message);
+    std::exit(EXIT_FAILURE);
+}
+
+inline void panic()
+{
     std::exit(EXIT_FAILURE);
 }
 

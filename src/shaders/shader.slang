@@ -34,7 +34,7 @@ VSOutput vertMain(VSInput input)
     );
 
     output.color = input.inColor;
-    output.fragTexCoord = input.texCoord;
+    output.fragTexCoord = float2(1.0, 1.25) + input.texCoord * float2(4.0, 4.0);
 
     return output;
 }

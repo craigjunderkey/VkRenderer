@@ -24,10 +24,11 @@ namespace HelloTriangleApplication::Geometry
         if (!warnText.empty())
             warn(warnText);
 
+        if (!errText.empty())
+            err(errText);
+
         if (!success)
             return Err<std::string>(errText);
-        
-        std::cout << "Loading model: " << shapes.size() << " faces, " << attributes.vertices.size() << " verts" << std::endl;
 
         // make a mesh from the faces 
         MeshData<T> mesh {};
@@ -39,7 +40,7 @@ namespace HelloTriangleApplication::Geometry
             for (const tinyobj::index_t index : shape.mesh.indices)
             {
                 Vertex vertex {};
-                
+
                 vertex.pos = {
                     attributes.vertices[3 * index.vertex_index + 0],
                     attributes.vertices[3 * index.vertex_index + 1],
