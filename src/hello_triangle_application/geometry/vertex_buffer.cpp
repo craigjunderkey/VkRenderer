@@ -7,8 +7,6 @@
 using HelloTriangleApplication::App;
 using HelloTriangleApplication::Geometry::Vertex;
 using HelloTriangleApplication::Geometry::FatBuffer;
-using HelloTriangleApplication::Geometry::VERTICES;
-using HelloTriangleApplication::Geometry::INDICES;
 
 using namespace HelloTriangleApplication::Utilities;
 

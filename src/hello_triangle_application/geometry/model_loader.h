@@ -47,12 +47,16 @@ namespace HelloTriangleApplication::Geometry
                     attributes.vertices[3 * index.vertex_index + 2]
                 };
 
+                vertex.normal = {
+                    attributes.normals[3 * index.normal_index + 0],
+                    attributes.normals[3 * index.normal_index + 1],
+                    attributes.normals[3 * index.normal_index + 2]
+                };
+
                 vertex.texCoord = {
                     attributes.texcoords[2 * index.texcoord_index + 0],
                     1.0f - attributes.texcoords[2 * index.texcoord_index + 1]
                 };
-
-                vertex.color = {1.0f, 1.0f, 1.0f};
 
                 auto [it, inserted] = uniqueVertices.insert({vertex, static_cast<T>(mesh.vertices.size())});
                 if (inserted)

@@ -29,7 +29,7 @@ namespace HelloTriangleApplication::Geometry
                 .location = 1,
                 .binding = 0,
                 .format = vkFloat3,
-                .offset = offsetof(Vertex, color)
+                .offset = offsetof(Vertex, normal)
             },
             vk::VertexInputAttributeDescription {
                 .location = 2,

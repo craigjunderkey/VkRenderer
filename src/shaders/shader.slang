@@ -1,14 +1,14 @@
 struct VSInput
 {
     float3 inPosition;
-    float3 inColor;
+    float3 normal;
     float2 texCoord;
 };
 
 struct VSOutput
 {
     float4 pos : SV_POSITION;
-    float3 color;
+    float3 normal;
     float2 fragTexCoord;
 };
 
@@ -33,7 +33,7 @@ VSOutput vertMain(VSInput input)
         )
     );
 
-    output.color = input.inColor;
+    output.normal = input.normal;
     output.fragTexCoord = float2(1.0, 1.25) + input.texCoord * float2(4.0, 4.0);
 
     return output;
@@ -42,5 +42,5 @@ VSOutput vertMain(VSInput input)
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_Target
 {
-    return float4(vertIn.color * texture.Sample(vertIn.fragTexCoord).rgb, 1.0);
+    return float4(texture.Sample(vertIn.fragTexCoord).rgb, 1.0);
 }
