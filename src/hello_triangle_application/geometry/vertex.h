@@ -26,7 +26,7 @@ namespace HelloTriangleApplication::Geometry
         {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
     };
 
-    const std::vector<u16> INDICES = {
+    const std::vector<u32> INDICES = {
         0, 1, 2, 2, 3, 0,
         4, 5, 6, 6, 7, 4
     };

@@ -25,7 +25,7 @@ Result<Unit, std::string> createVertexBuffer(App& app)
         vertexBuffer,
         FatBuffer::create(
             app,
-            sizeof(VERTICES[0]) * VERTICES.size(),
+            sizeof(app.mesh.vertices[0]) * app.mesh.vertices.size(),
             vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
             vk::MemoryPropertyFlagBits::eDeviceLocal,
             std::move(families)
@@ -33,7 +33,7 @@ Result<Unit, std::string> createVertexBuffer(App& app)
     );
 
     // store it in the app
-    app.vertexBuffer = std::move(vertexBuffer);
+    app.mesh.vertexBuffer = std::move(vertexBuffer);
 
     return Ok();
 }
@@ -51,7 +51,7 @@ Result<Unit, std::string> createIndexBuffer(App& app)
         indexBuffer,
         FatBuffer::create(
             app,
-            sizeof(u16) * INDICES.size(),
+            sizeof(app.mesh.indices[0]) * app.mesh.indices.size(),
             vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
             vk::MemoryPropertyFlagBits::eDeviceLocal,
             std::move(families)
@@ -59,7 +59,7 @@ Result<Unit, std::string> createIndexBuffer(App& app)
     );
 
     // store it in the app
-    app.indexBuffer = std::move(indexBuffer);
+    app.mesh.indexBuffer = std::move(indexBuffer);
 
     return Ok();
 }
@@ -137,22 +137,26 @@ namespace HelloTriangleApplication::Geometry
 
     Result<Unit, std::string> createBuffers(App& app)
     {
+        // TODO: remove this
+        app.mesh.indices = INDICES;
+        app.mesh.vertices = VERTICES;
+
         // create vertex buffer
         FatBuffer stagingBuffer;
         TRY_ASSIGN(
             stagingBuffer,
-            createStagingBuffer(app, (void*)VERTICES.data(), sizeof(VERTICES[0]) * VERTICES.size())
+            createStagingBuffer(app, (void*)app.mesh.vertices.data(), sizeof(app.mesh.vertices[0]) * app.mesh.vertices.size())
         );
         CHECK(createVertexBuffer(app));
-        CHECK(copyBuffer(app, stagingBuffer, app.vertexBuffer));
+        CHECK(copyBuffer(app, stagingBuffer, app.mesh.vertexBuffer));
 
         // create the index buffer
         TRY_ASSIGN(
             stagingBuffer,
-            createStagingBuffer(app, (void*)INDICES.data(), sizeof(u16) * INDICES.size())
+            createStagingBuffer(app, (void*)app.mesh.indices.data(), sizeof(app.mesh.indices[0]) * app.mesh.indices.size())
         );
         CHECK(createIndexBuffer(app));
-        CHECK(copyBuffer(app, stagingBuffer, app.indexBuffer));
+        CHECK(copyBuffer(app, stagingBuffer, app.mesh.indexBuffer));
 
         return Ok();
     }

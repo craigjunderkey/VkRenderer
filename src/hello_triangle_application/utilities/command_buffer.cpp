@@ -145,11 +145,11 @@ namespace HelloTriangleApplication::Utilities
         );
 
         // draw the damn thing
-        commandBuffer.bindVertexBuffers(0, *app.vertexBuffer.buffer, {0});
-        commandBuffer.bindIndexBuffer(*app.indexBuffer.buffer, 0, vk::IndexType::eUint16);
+        commandBuffer.bindVertexBuffers(0, *app.mesh.vertexBuffer.buffer, {0});
+        commandBuffer.bindIndexBuffer(*app.mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(app.mesh.indices)::value_type>::value);
         commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *app.pipelineLayout,
             0, *app.descriptorSets[app.frameIndex], nullptr);
-        commandBuffer.drawIndexed(Geometry::INDICES.size(), 1, 0, 0, 0);
+        commandBuffer.drawIndexed(app.mesh.indices.size(), 1, 0, 0, 0);
 
         // stop rendering
         commandBuffer.endRendering();

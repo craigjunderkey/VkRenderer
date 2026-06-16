@@ -11,6 +11,7 @@
 #include "utilities/queue.h"
 #include "geometry/buffer.h"
 #include "geometry/texture.h"
+#include "geometry/mesh.h"
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Geometry::FatBuffer;
@@ -54,8 +55,7 @@ namespace HelloTriangleApplication
         u32 frameIndex = 0;
 
         // geometry
-        FatBuffer vertexBuffer;
-        FatBuffer indexBuffer;
+        Geometry::Mesh<u32> mesh;
         std::vector<MappedBuffer> uniformBuffers = {};
         vk::raii::DescriptorPool descriptorPool = nullptr;
         std::vector<vk::raii::DescriptorSet> descriptorSets = {};
