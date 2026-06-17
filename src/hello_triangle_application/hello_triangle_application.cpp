@@ -59,8 +59,7 @@ namespace HelloTriangleApplication
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();
-        this->texture = Texture::loadFromFile(*this, TEXTURE_PATH).unwrap();
-        this->texture.makeSampler(*this).unwrap();
+        this->resources.loadTextures(*this, {"src/textures/rcoulter.jpg"});
         this->mesh = Mesh<u32>::fromData(loadMeshData<u32>(MODEL_PATH).unwrap());
         this->mesh.makeBuffers(*this).unwrap();
         createUniformBuffers(*this).unwrap();

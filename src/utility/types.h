@@ -2,6 +2,7 @@
 #include <glm/gtc/type_precision.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "rust_types.h"
+#include "string_id.h"
 
 using i8 = std::int8_t;
 using i16 = std::int16_t;

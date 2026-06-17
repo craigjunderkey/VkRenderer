@@ -56,8 +56,8 @@ namespace HelloTriangleApplication::Geometry
             };
 
             vk::DescriptorImageInfo imageInfo {
-                .sampler = *app.texture.sampler,
-                .imageView = *app.texture.view,
+                .sampler = *app.resources.texture(StringId("rcoulter")).sampler,
+                .imageView = *app.resources.texture(StringId("rcoulter")).view,
                 .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
             };
 

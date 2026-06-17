@@ -12,11 +12,13 @@
 #include "geometry/buffer.h"
 #include "geometry/texture.h"
 #include "geometry/mesh.h"
+#include "render_loop/resource_manager.h"
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Geometry::FatBuffer;
 using HelloTriangleApplication::Geometry::MappedBuffer;
 using HelloTriangleApplication::Geometry::Texture;
+using HelloTriangleApplication::RenderLoop::ResourceManager;
 
 namespace HelloTriangleApplication
 {
@@ -59,10 +61,12 @@ namespace HelloTriangleApplication
         std::vector<MappedBuffer> uniformBuffers = {};
         vk::raii::DescriptorPool descriptorPool = nullptr;
         std::vector<vk::raii::DescriptorSet> descriptorSets = {};
-        Texture texture;
         Texture depthTexture;
         mat4 view;
         mat4 projection;
+
+        // render loop
+        ResourceManager resources;
 
     private:
         void initWindow();
