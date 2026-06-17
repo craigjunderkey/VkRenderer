@@ -61,6 +61,8 @@ namespace HelloTriangleApplication
         std::vector<vk::raii::DescriptorSet> descriptorSets = {};
         Texture texture;
         Texture depthTexture;
+        mat4 view;
+        mat4 projection;
 
     private:
         void initWindow();

@@ -1,6 +1,7 @@
 #pragma once
 #include "material.h"
 #include "../geometry/mesh.h"
+#include "transform.h"
 
 namespace HelloTriangleApplication::RenderLoop
 {
@@ -8,6 +9,6 @@ namespace HelloTriangleApplication::RenderLoop
     {
         const Geometry::Mesh<u32>& mesh;
         const Material& material;
-        mat4 model;
+        Transform transform;
     };
 }

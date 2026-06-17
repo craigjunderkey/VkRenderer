@@ -18,9 +18,11 @@
 #include "geometry/depth_resources.h"
 #include "geometry/mesh.h"
 #include "geometry/model_loader.h"
+#include "render_loop/transform.h"
 
 using namespace HelloTriangleApplication::Utilities;
 using namespace HelloTriangleApplication::Geometry;
+using namespace HelloTriangleApplication::RenderLoop;
 
 namespace HelloTriangleApplication
 {
@@ -66,6 +68,8 @@ namespace HelloTriangleApplication
         createDescriptorSets(*this).unwrap();
         createCommandBuffers(*this).unwrap();
         createSyncObjects(*this).unwrap();
+        createViewTransform(*this);
+        createProjectionTransform(*this);
     }
 
     void App::mainLoop()

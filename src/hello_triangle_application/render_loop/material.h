@@ -15,6 +15,8 @@ namespace HelloTriangleApplication::RenderLoop
     struct Material
     {
         Geometry::Texture texture;
+        vec2 texOffset;
+        vec2 texScale;
         vec3 ambient;
         vec3 diffuse;
         vec3 specular;

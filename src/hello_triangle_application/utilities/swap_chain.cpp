@@ -2,6 +2,7 @@
 #include "swap_chain.h"
 #include "image_views.h"
 #include "../geometry/depth_resources.h"
+#include "../render_loop/transform.h"
 
 using HelloTriangleApplication::App;
 
@@ -176,6 +177,7 @@ namespace HelloTriangleApplication::Utilities
         CHECK(createSwapChain(app));
         CHECK(createImageViews(app));
         CHECK(Geometry::createDepthTexture(app));
+        RenderLoop::createProjectionTransform(app);
 
         return Ok();
     }
