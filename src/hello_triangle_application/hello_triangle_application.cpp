@@ -58,8 +58,7 @@ namespace HelloTriangleApplication
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();
-        this->resources.loadTextures(*this, {"src/textures/rcoulter.jpg"}).unwrap();
-        this->resources.loadMeshes(*this, {"src/models/utah_teapot.obj"}).unwrap();
+        this->resources.loadResources(*this, "src/assets.json").unwrap();
         createUniformBuffers(*this).unwrap();
         createDescriptorPool(*this).unwrap();
         createDescriptorSets(*this).unwrap();

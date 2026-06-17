@@ -21,5 +21,6 @@ namespace HelloTriangleApplication::RenderLoop
         vec3 diffuse;
         vec3 specular;
         f32 shininess;
+        bool isUnlit;
     };
 }

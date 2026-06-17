@@ -28,5 +28,6 @@ namespace HelloTriangleApplication::RenderLoop
         Result<Unit, std::string> loadTextures(App& app, std::vector<std::filesystem::path> paths);
         Result<Unit, std::string> loadMaterials(App& app, std::vector<std::filesystem::path> paths);
         Result<Unit, std::string> loadMeshes(App& app, std::vector<std::filesystem::path> paths);
+        Result<Unit, std::string> loadResources(App& app, std::filesystem::path assetsJsonPath);
     };
 }

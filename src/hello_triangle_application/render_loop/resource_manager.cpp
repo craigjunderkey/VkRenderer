@@ -1,6 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "resource_manager.h"
 #include "../geometry/model_loader.h"
+#include "resource_reader.h"
 
 using namespace HelloTriangleApplication::Geometry;
 
@@ -22,7 +23,7 @@ namespace HelloTriangleApplication::RenderLoop
             StringId id = pathToStringId(path);
             
             #ifndef NDEBUG
-                std::cout << "Loaded texture " << id.string() << " (" << pathString << ").\n";
+                std::cout << "Loaded texture " << id.string() << " (" << pathString << ")\n";
             #endif
 
             auto pair = std::tuple<StringId, Texture>(std::move(id), std::move(texture));
@@ -55,7 +56,7 @@ namespace HelloTriangleApplication::RenderLoop
             StringId id = pathToStringId(path);
 
             #ifndef NDEBUG
-                std::cout << "Loaded mesh " << id.string() << " (" << pathString << ").\n";
+                std::cout << "Loaded mesh " << id.string() << " (" << pathString << ")\n";
             #endif
 
             auto pair = std::tuple<StringId, Mesh<u32>>(std::move(id), std::move(mesh));
@@ -64,6 +65,33 @@ namespace HelloTriangleApplication::RenderLoop
             if (!insertResult.second)
                 return Err<std::string>("Tried to load " + pathString + " multiple times.");
         }
+
+        return Ok();
+    }
+
+    Result<Unit, std::string> ResourceManager::loadResources(App& app, std::filesystem::path assetsPath)
+    {
+        // load assets json
+        ResourceReader reader;
+        CHECK(reader.readAssetJson(std::move(assetsPath)));
+
+        // load texture paths
+        auto texPathsResult = reader.readResource("textures");
+        CHECK_KEEP(texPathsResult);
+        std::vector<std::filesystem::path> texPaths = texPathsResult.take();
+
+        // load mesh paths
+        auto meshPathsResult = reader.readResource("meshes");
+        CHECK_KEEP(meshPathsResult);
+        std::vector<std::filesystem::path> meshPaths = meshPathsResult.take();
+
+        // load textures
+        auto texLoadResult = this->loadTextures(app, std::move(texPaths));
+        CHECK(texLoadResult);
+
+        // load meshes
+        auto meshLoadResult = this->loadMeshes(app, std::move(meshPaths));
+        CHECK(meshLoadResult);
 
         return Ok();
     }
