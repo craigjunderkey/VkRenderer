@@ -57,7 +57,6 @@ namespace HelloTriangleApplication
         u32 frameIndex = 0;
 
         // geometry
-        Geometry::Mesh<u32> mesh;
         std::vector<MappedBuffer> uniformBuffers = {};
         vk::raii::DescriptorPool descriptorPool = nullptr;
         std::vector<vk::raii::DescriptorSet> descriptorSets = {};

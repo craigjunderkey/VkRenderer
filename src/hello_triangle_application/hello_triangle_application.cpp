@@ -17,7 +17,6 @@
 #include "geometry/texture.h"
 #include "geometry/depth_resources.h"
 #include "geometry/mesh.h"
-#include "geometry/model_loader.h"
 #include "render_loop/transform.h"
 
 using namespace HelloTriangleApplication::Utilities;
@@ -59,9 +58,8 @@ namespace HelloTriangleApplication
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();
-        this->resources.loadTextures(*this, {"src/textures/rcoulter.jpg"});
-        this->mesh = Mesh<u32>::fromData(loadMeshData<u32>(MODEL_PATH).unwrap());
-        this->mesh.makeBuffers(*this).unwrap();
+        this->resources.loadTextures(*this, {"src/textures/rcoulter.jpg"}).unwrap();
+        this->resources.loadMeshes(*this, {"src/models/utah_teapot.obj"}).unwrap();
         createUniformBuffers(*this).unwrap();
         createDescriptorPool(*this).unwrap();
         createDescriptorSets(*this).unwrap();

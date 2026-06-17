@@ -1,6 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "command_buffer.h"
 #include "../geometry/vertex.h"
+#include "../geometry/mesh.h"
 
 using HelloTriangleApplication::App;
 
@@ -145,11 +146,12 @@ namespace HelloTriangleApplication::Utilities
         );
 
         // draw the damn thing
-        commandBuffer.bindVertexBuffers(0, *app.mesh.vertexBuffer.buffer, {0});
-        commandBuffer.bindIndexBuffer(*app.mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(app.mesh.indices)::value_type>::value);
+        const Geometry::Mesh<u32>& mesh = app.resources.mesh(StringId("utah_teapot"));
+        commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
+        commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
         commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *app.pipelineLayout,
             0, *app.descriptorSets[app.frameIndex], nullptr);
-        commandBuffer.drawIndexed(app.mesh.numIndices, 1, 0, 0, 0);
+        commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
 
         // stop rendering
         commandBuffer.endRendering();
