@@ -83,6 +83,8 @@ namespace HelloTriangleApplication::Geometry
             app.device.updateDescriptorSets(descriptorWrites, {});
         }
 
+        // app.resources.material("fantl").bind(app);
+
         return Ok();
     }
 }

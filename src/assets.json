@@ -4,7 +4,8 @@
         "meshes": "models"
     },
     "textures": [
-        "rcoulter.jpg"
+        "rcoulter.jpg",
+        "jfantl.jpg"
     ],
     "meshes": [
         "utah_teapot.obj"
@@ -19,6 +20,7 @@
             "specular": [0.9, 0.9, 0.9],
             "shininess": 50.0,
             "isUnlit": false
-        }
+        },
+        "fantl": { "texture" : "jfantl" }
     }
 }

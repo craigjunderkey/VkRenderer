@@ -1,13 +1,18 @@
 #pragma once
 #include <string>
+#include <iostream>
 
 struct StringId
 {
     friend std::hash<StringId>;
 
+private:
+    std::string id_;
+
 public:
     StringId() : id_("") {};
     StringId(std::string id) : id_(id) {};
+    StringId(const char* id) : id_(std::string(id)) {};
     
     bool operator==(const StringId& other) const
     {
@@ -26,8 +31,23 @@ public:
     }
 #endif
 
-private:
-    std::string id_;
+    std::ostream& operator<<(std::ostream& os) const
+    {
+        #ifndef NDEBUG
+            return os << this->id_ << "(" << this->string() << ")";
+        #else
+            return os << this->id;
+        #endif
+    }
+
+    operator std::string() const
+    {
+        #ifndef NDEBUG
+            return std::string(this->id_) + "(" + this->string() + ")";
+        #else
+            return std::string(this->id_);
+        #endif
+    }
 };
 
 namespace std

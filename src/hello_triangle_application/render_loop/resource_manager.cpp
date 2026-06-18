@@ -38,6 +38,34 @@ namespace HelloTriangleApplication::RenderLoop
 
     Result<Unit, std::string> ResourceManager::loadMaterials(App& app, std::vector<MaterialResourceData> data)
     {
+        for (const MaterialResourceData& matData : data)
+        {
+            // load material
+            Material mat {
+                .texture = this->texture(matData.texture),
+                .texOffset = matData.texOffset,
+                .texScale = matData.texScale,
+                .ambient = matData.ambient,
+                .diffuse = matData.diffuse,
+                .specular = matData.specular,
+                .shininess = matData.shininess,
+                .isUnlit = matData.isUnlit
+            };
+
+            // add it to the map
+            StringId id = std::move(matData.name);
+
+            #ifndef NDEBUG
+                std::cout << "Loaded material " << id.string() << "\n";
+            #endif
+
+            auto pair = std::tuple<StringId, Material>(std::move(id), std::move(mat));
+            auto insertResult = this->materials.insert(std::move(pair));
+
+            if (!insertResult.second)
+                return Err<std::string>("Tried to load material " + std::string(id) + " multiple times.");
+        }
+
         return Ok();
     }
 

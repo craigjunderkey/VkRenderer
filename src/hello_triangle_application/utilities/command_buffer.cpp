@@ -146,7 +146,7 @@ namespace HelloTriangleApplication::Utilities
         );
 
         // draw the damn thing
-        const Geometry::Mesh<u32>& mesh = app.resources.mesh(StringId("utah_teapot"));
+        const Geometry::Mesh<u32>& mesh = app.resources.mesh("utah_teapot");
         commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
         commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
         commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *app.pipelineLayout,

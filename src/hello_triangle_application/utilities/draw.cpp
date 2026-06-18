@@ -45,7 +45,7 @@ namespace HelloTriangleApplication::Utilities
         vk::Result fenceResult = app.device.waitForFences(*app.inFlightFences[app.frameIndex], true, DISABLE_TIMEOUT);
         if (fenceResult != vk::Result::eSuccess)
             return Err<std::string>("Failed to wait for fence.");
-        
+
         // so, we now have that the previous frame is done being drawn to the screen
         // so, request the next image from the swap chain
         auto nextImage = nextImageInSwapChain(app);

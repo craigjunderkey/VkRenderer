@@ -2,6 +2,8 @@
 #include "../utilities/common.h"
 #include "../geometry/texture.h"
 
+namespace HelloTriangleApplication { class App; }
+
 namespace HelloTriangleApplication::RenderLoop
 {
     struct Light
@@ -22,5 +24,7 @@ namespace HelloTriangleApplication::RenderLoop
         vec3 specular;
         f32 shininess;
         bool isUnlit;
+
+        void bind(App& app) const;
     };
 }
