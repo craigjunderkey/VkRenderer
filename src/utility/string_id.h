@@ -20,7 +20,7 @@ public:
     }
 
 #ifndef NDEBUG
-    const std::string& string()
+    const std::string& string() const
     {
         return this->id_;
     }

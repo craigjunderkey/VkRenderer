@@ -3,6 +3,7 @@
 #include "material.h"
 #include "../geometry/texture.h"
 #include "../geometry/mesh.h"
+#include "resource_data.h"
 
 #include <unordered_map>
 #include <filesystem>
@@ -26,7 +27,7 @@ namespace HelloTriangleApplication::RenderLoop
         inline const Geometry::Mesh<u32>& mesh(StringId id) const { return this->meshes.find(id)->second; }
 
         Result<Unit, std::string> loadTextures(App& app, std::vector<std::filesystem::path> paths);
-        Result<Unit, std::string> loadMaterials(App& app, std::vector<std::filesystem::path> paths);
+        Result<Unit, std::string> loadMaterials(App& app, std::vector<MaterialResourceData> data);
         Result<Unit, std::string> loadMeshes(App& app, std::vector<std::filesystem::path> paths);
         Result<Unit, std::string> loadResources(App& app, std::filesystem::path assetsJsonPath);
     };

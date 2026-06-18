@@ -1,8 +1,11 @@
 #pragma once
 #include "../utilities/common.h"
+#include "resource_data.h"
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
+
+#define CHECK_KEY(json, key) if (!json.contains(key)) return Err<std::string>("Missing '" + std::string(key) + "' key.")
 
 namespace HelloTriangleApplication::RenderLoop
 {
@@ -22,7 +25,7 @@ namespace HelloTriangleApplication::RenderLoop
             this->assetsJson_ = nlohmann::json::parse(assetsFile);
 
             #ifndef NDEBUG
-                std::cout << "Loaded assets root (" << path << ")\n";
+                std::cout << "Loaded assets root (" << path.string() << ")\n";
             #endif
 
             this->root_ = path.parent_path();
@@ -35,14 +38,10 @@ namespace HelloTriangleApplication::RenderLoop
             assert(this->assetsJson_.has_value());
             const nlohmann::json& assetsJson = this->assetsJson_.value();
 
-            if (!assetsJson.contains("directories"))
-                return Err<std::string>("Assets json is missing a 'directories' key.");
-            
+            CHECK_KEY(assetsJson, "directories");
             const nlohmann::json& directories = assetsJson["directories"];
 
-            if (!directories.contains(name))
-                return Err<std::string>("Directories section of assets json does not contain a '" + name + "' key.");
-            
+            CHECK_KEY(directories, name);
             std::string pathLabel = directories[name];
             std::filesystem::path relativePath = std::filesystem::path(std::move(pathLabel));
 
@@ -57,13 +56,12 @@ namespace HelloTriangleApplication::RenderLoop
             assert(this->assetsJson_.has_value());
             const nlohmann::json& assets = this->assetsJson_.value();
 
-            if (!assets.contains(resourceKey))
-                return Err<std::string>("Assets json is missing a '" + resourceKey + "' key.");
+            CHECK_KEY(assets, resourceKey);
+            auto resList = assets[resourceKey];
             
             std::vector<std::filesystem::path> paths {};
             
-            auto texList = assets[resourceKey];
-            for (const auto& res : texList)
+            for (const auto& res : resList)
             {
                 std::filesystem::path name = std::string(res);
                 paths.emplace_back(dir / name);
@@ -72,13 +70,49 @@ namespace HelloTriangleApplication::RenderLoop
             return std::move(paths);
         }
         
-        Result<std::vector<std::filesystem::path>, std::string> readResource(std::string resourceKey)
+        Result<std::vector<std::filesystem::path>, std::string> readResourcePaths(std::string resourceKey)
         {
             auto dirResult = getDirectory(resourceKey);
             CHECK_KEEP(dirResult);
             std::filesystem::path dir = dirResult.take();
 
             return readPaths(std::move(dir), std::move(resourceKey));
+        }
+
+        Result<MaterialResourceData, std::string> readMaterialData(const std::string& name, const nlohmann::json& data)
+        {
+            MaterialResourceData mat { .name = StringId(name) };
+            
+            if (data.contains("texture")) mat.texture = StringId(data["texture"]);
+            if (data.contains("texOffset")) mat.texOffset = vec2(data["texOffset"][0], data["texOffset"][1]);
+            if (data.contains("texScale")) mat.texScale = vec2(data["texScale"][0], data["texScale"][1]);
+            if (data.contains("ambient")) mat.ambient = vec3(data["ambient"][0], data["ambient"][1], data["ambient"][2]);
+            if (data.contains("diffuse")) mat.diffuse = vec3(data["diffuse"][0], data["diffuse"][1], data["diffuse"][2]);
+            if (data.contains("specular")) mat.specular = vec3(data["specular"][0], data["specular"][1], data["specular"][2]);
+            if (data.contains("shininess")) mat.shininess = data["shininess"];
+            if (data.contains("isUnlit")) mat.isUnlit = data["isUnlit"];
+
+            return std::move(mat);
+        }
+        
+        Result<std::vector<MaterialResourceData>, std::string> readMaterialData()
+        {
+            assert(this->assetsJson_.has_value());
+            const nlohmann::json& assets = this->assetsJson_.value();
+
+            CHECK_KEY(assets, "materials");
+            auto matList = assets["materials"].items();
+
+            std::vector<MaterialResourceData> data {};
+
+            for (const auto& mat : matList)
+            {
+                auto matReadResult = readMaterialData(mat.key(), mat.value());
+                CHECK_KEEP(matReadResult);
+                data.emplace_back(matReadResult.take());
+            }
+
+            return std::move(data);
         }
     };
 }

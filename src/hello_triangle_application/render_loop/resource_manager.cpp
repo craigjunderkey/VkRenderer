@@ -36,7 +36,7 @@ namespace HelloTriangleApplication::RenderLoop
         return Ok();
     }
 
-    Result<Unit, std::string> ResourceManager::loadMaterials(App& app, std::vector<std::filesystem::path> paths)
+    Result<Unit, std::string> ResourceManager::loadMaterials(App& app, std::vector<MaterialResourceData> data)
     {
         return Ok();
     }
@@ -75,23 +75,32 @@ namespace HelloTriangleApplication::RenderLoop
         ResourceReader reader;
         CHECK(reader.readAssetJson(std::move(assetsPath)));
 
-        // load texture paths
-        auto texPathsResult = reader.readResource("textures");
-        CHECK_KEEP(texPathsResult);
-        std::vector<std::filesystem::path> texPaths = texPathsResult.take();
-
-        // load mesh paths
-        auto meshPathsResult = reader.readResource("meshes");
-        CHECK_KEEP(meshPathsResult);
-        std::vector<std::filesystem::path> meshPaths = meshPathsResult.take();
-
         // load textures
-        auto texLoadResult = this->loadTextures(app, std::move(texPaths));
-        CHECK(texLoadResult);
+        {
+            auto texPathsResult = reader.readResourcePaths("textures");
+            CHECK_KEEP(texPathsResult);
+            std::vector<std::filesystem::path> texPaths = texPathsResult.take();
+            auto texLoadResult = this->loadTextures(app, std::move(texPaths));
+            CHECK(texLoadResult);
+        }
 
         // load meshes
-        auto meshLoadResult = this->loadMeshes(app, std::move(meshPaths));
-        CHECK(meshLoadResult);
+        {
+            auto meshPathsResult = reader.readResourcePaths("meshes");
+            CHECK_KEEP(meshPathsResult);
+            std::vector<std::filesystem::path> meshPaths = meshPathsResult.take();
+            auto meshLoadResult = this->loadMeshes(app, std::move(meshPaths));
+            CHECK(meshLoadResult);
+        }
+
+        // load materials
+        {
+            auto matDataResult = reader.readMaterialData();
+            CHECK_KEEP(matDataResult);
+            std::vector<MaterialResourceData> matData = matDataResult.take();
+            auto matLoadResult = this->loadMaterials(app, std::move(matData));
+            CHECK(matLoadResult);
+        }
 
         return Ok();
     }
