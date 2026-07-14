@@ -10,6 +10,7 @@ namespace HelloTriangleApplication::Geometry
 {
     struct Texture
     {
+        StringId name = StringId();
         vk::raii::Image image = nullptr;
         vk::raii::ImageView view = nullptr;
         vk::raii::DeviceMemory memory = nullptr;

@@ -20,6 +20,7 @@ namespace HelloTriangleApplication::Geometry
     template <typename T>
     struct Mesh
     {
+        StringId name = StringId();
         std::vector<Vertex> vertices = {};
         std::vector<T> indices = {};
         T numIndices;

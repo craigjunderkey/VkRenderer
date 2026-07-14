@@ -24,23 +24,3 @@ using vec2 = glm::vec2;
 using vec3 = glm::vec3;
 using vec4 = glm::vec4;
 using mat4 = glm::mat4;
-
-
-// ostream overloads
-namespace glm
-{
-    inline std::ostream& operator<<(std::ostream& os, const vec2& vec)
-    {
-        return os << "[" << vec.x << ", " << vec.y << "]";
-    }
-
-    inline std::ostream& operator<<(std::ostream& os, const vec3& vec)
-    {
-        return os << "[" << vec.x << ", " << vec.y << ", " << vec.z << "]";
-    }
-
-    inline std::ostream& operator<<(std::ostream& os, const vec4& vec)
-    {
-        return os << "[" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << "]";
-    }
-}

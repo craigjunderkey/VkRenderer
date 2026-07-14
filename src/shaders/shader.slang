@@ -22,6 +22,21 @@ ConstantBuffer<MVP> mvp;
 
 Sampler2D texture;
 
+struct Material
+{
+    int texId;
+    int samplerId;
+    float shininess;
+    bool isUnlit;
+    float2 texOffset;
+    float2 texScale;
+    float3 ambient;
+    float3 diffuse;
+    float3 specular;
+}
+
+Material materials[];
+
 [shader("vertex")]
 VSOutput vertMain(VSInput input)
 {

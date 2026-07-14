@@ -2,6 +2,7 @@
 #include "resource_manager.h"
 #include "../geometry/model_loader.h"
 #include "resource_reader.h"
+#include "../geometry/texture.h"
 
 using namespace HelloTriangleApplication::Geometry;
 
@@ -21,6 +22,7 @@ namespace HelloTriangleApplication::RenderLoop
 
             // add it to the map
             StringId id = pathToStringId(path);
+            texture.name = id;
             
             #ifndef NDEBUG
                 std::cout << "Loaded texture " << id.string() << " (" << pathString << ")\n";
@@ -42,6 +44,7 @@ namespace HelloTriangleApplication::RenderLoop
         {
             // load material
             Material mat {
+                .name = std::move(matData.name),
                 .texture = this->texture(matData.texture),
                 .texOffset = matData.texOffset,
                 .texScale = matData.texScale,
@@ -66,6 +69,8 @@ namespace HelloTriangleApplication::RenderLoop
                 return Err<std::string>("Tried to load material " + std::string(id) + " multiple times.");
         }
 
+        TRY_ASSIGN(matManager, MaterialManager::create(app, this->textures, this->materials));
+
         return Ok();
     }
 
@@ -82,6 +87,7 @@ namespace HelloTriangleApplication::RenderLoop
 
             // add it to the map
             StringId id = pathToStringId(path);
+            mesh.name = id;
 
             #ifndef NDEBUG
                 std::cout << "Loaded mesh " << id.string() << " (" << pathString << ")\n";

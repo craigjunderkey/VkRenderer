@@ -31,19 +31,19 @@ public:
     }
 #endif
 
-    std::ostream& operator<<(std::ostream& os) const
+    friend std::ostream& operator<<(std::ostream& os, const StringId& id)
     {
         #ifndef NDEBUG
-            return os << this->id_ << "(" << this->string() << ")";
+            return os << id.id_ << " (" << id.string() << ")";
         #else
-            return os << this->id;
+            return os << id.id_;
         #endif
     }
 
     operator std::string() const
     {
         #ifndef NDEBUG
-            return std::string(this->id_) + "(" + this->string() + ")";
+            return std::string(this->id_) + " (" + this->string() + ")";
         #else
             return std::string(this->id_);
         #endif

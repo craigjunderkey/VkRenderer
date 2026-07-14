@@ -16,6 +16,7 @@ namespace HelloTriangleApplication::RenderLoop
     
     struct Material
     {
+        StringId name;
         const Geometry::Texture& texture;
         vec2 texOffset;
         vec2 texScale;
