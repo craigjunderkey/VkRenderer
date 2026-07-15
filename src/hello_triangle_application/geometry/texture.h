@@ -11,10 +11,11 @@ namespace HelloTriangleApplication::Geometry
     struct Texture
     {
         StringId name = StringId();
+        // StringId sampler = StringId();
+        const vk::raii::Sampler* sampler = nullptr;
         vk::raii::Image image = nullptr;
         vk::raii::ImageView view = nullptr;
         vk::raii::DeviceMemory memory = nullptr;
-        std::shared_ptr<vk::raii::Sampler> sampler = nullptr;
         vk::Format format;
 
         static Result<Texture, std::string> loadFromFile(App& app, std::string path,
@@ -33,6 +34,6 @@ namespace HelloTriangleApplication::Geometry
             vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties,
             vk::ImageAspectFlags aspectFlags = vk::ImageAspectFlagBits::eColor);
         
-        Result<Unit, std::string> makeSampler(App& app);
+        static Result<vk::raii::Sampler, std::string> makeDefaultSampler(App& app);
     };
 }

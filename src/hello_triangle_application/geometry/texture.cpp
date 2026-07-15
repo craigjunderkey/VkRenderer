@@ -11,7 +11,7 @@ using namespace HelloTriangleApplication::Utilities;
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<Unit, std::string> Texture::makeSampler(App& app)
+    Result<vk::raii::Sampler, std::string> Texture::makeDefaultSampler(App& app)
     {
         vk::PhysicalDeviceProperties deviceProperties = app.physicalDevice.getProperties();
 
@@ -37,9 +37,7 @@ namespace HelloTriangleApplication::Geometry
         if (!samplerResult)
             return Err<std::string>("Failed to create texture sampler.");
         
-        this->sampler = std::make_shared<vk::raii::Sampler>(samplerResult.take());
-
-        return Ok();
+        return samplerResult.take();
     }
 
     Result<Texture, std::string> Texture::loadFromFile(App& app, std::string path, vk::Format format,

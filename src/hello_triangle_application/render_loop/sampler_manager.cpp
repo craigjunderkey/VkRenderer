@@ -1,5 +1,6 @@
 #include "../hello_triangle_application.h"
 #include "sampler_manager.h"
+#include "../geometry/texture.h"
 
 namespace HelloTriangleApplication::RenderLoop
 {
@@ -9,42 +10,23 @@ namespace HelloTriangleApplication::RenderLoop
 
         // make default sampler
         {
-            vk::SamplerCreateInfo samplerInfo {
-                .magFilter = vk::Filter::eLinear,
-                .minFilter = vk::Filter::eLinear,
-                .mipmapMode = vk::SamplerMipmapMode::eLinear,
-                .addressModeU = vk::SamplerAddressMode::eMirroredRepeat,
-                .addressModeV = vk::SamplerAddressMode::eMirroredRepeat,
-                .addressModeW = vk::SamplerAddressMode::eMirroredRepeat,
-                .mipLodBias = 0.0f,
-                .anisotropyEnable = vk::True,
-                .maxAnisotropy = deviceProperties.limits.maxSamplerAnisotropy,
-                .compareEnable = vk::False,
-                .compareOp = vk::CompareOp::eAlways,
-                .minLod = 0.0f,
-                .maxLod = 0.0f,
-                .borderColor = vk::BorderColor::eIntOpaqueBlack,
-                .unnormalizedCoordinates = vk::False
-            };
-
-            auto samplerResult = castVkResult(app.device.createSampler(samplerInfo));
+            auto samplerResult = Texture::makeDefaultSampler(app);
             if (!samplerResult)
                 return Err<std::string>("Failed to create texture sampler.");
             
-            this->samplerIdMap_.insert({ StringId(), samplerResult.take() });
+            this->samplers_[SamplerName::Default] = samplerResult.take();
         }
 
         return Ok();
     }
 
-    const vk::raii::Sampler& SamplerManager::sampler(StringId name)
+    const vk::raii::Sampler& SamplerManager::sampler(SamplerName name) const
     {
-        return this->samplerIdMap_.find(name)->second;
+        return this->samplers_[name];
     }
 
     u32 SamplerManager::numSamplers() const
     {
-        // TODO: treat samplers as a resource; keep a vector of, say, SamplerResourceDatas
-        return 1;
+        return SamplerName::Count;
     }
 }

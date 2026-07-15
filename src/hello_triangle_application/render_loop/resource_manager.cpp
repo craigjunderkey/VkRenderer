@@ -17,8 +17,7 @@ namespace HelloTriangleApplication::RenderLoop
             auto loadResult = Texture::loadFromFile(app, pathString);
             CHECK_KEEP(loadResult);
             Texture texture = loadResult.take();
-            auto samplerResult = texture.makeSampler(app);
-            CHECK(samplerResult);
+            texture.sampler = &app.resources.samplerManager().sampler(SamplerName::Default);
 
             // add it to the map
             StringId id = pathToStringId(path);

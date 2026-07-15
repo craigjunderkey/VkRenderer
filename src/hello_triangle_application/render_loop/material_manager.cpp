@@ -25,7 +25,7 @@ namespace HelloTriangleApplication::RenderLoop
         auto samplers = std::unordered_set<const vk::raii::Sampler*>();
         for (const Texture* tex : textures)
         {
-            const vk::raii::Sampler* sampler = tex->sampler.get();
+            const vk::raii::Sampler* sampler = tex->sampler;
             samplers.insert(sampler);
         }
 

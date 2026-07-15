@@ -2,20 +2,24 @@
 #include "../utilities/common.h"
 #include "../utilities/vulkan_common.h"
 
-#include <unordered_map>
-
 namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::RenderLoop
 {
+    enum SamplerName
+    {
+        Default,
+        Count
+    };
+
     class SamplerManager
     {
     private:
-        std::unordered_map<StringId, vk::raii::Sampler> samplerIdMap_;
+        std::array<vk::raii::Sampler, SamplerName::Count> samplers_ {nullptr};
     
     public:
         Result<Unit, std::string> loadSamplers(App& app);
-        const vk::raii::Sampler& sampler(StringId name);
+        const vk::raii::Sampler& sampler(SamplerName name) const;
         u32 numSamplers() const;
     };
 }
