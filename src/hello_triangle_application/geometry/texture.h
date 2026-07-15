@@ -2,6 +2,8 @@
 #include "../utilities/common.h"
 #include "../utilities/vulkan_common.h"
 #include "buffer.h"
+#include "../render_loop/sampler_manager.h"
+
 #include <memory>
 
 namespace HelloTriangleApplication { class App; }
@@ -11,8 +13,7 @@ namespace HelloTriangleApplication::Geometry
     struct Texture
     {
         StringId name = StringId();
-        // StringId sampler = StringId();
-        const vk::raii::Sampler* sampler = nullptr;
+        HelloTriangleApplication::RenderLoop::SamplerName sampler;
         vk::raii::Image image = nullptr;
         vk::raii::ImageView view = nullptr;
         vk::raii::DeviceMemory memory = nullptr;

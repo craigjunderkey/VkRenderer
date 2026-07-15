@@ -20,6 +20,7 @@ namespace HelloTriangleApplication::RenderLoop
     public:
         Result<Unit, std::string> loadSamplers(App& app);
         const vk::raii::Sampler& sampler(SamplerName name) const;
+        const vk::raii::Sampler& sampler(u32 id) const;
         u32 numSamplers() const;
     };
 }

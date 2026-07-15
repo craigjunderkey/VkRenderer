@@ -25,6 +25,12 @@ namespace HelloTriangleApplication::RenderLoop
         return this->samplers_[name];
     }
 
+    const vk::raii::Sampler& SamplerManager::sampler(u32 id) const
+    {
+        assert(id < SamplerName::Count);
+        return this->samplers_[id];
+    }
+
     u32 SamplerManager::numSamplers() const
     {
         return SamplerName::Count;

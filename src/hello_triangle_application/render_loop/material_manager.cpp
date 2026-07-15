@@ -5,41 +5,8 @@
 
 using namespace HelloTriangleApplication::Geometry;
 
-std::unordered_map<const vk::raii::Sampler*, u32> makeSamplerIdMap(const std::vector<const vk::raii::Sampler*>& samplers)
-{
-    auto samplerIdMap = std::unordered_map<const vk::raii::Sampler*, u32>();
-    
-    for (u32 i = 0; i < samplers.size(); i++)
-    {
-        samplerIdMap.insert({ samplers[i], i });
-    }
-    
-    return std::move(samplerIdMap);
-}
-
 namespace HelloTriangleApplication::RenderLoop
 {
-    std::vector<const vk::raii::Sampler*> getSamplers(const std::vector<const Texture*>& textures)
-    {
-        // get the set of samplers
-        auto samplers = std::unordered_set<const vk::raii::Sampler*>();
-        for (const Texture* tex : textures)
-        {
-            const vk::raii::Sampler* sampler = tex->sampler;
-            samplers.insert(sampler);
-        }
-
-        // convert the set to a vector
-        std::vector<const vk::raii::Sampler*> samplerVec {};
-        samplerVec.reserve(samplers.size());
-        for (const vk::raii::Sampler* sampler : samplers)
-        {
-            samplerVec.push_back(sampler);
-        }
-
-        return std::move(samplerVec);
-    }
-
     u32 MaterialManager::getMaterialId(const Material& material) const
     {
         return this->matIdMap_.find(material.name)->second;
@@ -58,18 +25,12 @@ namespace HelloTriangleApplication::RenderLoop
         // make vectors
         std::vector<const Texture*> texVec = mapValuesAsConstPtrs(textures);
         std::vector<const Material*> matVec = mapValuesAsConstPtrs(materials);
-        std::vector<const vk::raii::Sampler*> samplerVec = getSamplers(texVec);
 
         // make maps
         std::unordered_map<StringId, u32> texIdMap = idMapFromKeys(textures);
         std::unordered_map<StringId, u32> matIdMap = idMapFromKeys(materials);
-        std::unordered_map<const vk::raii::Sampler*, u32> samplerIdMap = makeSamplerIdMap(samplerVec);
 
         // debug: print everything!
-        println("--Samplers");
-        printVecAsOrderedList(samplerVec);
-        println("---Ids");
-        printMap(samplerIdMap);
         println("--Materials");
         printVecAsOrderedList(matVec);
         println("---Ids");
@@ -100,7 +61,7 @@ namespace HelloTriangleApplication::RenderLoop
             },
             vk::DescriptorPoolSize {
                 .type = vk::DescriptorType::eSampler,
-                .descriptorCount = (u32)samplerVec.size()
+                .descriptorCount = (u32)app.resources.samplerManager().numSamplers()
             }
         };
         vk::DescriptorPoolCreateInfo poolInfo {
@@ -128,7 +89,7 @@ namespace HelloTriangleApplication::RenderLoop
             vk::DescriptorSetLayoutBinding {
                 .binding = 2,
                 .descriptorType = vk::DescriptorType::eSampler,
-                .descriptorCount = (u32)samplerVec.size(),
+                .descriptorCount = (u32)app.resources.samplerManager().numSamplers(),
                 .stageFlags = vk::ShaderStageFlagBits::eFragment
             }
         };
@@ -155,7 +116,7 @@ namespace HelloTriangleApplication::RenderLoop
         {
             matData.push_back(MaterialUniformData {
                 .texId = texIdMap.find(matVec[i]->texture.name)->second,
-                .samplerId = samplerIdMap.find(&*matVec[i]->texture.sampler)->second,
+                .samplerId = (u32)matVec[i]->texture.sampler,
                 .shininess = matVec[i]->shininess,
                 .isUnlit = matVec[i]->isUnlit,
                 .texOffset = matVec[i]->texOffset,
@@ -200,11 +161,11 @@ namespace HelloTriangleApplication::RenderLoop
         }
 
         std::vector<vk::DescriptorImageInfo> samplerImageInfo {};
-        samplerImageInfo.reserve(samplerVec.size());
-        for (u32 i = 0; i < samplerVec.size(); i++)
+        samplerImageInfo.reserve(app.resources.samplerManager().numSamplers());
+        for (u32 i = 0; i < app.resources.samplerManager().numSamplers(); i++)
         {
             samplerImageInfo.push_back(vk::DescriptorImageInfo {
-                .sampler = **samplerVec[i],
+                .sampler = *app.resources.samplerManager().sampler(i),
                 .imageView = nullptr,
                 .imageLayout = vk::ImageLayout::eUndefined
             });

@@ -55,9 +55,11 @@ namespace HelloTriangleApplication::Geometry
                 .range = vk::WholeSize
             };
 
+            const Texture& tex = app.resources.texture(StringId("rcoulter"));
+
             vk::DescriptorImageInfo imageInfo {
-                .sampler = *app.resources.texture(StringId("rcoulter")).sampler,
-                .imageView = *app.resources.texture(StringId("rcoulter")).view,
+                .sampler = *app.resources.samplerManager().sampler(tex.sampler),
+                .imageView = *tex.view,
                 .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
             };
 
