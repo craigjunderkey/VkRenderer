@@ -69,7 +69,7 @@ namespace HelloTriangleApplication::RenderLoop
                 return Err<std::string>("Tried to load material " + std::string(id) + " multiple times.");
         }
 
-        TRY_ASSIGN(matManager, MaterialManager::create(app, this->textures, this->materials));
+        TRY_ASSIGN(this->matManager_, MaterialManager::create(app, this->textures, this->materials));
 
         return Ok();
     }
@@ -136,6 +136,10 @@ namespace HelloTriangleApplication::RenderLoop
         assert(this->loaded_.has_value());
 
         RawLoadedResources loaded = std::move(this->loaded_.value());
+
+        // import samplers
+        auto samplerLoadResult = this->samplerManager_.loadSamplers(app);
+        CHECK(samplerLoadResult);
 
         // import textures
         auto texLoadResult = this->loadTextures(app, std::move(loaded.texPaths));
