@@ -17,11 +17,75 @@ namespace HelloTriangleApplication::RenderLoop
         return this->matIdMap_.find(name)->second;
     }
 
-    Result<MaterialManager, std::string> MaterialManager::create(App& app,
-        const std::unordered_map<StringId, Texture>& textures, const std::unordered_map<StringId, Material>& materials)
+    Result<MaterialManager, std::string> MaterialManager::create(App& app, u32 numMaterials, u32 numTextures, u32 numSamplers)
     {
         MaterialManager mats {};
 
+        // create descriptor pool
+        std::array<vk::DescriptorPoolSize, 3> poolSizes {
+            vk::DescriptorPoolSize {
+                .type = vk::DescriptorType::eUniformBuffer,
+                .descriptorCount = numMaterials
+            },
+            vk::DescriptorPoolSize {
+                .type = vk::DescriptorType::eSampledImage,
+                .descriptorCount = numTextures
+            },
+            vk::DescriptorPoolSize {
+                .type = vk::DescriptorType::eSampler,
+                .descriptorCount = numSamplers
+            }
+        };
+        vk::DescriptorPoolCreateInfo poolInfo {
+            .flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
+            .maxSets = 1,
+            .poolSizeCount = (u32)poolSizes.size(),
+            .pPoolSizes = poolSizes.data()
+        };
+        TRY_ASSIGN(mats.pool_, castVkResult(app.device.createDescriptorPool(poolInfo)));
+
+        // create descriptor layout
+        std::array<vk::DescriptorSetLayoutBinding, 3> layoutBindings {
+            vk::DescriptorSetLayoutBinding {
+                .binding = 0,
+                .descriptorType = vk::DescriptorType::eUniformBuffer,
+                .descriptorCount = numMaterials,
+                .stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
+            },
+            vk::DescriptorSetLayoutBinding {
+                .binding = 1,
+                .descriptorType = vk::DescriptorType::eSampledImage,
+                .descriptorCount = numTextures,
+                .stageFlags = vk::ShaderStageFlagBits::eFragment
+            },
+            vk::DescriptorSetLayoutBinding {
+                .binding = 2,
+                .descriptorType = vk::DescriptorType::eSampler,
+                .descriptorCount = numSamplers,
+                .stageFlags = vk::ShaderStageFlagBits::eFragment
+            }
+        };
+        vk::DescriptorSetLayoutCreateInfo layoutInfo {
+            .bindingCount = (u32)layoutBindings.size(),
+            .pBindings = layoutBindings.data()
+        };
+        TRY_ASSIGN(mats.layout_, castVkResult(app.device.createDescriptorSetLayout(layoutInfo)));
+
+        // allocate descriptor set
+        vk::DescriptorSetAllocateInfo allocInfo {
+            .descriptorPool = *mats.pool_,
+            .descriptorSetCount = 1,
+            .pSetLayouts = &*mats.layout_
+        };
+        auto allocResult = castVkResult(app.device.allocateDescriptorSets(allocInfo));
+        CHECK_KEEP(allocResult);
+        mats.set_ = std::move(allocResult.take().front());
+        return std::move(mats);
+    }
+
+    Result<Unit, std::string> MaterialManager::writeMaterialData(App& app,
+            const std::unordered_map<StringId, Geometry::Texture>& textures, const std::unordered_map<StringId, Material>& materials)
+    {
         // make vectors
         std::vector<const Texture*> texVec = mapValuesAsConstPtrs(textures);
         std::vector<const Material*> matVec = mapValuesAsConstPtrs(materials);
@@ -43,71 +107,9 @@ namespace HelloTriangleApplication::RenderLoop
         // MAYBE: what follows is the cause of all the warnings at the end of the program.
         
         // -- TEMPORARY!!!
-        // save the StringId to material shader id map for outside use
-        mats.matIdMap_ = std::move(matIdMap);
-
-        return std::move(mats);
+        this->matIdMap_ = std::move(matIdMap);
+        return Ok();
         // -- TEMPORARY!!!
-
-        // create descriptor pool
-        std::array<vk::DescriptorPoolSize, 3> poolSizes {
-            vk::DescriptorPoolSize {
-                .type = vk::DescriptorType::eUniformBuffer,
-                .descriptorCount = (u32)matVec.size()
-            },
-            vk::DescriptorPoolSize {
-                .type = vk::DescriptorType::eSampledImage,
-                .descriptorCount = (u32)texVec.size()
-            },
-            vk::DescriptorPoolSize {
-                .type = vk::DescriptorType::eSampler,
-                .descriptorCount = (u32)app.resources.samplerManager().numSamplers()
-            }
-        };
-        vk::DescriptorPoolCreateInfo poolInfo {
-            .flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
-            .maxSets = 1,
-            .poolSizeCount = (u32)poolSizes.size(),
-            .pPoolSizes = poolSizes.data()
-        };
-        TRY_ASSIGN(mats.pool_, castVkResult(app.device.createDescriptorPool(poolInfo)));
-
-        // create descriptor layout
-        std::array<vk::DescriptorSetLayoutBinding, 3> layoutBindings {
-            vk::DescriptorSetLayoutBinding {
-                .binding = 0,
-                .descriptorType = vk::DescriptorType::eUniformBuffer,
-                .descriptorCount = (u32)matVec.size(),
-                .stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
-            },
-            vk::DescriptorSetLayoutBinding {
-                .binding = 1,
-                .descriptorType = vk::DescriptorType::eSampledImage,
-                .descriptorCount = (u32)texVec.size(),
-                .stageFlags = vk::ShaderStageFlagBits::eFragment
-            },
-            vk::DescriptorSetLayoutBinding {
-                .binding = 2,
-                .descriptorType = vk::DescriptorType::eSampler,
-                .descriptorCount = (u32)app.resources.samplerManager().numSamplers(),
-                .stageFlags = vk::ShaderStageFlagBits::eFragment
-            }
-        };
-        vk::DescriptorSetLayoutCreateInfo layoutInfo {
-            .bindingCount = (u32)layoutBindings.size(),
-            .pBindings = layoutBindings.data()
-        };
-        TRY_ASSIGN(mats.layout_, castVkResult(app.device.createDescriptorSetLayout(layoutInfo)));
-
-        // allocate descriptor set
-        vk::DescriptorSetAllocateInfo allocInfo {
-            .descriptorPool = *mats.pool_,
-            .descriptorSetCount = 1,
-            .pSetLayouts = &*mats.layout_
-        };
-        auto allocResult = castVkResult(app.device.allocateDescriptorSets(allocInfo));
-        CHECK_KEEP(allocResult);
-        mats.set_ = std::move(allocResult.take().front());
 
         // construct array of MaterialUniformData
         std::vector<MaterialUniformData> matData {};
@@ -130,7 +132,7 @@ namespace HelloTriangleApplication::RenderLoop
         // populate material buffer        
         u64 matBufferSize = sizeof(MaterialUniformData) * matData.size();
         TRY_ASSIGN(
-            mats.buffer_,
+            this->buffer_,
             MappedBuffer::fromFatBufferResult(
                 FatBuffer::create(
                     app,
@@ -140,11 +142,11 @@ namespace HelloTriangleApplication::RenderLoop
                 )
             )
         );
-        memcpy(mats.buffer_.data, &matData[0], matBufferSize);
+        memcpy(this->buffer_.data, &matData[0], matBufferSize);
 
         // construct descriptor infos
         vk::DescriptorBufferInfo matBufferInfo {
-            .buffer = *mats.buffer_.buffer,
+            .buffer = *this->buffer_.buffer,
             .offset = 0,
             .range = vk::WholeSize
         };
@@ -174,7 +176,7 @@ namespace HelloTriangleApplication::RenderLoop
         // populate descriptor set
         std::array<vk::WriteDescriptorSet, 3> writeDescriptorSet {
             vk::WriteDescriptorSet {
-                .dstSet = *mats.set_,
+                .dstSet = *this->set_,
                 .dstBinding = 0,
                 .dstArrayElement = 0,
                 .descriptorCount = 1,
@@ -182,7 +184,7 @@ namespace HelloTriangleApplication::RenderLoop
                 .pBufferInfo = &matBufferInfo
             },
             vk::WriteDescriptorSet {
-                .dstSet = *mats.set_,
+                .dstSet = *this->set_,
                 .dstBinding = 1,
                 .dstArrayElement = 0,
                 .descriptorCount = (u32)texImageInfo.size(),
@@ -190,7 +192,7 @@ namespace HelloTriangleApplication::RenderLoop
                 .pImageInfo = texImageInfo.data()
             },
             vk::WriteDescriptorSet {
-                .dstSet = *mats.set_,
+                .dstSet = *this->set_,
                 .dstBinding = 2,
                 .dstArrayElement = 0,
                 .descriptorCount = (u32)samplerImageInfo.size(),
@@ -200,10 +202,9 @@ namespace HelloTriangleApplication::RenderLoop
         };
 
         app.device.updateDescriptorSets(writeDescriptorSet, {});
-        
-        // save the StringId to material shader id map for outside use
-        mats.matIdMap_ = std::move(matIdMap);
 
-        return std::move(mats);
+        // save the StringId to material shader id map for outside use
+        this->matIdMap_ = std::move(matIdMap);
+        return Ok();
     }
 }

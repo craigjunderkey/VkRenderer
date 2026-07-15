@@ -28,7 +28,6 @@ namespace HelloTriangleApplication
     void App::run()
     {
         initWindow();
-        initResources();
         initVulkan();
         mainLoop();
         cleanup();
@@ -45,12 +44,6 @@ namespace HelloTriangleApplication
         );
     }
 
-    void App::initResources()
-    {
-        std::cout << "Initializing resources\n";
-        this->resources.prepareResources(*this, "src/assets.json").unwrap();
-    }
-
     void App::initVulkan()
     {
         std::cout << "Initializing Vulkan\n";
@@ -62,6 +55,7 @@ namespace HelloTriangleApplication
         createSwapChain(*this).unwrap();
         createImageViews(*this).unwrap();
         createDescriptorSetLayout(*this).unwrap();
+        this->resources.prepareResources(*this, "src/assets.json").unwrap();
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();

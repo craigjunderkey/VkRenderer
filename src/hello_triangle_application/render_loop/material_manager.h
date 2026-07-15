@@ -35,7 +35,9 @@ namespace HelloTriangleApplication::RenderLoop
         std::unordered_map<StringId, u32> matIdMap_;
 
     public:
-        static Result<MaterialManager, std::string> create(App& app,
+        static Result<MaterialManager, std::string> create(App& app, u32 numMaterials, u32 numTextures, u32 numSamplers);
+        
+        Result<Unit, std::string> writeMaterialData(App& app,
             const std::unordered_map<StringId, Geometry::Texture>& textures, const std::unordered_map<StringId, Material>& materials);
         
         u32 getMaterialId(const Material& material) const;
