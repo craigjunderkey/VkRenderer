@@ -157,9 +157,15 @@ namespace HelloTriangleApplication::Utilities
         // pipeline layout
         // MAYBE: we're using two descriptor set layouts, so this shouldn't just be the one
         //  containing the MVP and the combined texture sampler.
+
+        std::array<vk::DescriptorSetLayout, 2> setLayouts {
+            *app.descriptorSetLayout,
+            *app.resources.materialManager().descriptorSetLayout()
+        };
+
         vk::PipelineLayoutCreateInfo pipelineLayoutInfo {
-            .setLayoutCount = 1,
-            .pSetLayouts = &*app.descriptorSetLayout,
+            .setLayoutCount = (u32)setLayouts.size(),
+            .pSetLayouts = setLayouts.data(),
             .pushConstantRangeCount = 0
         };
         TRY_ASSIGN(

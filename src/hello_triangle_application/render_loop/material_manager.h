@@ -29,8 +29,8 @@ namespace HelloTriangleApplication::RenderLoop
     {
     private:
         vk::raii::DescriptorSetLayout layout_ = nullptr;
-        vk::raii::DescriptorSet set_ = nullptr;
         vk::raii::DescriptorPool pool_ = nullptr;
+        vk::raii::DescriptorSet set_ = nullptr;
         Geometry::MappedBuffer buffer_ = {};
         std::unordered_map<StringId, u32> matIdMap_;
 
@@ -43,6 +43,8 @@ namespace HelloTriangleApplication::RenderLoop
         u32 getMaterialId(const Material& material) const;
         u32 getMaterialId(StringId name) const;
 
+        const vk::raii::DescriptorSetLayout& descriptorSetLayout() const { return this->layout_; }
         const vk::raii::DescriptorSet& descriptorSet() const { return this->set_; }
+        const vk::raii::DescriptorPool& descriptorPool() const { return this->pool_; }
     };
 }
