@@ -151,8 +151,11 @@ namespace HelloTriangleApplication::Utilities
         commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
         commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *app.pipelineLayout,
             0, *app.descriptorSets[app.frameIndex], nullptr);
-        commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *app.pipelineLayout,
-            0, *app.resources.materialManager().descriptorSet(), nullptr);
+        
+        // MAYBE: all the fucking crazy errors occur when binding the descriptor sets, so the problem is with them.
+        // commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *app.pipelineLayout,
+        //     0, *app.resources.materialManager().descriptorSet(), nullptr);
+        
         commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
 
         // stop rendering

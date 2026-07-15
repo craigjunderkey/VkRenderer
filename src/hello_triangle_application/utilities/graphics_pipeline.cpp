@@ -155,6 +155,8 @@ namespace HelloTriangleApplication::Utilities
         };
 
         // pipeline layout
+        // MAYBE: we're using two descriptor set layouts, so this shouldn't just be the one
+        //  containing the MVP and the combined texture sampler.
         vk::PipelineLayoutCreateInfo pipelineLayoutInfo {
             .setLayoutCount = 1,
             .pSetLayouts = &*app.descriptorSetLayout,

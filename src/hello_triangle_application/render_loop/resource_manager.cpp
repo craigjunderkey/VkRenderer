@@ -103,38 +103,51 @@ namespace HelloTriangleApplication::RenderLoop
         return Ok();
     }
 
-    Result<Unit, std::string> ResourceManager::loadResources(App& app, std::filesystem::path assetsPath)
+    Result<Unit, std::string> ResourceManager::prepareResources(App& app, std::filesystem::path assetsPath)
     {
         // load assets json
         ResourceReader reader;
         CHECK(reader.readAssetJson(std::move(assetsPath)));
 
+        RawLoadedResources loaded {};
+
         // load textures
-        {
-            auto texPathsResult = reader.readResourcePaths("textures");
-            CHECK_KEEP(texPathsResult);
-            std::vector<std::filesystem::path> texPaths = texPathsResult.take();
-            auto texLoadResult = this->loadTextures(app, std::move(texPaths));
-            CHECK(texLoadResult);
-        }
+        auto texPathsResult = reader.readResourcePaths("textures");
+        CHECK_KEEP(texPathsResult);
+        loaded.texPaths = texPathsResult.take();
 
         // load meshes
-        {
-            auto meshPathsResult = reader.readResourcePaths("meshes");
-            CHECK_KEEP(meshPathsResult);
-            std::vector<std::filesystem::path> meshPaths = meshPathsResult.take();
-            auto meshLoadResult = this->loadMeshes(app, std::move(meshPaths));
-            CHECK(meshLoadResult);
-        }
+        auto meshPathsResult = reader.readResourcePaths("meshes");
+        CHECK_KEEP(meshPathsResult);
+        loaded.meshPaths = meshPathsResult.take();
 
         // load materials
-        {
-            auto matDataResult = reader.readMaterialData();
-            CHECK_KEEP(matDataResult);
-            std::vector<MaterialResourceData> matData = matDataResult.take();
-            auto matLoadResult = this->loadMaterials(app, std::move(matData));
-            CHECK(matLoadResult);
-        }
+        auto matDataResult = reader.readMaterialData();
+        CHECK_KEEP(matDataResult);
+        loaded.matData = matDataResult.take();
+
+        this->loaded_ = std::move(loaded);
+
+        return Ok();
+    }
+
+    Result<Unit, std::string> ResourceManager::loadResources(App& app)
+    {
+        assert(this->loaded_.has_value());
+
+        RawLoadedResources loaded = std::move(this->loaded_.value());
+
+        // import textures
+        auto texLoadResult = this->loadTextures(app, std::move(loaded.texPaths));
+        CHECK(texLoadResult);
+
+        // import meshes
+        auto meshLoadResult = this->loadMeshes(app, std::move(loaded.meshPaths));
+        CHECK(meshLoadResult);
+
+        // import materials
+        auto matLoadResult = this->loadMaterials(app, std::move(loaded.matData));
+        CHECK(matLoadResult);
 
         return Ok();
     }

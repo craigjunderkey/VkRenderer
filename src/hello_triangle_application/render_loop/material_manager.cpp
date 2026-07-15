@@ -79,6 +79,15 @@ namespace HelloTriangleApplication::RenderLoop
         println("---Ids");
         printMap(texIdMap);
 
+        // MAYBE: what follows is the cause of all the warnings at the end of the program.
+        
+        // -- TEMPORARY!!!
+        // save the StringId to material shader id map for outside use
+        mats.matIdMap_ = std::move(matIdMap);
+
+        return std::move(mats);
+        // -- TEMPORARY!!!
+
         // create descriptor pool
         std::array<vk::DescriptorPoolSize, 3> poolSizes {
             vk::DescriptorPoolSize {

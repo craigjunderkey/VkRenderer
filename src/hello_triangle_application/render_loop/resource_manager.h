@@ -15,9 +15,17 @@ namespace HelloTriangleApplication::RenderLoop
 {
     inline StringId pathToStringId(std::filesystem::path path) { return StringId(path.stem()); }
 
+    struct RawLoadedResources
+    {
+        std::vector<std::filesystem::path> texPaths;
+        std::vector<std::filesystem::path> meshPaths;
+        std::vector<MaterialResourceData> matData;
+    };
+
     class ResourceManager
     {
     private:
+        Option<RawLoadedResources> loaded_;
         std::unordered_map<StringId, Geometry::Texture> textures;
         std::unordered_map<StringId, Material> materials;
         std::unordered_map<StringId, Geometry::Mesh<u32>> meshes;
@@ -32,6 +40,7 @@ namespace HelloTriangleApplication::RenderLoop
         Result<Unit, std::string> loadTextures(App& app, std::vector<std::filesystem::path> paths);
         Result<Unit, std::string> loadMaterials(App& app, std::vector<MaterialResourceData> data);
         Result<Unit, std::string> loadMeshes(App& app, std::vector<std::filesystem::path> paths);
-        Result<Unit, std::string> loadResources(App& app, std::filesystem::path assetsJsonPath);
+        Result<Unit, std::string> prepareResources(App& app, std::filesystem::path assetsJsonPath);
+        Result<Unit, std::string> loadResources(App& app);
     };
 }

@@ -69,6 +69,7 @@ namespace HelloTriangleApplication
 
     private:
         void initWindow();
+        void initResources();
         void initVulkan();
         void mainLoop();
         void cleanup();
