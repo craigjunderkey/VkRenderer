@@ -25,7 +25,7 @@ namespace HelloTriangleApplication::RenderLoop
         std::array<vk::DescriptorPoolSize, 3> poolSizes {
             vk::DescriptorPoolSize {
                 .type = vk::DescriptorType::eUniformBuffer,
-                .descriptorCount = numMaterials
+                .descriptorCount = 1
             },
             vk::DescriptorPoolSize {
                 .type = vk::DescriptorType::eSampledImage,
@@ -49,7 +49,7 @@ namespace HelloTriangleApplication::RenderLoop
             vk::DescriptorSetLayoutBinding {
                 .binding = 0,
                 .descriptorType = vk::DescriptorType::eUniformBuffer,
-                .descriptorCount = numMaterials,
+                .descriptorCount = 1,
                 .stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
             },
             vk::DescriptorSetLayoutBinding {
@@ -103,13 +103,6 @@ namespace HelloTriangleApplication::RenderLoop
         printVecAsOrderedList(texVec);
         println("---Ids");
         printMap(texIdMap);
-
-        // MAYBE: what follows is the cause of all the warnings at the end of the program.
-        
-        // -- TEMPORARY!!!
-        this->matIdMap_ = std::move(matIdMap);
-        return Ok();
-        // -- TEMPORARY!!!
 
         // construct array of MaterialUniformData
         std::vector<MaterialUniformData> matData {};
