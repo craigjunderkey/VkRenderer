@@ -1,6 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "graphics_pipeline.h"
 #include "../geometry/vertex.h"
+#include "push_constants.h"
 #include <fstream>
 
 using HelloTriangleApplication::App;
@@ -162,7 +163,7 @@ namespace HelloTriangleApplication::Utilities
         vk::PushConstantRange pushConstantRange {
             .stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
             .offset = 0,
-            .size = sizeof(u32)
+            .size = sizeof(PushConstants)
         };
         vk::PipelineLayoutCreateInfo pipelineLayoutInfo {
             .setLayoutCount = (u32)setLayouts.size(),

@@ -74,7 +74,8 @@ namespace HelloTriangleApplication
     {
         this->renderObject = RenderObject {
             .mesh = "utah_teapot",
-            .material = "coulter"
+            .material = "coulter",
+            .transform { .s { 0.4f, 0.4f, 0.4f } }
         };
     }
 

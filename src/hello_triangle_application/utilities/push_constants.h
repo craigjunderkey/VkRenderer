@@ -1,0 +1,8 @@
+#pragma once
+#include "common.h"
+
+struct PushConstants
+{
+    u32 matId   alignas(4);
+    mat4 model  alignas(16);
+};

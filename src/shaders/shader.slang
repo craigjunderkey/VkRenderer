@@ -40,11 +40,16 @@ struct EveryFrame
     ConstantBuffer<MVP> mvp;
     Sampler2D texture;
 };
+struct PerObject
+{
+    uint matId;
+    float4x4 model;
+};
 
 ParameterBlock<OnCreate> onCreate;
 ParameterBlock<EveryFrame> everyFrame;
 
-[[vk::push_constant]] uint matId;
+[[vk::push_constant]] PerObject obj;
 
 [shader("vertex")]
 VSOutput vertMain(VSInput input)
@@ -53,15 +58,15 @@ VSOutput vertMain(VSInput input)
 
     output.pos = mul(everyFrame.mvp.projection,
         mul(everyFrame.mvp.view,
-            mul(everyFrame.mvp.model, float4(input.inPosition, 1.0))
+            mul(obj.model, float4(input.inPosition, 1.0))
         )
     );
 
     output.normal = input.normal;
 
     // calculate tex coords
-    float2 texOffset = onCreate.materials[matId].texOffset;
-    float2 texScale = onCreate.materials[matId].texScale;
+    float2 texOffset = onCreate.materials[obj.matId].texOffset;
+    float2 texScale = onCreate.materials[obj.matId].texScale;
     output.fragTexCoord = texOffset + input.texCoord * texScale;
 
     return output;
@@ -70,8 +75,8 @@ VSOutput vertMain(VSInput input)
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_Target
 {
-    int texId = onCreate.materials[matId].texId;
-    int samplerId = onCreate.materials[matId].samplerId;
+    int texId = onCreate.materials[obj.matId].texId;
+    int samplerId = onCreate.materials[obj.matId].samplerId;
     return float4(
         onCreate.textures[texId].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb,
         1.0

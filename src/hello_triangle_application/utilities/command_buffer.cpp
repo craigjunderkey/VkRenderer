@@ -2,6 +2,7 @@
 #include "command_buffer.h"
 #include "../geometry/vertex.h"
 #include "../geometry/mesh.h"
+#include "push_constants.h"
 
 using HelloTriangleApplication::App;
 
@@ -160,11 +161,14 @@ namespace HelloTriangleApplication::Utilities
             nullptr
         );
 
-        u32 matId = app.resources.materialManager().getMaterialId(app.renderObject.material);
+        PushConstants pushConstants {
+            .matId = app.resources.materialManager().getMaterialId(app.renderObject.material),
+            .model = app.renderObject.transform.model()
+        };
         commandBuffer.pushConstants(
             *app.pipelineLayout,
             vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-            0, sizeof(u32), &matId
+            0, sizeof(PushConstants), &pushConstants
         );
         
         // draw the damn thing
