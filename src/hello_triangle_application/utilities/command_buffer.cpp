@@ -152,8 +152,8 @@ namespace HelloTriangleApplication::Utilities
         commandBuffer.bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics, *app.pipelineLayout, 0,
             {
-                *app.descriptorSets[app.frameIndex],
-                *app.resources.materialManager().descriptorSet()
+                *app.resources.materialManager().descriptorSet(),
+                *app.descriptorSets[app.frameIndex]
             },
             nullptr
         );

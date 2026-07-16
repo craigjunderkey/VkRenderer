@@ -4,52 +4,65 @@ struct VSInput
     float3 normal;
     float2 texCoord;
 };
-
 struct VSOutput
 {
     float4 pos : SV_POSITION;
     float3 normal;
     float2 fragTexCoord;
 };
-
 struct MVP
 {
     float4x4 model;
     float4x4 view;
     float4x4 projection;
 };
-ConstantBuffer<MVP> mvp;
+struct Material
+{
+    int texId;
+    int samplerId;
+    float shininess;
+    bool isUnlit;
+    float2 texOffset;
+    float2 texScale;
+    float3 ambient;
+    float3 diffuse;
+    float3 specular;
+};
 
-Sampler2D texture;
+struct OnCreate
+{
+    Material materials[2];
+    Texture2D textures[2];
+    SamplerState samplers[1];
+};
+struct EveryFrame
+{
+    ConstantBuffer<MVP> mvp;
+    Sampler2D texture;
+};
 
-// struct Material
-// {
-//     int texId;
-//     int samplerId;
-//     float shininess;
-//     bool isUnlit;
-//     float2 texOffset;
-//     float2 texScale;
-//     float3 ambient;
-//     float3 diffuse;
-//     float3 specular;
-// }
+ParameterBlock<OnCreate> onCreate;
+ParameterBlock<EveryFrame> everyFrame;
 
-// Material materials[];
+#define CURRENT_MAT 1
 
 [shader("vertex")]
 VSOutput vertMain(VSInput input)
 {
     VSOutput output;
-    
-    output.pos = mul(mvp.projection,
-        mul(mvp.view,
-            mul(mvp.model, float4(input.inPosition, 1.0))
+
+    output.pos = mul(everyFrame.mvp.projection,
+        mul(everyFrame.mvp.view,
+            mul(everyFrame.mvp.model, float4(input.inPosition, 1.0))
         )
     );
 
     output.normal = input.normal;
-    output.fragTexCoord = float2(1.0, 1.25) + input.texCoord * float2(4.0, 4.0);
+
+    // calculate tex coords
+    float2 texOffset = onCreate.materials[CURRENT_MAT].texOffset;
+    float2 texScale = onCreate.materials[CURRENT_MAT].texScale;
+    output.fragTexCoord = texOffset + input.texCoord * texScale;
 
     return output;
 }
@@ -57,5 +70,10 @@ VSOutput vertMain(VSInput input)
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_Target
 {
-    return float4(texture.Sample(vertIn.fragTexCoord).rgb, 1.0);
+    int texId = onCreate.materials[CURRENT_MAT].texId;
+    int samplerId = onCreate.materials[CURRENT_MAT].samplerId;
+    return float4(
+        onCreate.textures[texId].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb,
+        1.0
+    );
 }

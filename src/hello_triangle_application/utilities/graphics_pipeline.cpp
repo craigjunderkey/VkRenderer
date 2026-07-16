@@ -156,8 +156,8 @@ namespace HelloTriangleApplication::Utilities
 
         // pipeline layout
         std::array<vk::DescriptorSetLayout, 2> setLayouts {
-            *app.descriptorSetLayout,
-            *app.resources.materialManager().descriptorSetLayout()
+            *app.resources.materialManager().descriptorSetLayout(),
+            *app.descriptorSetLayout
         };
         vk::PipelineLayoutCreateInfo pipelineLayoutInfo {
             .setLayoutCount = (u32)setLayouts.size(),
