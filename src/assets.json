@@ -5,7 +5,9 @@
     },
     "textures": [
         "rcoulter.jpg",
-        "jfantl.jpg"
+        "jfantl.jpg",
+        "ccrumpler.jpg",
+        "rlaurent.png"
     ],
     "meshes": [
         "utah_teapot.obj"
@@ -24,6 +26,16 @@
         "fantl": {
             "texture": "jfantl",
             "texScale": [7.0, 7.0]
+        },
+        "crumpler": {
+            "texture": "ccrumpler",
+            "texScale": [5.0, 5.0],
+            "texOffset": [0.0, 0.25]
+        },
+        "laurent": {
+            "texture": "rlaurent",
+            "texScale": [6.0, 6.0],
+            "texOffset": [0.0, 1.5]
         }
     }
 }

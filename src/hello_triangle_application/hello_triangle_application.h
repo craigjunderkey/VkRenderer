@@ -8,6 +8,7 @@
 #include "../utility/types.h"
 #include "../utility/constants.h"
 #include "window.h"
+#include "keyboard_controller.h"
 #include "utilities/queue.h"
 #include "geometry/buffer.h"
 #include "geometry/texture.h"
@@ -31,6 +32,7 @@ namespace HelloTriangleApplication
 
         // setup
         Window window;
+        KeyboardController keyboard;
         vk::raii::Context context;
         vk::raii::Instance instance = nullptr;
         vk::raii::PhysicalDevice physicalDevice = nullptr;
@@ -69,6 +71,7 @@ namespace HelloTriangleApplication
         // render loop
         ResourceManager resources;
         RenderObject renderObject;
+        u32 demoMatId = 0;
 
     private:
         void initWindow();

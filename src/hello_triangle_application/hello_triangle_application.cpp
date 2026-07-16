@@ -85,6 +85,14 @@ namespace HelloTriangleApplication
         while (!glfwWindowShouldClose(*this->window))
         {
             glfwPollEvents();
+            keyboard.update(this->window);
+
+            if (keyboard.pressedSpace())
+            {
+                this->renderObject.material = this->resources.materialManager().getMaterialName(demoMatId);
+                demoMatId = (demoMatId + 1) % this->resources.materialManager().numMaterials();
+            }
+
             drawFrame(*this).unwrap();
         }
 

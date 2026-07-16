@@ -42,9 +42,12 @@ namespace HelloTriangleApplication::RenderLoop
         
         u32 getMaterialId(const Material& material) const;
         u32 getMaterialId(StringId name) const;
+        StringId getMaterialName(u32 id) const;
 
         const vk::raii::DescriptorSetLayout& descriptorSetLayout() const { return this->layout_; }
         const vk::raii::DescriptorSet& descriptorSet() const { return this->set_; }
         const vk::raii::DescriptorPool& descriptorPool() const { return this->pool_; }
+        
+        u32 numMaterials() const { return this->matIdMap_.size(); }
     };
 }

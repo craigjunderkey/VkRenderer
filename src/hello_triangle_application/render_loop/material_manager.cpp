@@ -190,4 +190,14 @@ namespace HelloTriangleApplication::RenderLoop
         this->matIdMap_ = std::move(matIdMap);
         return Ok();
     }
+
+    StringId MaterialManager::getMaterialName(u32 id) const
+    {
+        auto matIter = this->matIdMap_.begin();
+        for (u32 i = 0; i < id; i++)
+        {
+            matIter++;
+        }
+        return matIter->first;
+    }
 }
