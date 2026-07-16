@@ -145,10 +145,12 @@ namespace HelloTriangleApplication::Utilities
             }
         );
 
-        // draw the damn thing
-        const Geometry::Mesh<u32>& mesh = app.resources.mesh("utah_teapot");
+        // bind the geometry
+        const Geometry::Mesh<u32>& mesh = app.resources.mesh(app.renderObject.mesh);
         commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
         commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
+        
+        // bind our descriptor sets and the current material id
         commandBuffer.bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics, *app.pipelineLayout, 0,
             {
@@ -157,7 +159,15 @@ namespace HelloTriangleApplication::Utilities
             },
             nullptr
         );
+
+        u32 matId = app.resources.materialManager().getMaterialId(app.renderObject.material);
+        commandBuffer.pushConstants(
+            *app.pipelineLayout,
+            vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+            0, sizeof(u32), &matId
+        );
         
+        // draw the damn thing
         commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
 
         // stop rendering

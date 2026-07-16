@@ -13,12 +13,14 @@
 #include "geometry/texture.h"
 #include "geometry/mesh.h"
 #include "render_loop/resource_manager.h"
+#include "render_loop/render_object.h"
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Geometry::FatBuffer;
 using HelloTriangleApplication::Geometry::MappedBuffer;
 using HelloTriangleApplication::Geometry::Texture;
 using HelloTriangleApplication::RenderLoop::ResourceManager;
+using HelloTriangleApplication::RenderLoop::RenderObject;
 
 namespace HelloTriangleApplication
 {
@@ -66,10 +68,12 @@ namespace HelloTriangleApplication
 
         // render loop
         ResourceManager resources;
+        RenderObject renderObject;
 
     private:
         void initWindow();
         void initVulkan();
+        void initScene();
         void mainLoop();
         void cleanup();
     };

@@ -29,6 +29,7 @@ namespace HelloTriangleApplication
     {
         initWindow();
         initVulkan();
+        initScene();
         mainLoop();
         cleanup();
     }
@@ -67,6 +68,14 @@ namespace HelloTriangleApplication
         createSyncObjects(*this).unwrap();
         createViewTransform(*this);
         createProjectionTransform(*this);
+    }
+
+    void App::initScene()
+    {
+        this->renderObject = RenderObject {
+            .mesh = "utah_teapot",
+            .material = "coulter"
+        };
     }
 
     void App::mainLoop()

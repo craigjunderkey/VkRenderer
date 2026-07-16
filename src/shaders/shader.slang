@@ -44,7 +44,7 @@ struct EveryFrame
 ParameterBlock<OnCreate> onCreate;
 ParameterBlock<EveryFrame> everyFrame;
 
-#define CURRENT_MAT 1
+[[vk::push_constant]] uint matId;
 
 [shader("vertex")]
 VSOutput vertMain(VSInput input)
@@ -60,8 +60,8 @@ VSOutput vertMain(VSInput input)
     output.normal = input.normal;
 
     // calculate tex coords
-    float2 texOffset = onCreate.materials[CURRENT_MAT].texOffset;
-    float2 texScale = onCreate.materials[CURRENT_MAT].texScale;
+    float2 texOffset = onCreate.materials[matId].texOffset;
+    float2 texScale = onCreate.materials[matId].texScale;
     output.fragTexCoord = texOffset + input.texCoord * texScale;
 
     return output;
@@ -70,8 +70,8 @@ VSOutput vertMain(VSInput input)
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_Target
 {
-    int texId = onCreate.materials[CURRENT_MAT].texId;
-    int samplerId = onCreate.materials[CURRENT_MAT].samplerId;
+    int texId = onCreate.materials[matId].texId;
+    int samplerId = onCreate.materials[matId].samplerId;
     return float4(
         onCreate.textures[texId].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb,
         1.0

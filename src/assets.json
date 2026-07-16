@@ -21,6 +21,9 @@
             "shininess": 50.0,
             "isUnlit": false
         },
-        "fantl": { "texture" : "jfantl" }
+        "fantl": {
+            "texture": "jfantl",
+            "texScale": [7.0, 7.0]
+        }
     }
 }

@@ -159,10 +159,16 @@ namespace HelloTriangleApplication::Utilities
             *app.resources.materialManager().descriptorSetLayout(),
             *app.descriptorSetLayout
         };
+        vk::PushConstantRange pushConstantRange {
+            .stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+            .offset = 0,
+            .size = sizeof(u32)
+        };
         vk::PipelineLayoutCreateInfo pipelineLayoutInfo {
             .setLayoutCount = (u32)setLayouts.size(),
             .pSetLayouts = setLayouts.data(),
-            .pushConstantRangeCount = 0
+            .pushConstantRangeCount = 1,
+            .pPushConstantRanges = &pushConstantRange
         };
         TRY_ASSIGN(
             app.pipelineLayout,

@@ -94,16 +94,6 @@ namespace HelloTriangleApplication::RenderLoop
         std::unordered_map<StringId, u32> texIdMap = idMapFromKeys(textures);
         std::unordered_map<StringId, u32> matIdMap = idMapFromKeys(materials);
 
-        // debug: print everything!
-        println("--Materials");
-        printVecAsOrderedList(matVec);
-        println("---Ids");
-        printMap(matIdMap);
-        println("--Textures");
-        printVecAsOrderedList(texVec);
-        println("---Ids");
-        printMap(texIdMap);
-
         // construct array of MaterialUniformData
         std::vector<MaterialUniformData> matData {};
         matData.reserve(matVec.size());
