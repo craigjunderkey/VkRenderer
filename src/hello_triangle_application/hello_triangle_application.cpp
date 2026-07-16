@@ -72,10 +72,17 @@ namespace HelloTriangleApplication
 
     void App::initScene()
     {
-        this->renderObject = RenderObject {
-            .mesh = "utah_teapot",
-            .material = "coulter",
-            .transform { .s { 0.4f, 0.4f, 0.4f } }
+        this->renderObjects = {
+            {
+                .mesh = "utah_teapot",
+                .material = "coulter",
+                .transform { .s { 0.4f, 0.4f, 0.4f } }
+            },
+            {
+                .mesh = "utah_teapot",
+                .material = "laurent",
+                .transform { .t { 0.0f, 0.5f, 1.25f }, .r { 0.0f, -0.4f, 0.0f }, .s { 0.15f, 0.15f, 0.15f} }
+            }
         };
     }
 
@@ -87,13 +94,6 @@ namespace HelloTriangleApplication
         {
             glfwPollEvents();
             keyboard.update(this->window);
-
-            if (keyboard.pressedSpace())
-            {
-                this->renderObject.material = this->resources.materialManager().getMaterialName(demoMatId);
-                demoMatId = (demoMatId + 1) % this->resources.materialManager().numMaterials();
-            }
-
             drawFrame(*this).unwrap();
         }
 

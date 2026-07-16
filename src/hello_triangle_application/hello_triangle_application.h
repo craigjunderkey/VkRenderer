@@ -70,8 +70,7 @@ namespace HelloTriangleApplication
 
         // render loop
         ResourceManager resources;
-        RenderObject renderObject;
-        u32 demoMatId = 0;
+        std::vector<RenderObject> renderObjects;
 
     private:
         void initWindow();

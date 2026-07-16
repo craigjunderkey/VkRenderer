@@ -11,7 +11,7 @@ namespace HelloTriangleApplication::RenderLoop
         vec3 r = vec3(0.0, 0.0, 0.0);
         vec3 s = vec3(1.0, 1.0, 1.0);
 
-        mat4 model();
+        mat4 model() const;
     };
 
     void createViewTransform(App& app);

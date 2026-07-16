@@ -146,12 +146,7 @@ namespace HelloTriangleApplication::Utilities
             }
         );
 
-        // bind the geometry
-        const Geometry::Mesh<u32>& mesh = app.resources.mesh(app.renderObject.mesh);
-        commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
-        commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
-        
-        // bind our descriptor sets and the current material id
+        // bind our descriptor sets
         commandBuffer.bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics, *app.pipelineLayout, 0,
             {
@@ -161,18 +156,28 @@ namespace HelloTriangleApplication::Utilities
             nullptr
         );
 
-        PushConstants pushConstants {
-            .matId = app.resources.materialManager().getMaterialId(app.renderObject.material),
-            .model = app.renderObject.transform.model()
-        };
-        commandBuffer.pushConstants(
-            *app.pipelineLayout,
-            vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-            0, sizeof(PushConstants), &pushConstants
-        );
-        
-        // draw the damn thing
-        commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
+        // draw all the render objects
+        for (const RenderObject& renderObject : app.renderObjects)
+        {
+            // bind the geometry
+        const Geometry::Mesh<u32>& mesh = app.resources.mesh(renderObject.mesh);
+            commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
+            commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
+
+            // upload per-object data
+            PushConstants pushConstants {
+                .matId = app.resources.materialManager().getMaterialId(renderObject.material),
+                .model = renderObject.transform.model()
+            };
+            commandBuffer.pushConstants(
+                *app.pipelineLayout,
+                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+                0, sizeof(PushConstants), &pushConstants
+            );
+            
+            // draw the damn thing
+            commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
+        }
 
         // stop rendering
         commandBuffer.endRendering();

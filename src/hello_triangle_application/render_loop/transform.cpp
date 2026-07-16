@@ -9,7 +9,7 @@ constexpr f32 QUARTER_PI = std::numbers::pi / 4.0f;
 
 namespace HelloTriangleApplication::RenderLoop
 {
-    mat4 Transform::model()
+    mat4 Transform::model() const
     {
         mat4 model = mat4(1.0f);
         model = glm::translate(model, this->t);
