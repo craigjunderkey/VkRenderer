@@ -1,5 +1,6 @@
 #pragma once
 #include "transform.h"
+#include "animation.h"
 
 namespace HelloTriangleApplication::RenderLoop
 {
@@ -9,5 +10,13 @@ namespace HelloTriangleApplication::RenderLoop
         StringId mesh;
         StringId material;
         Transform transform;
+        std::unique_ptr<Animation> animation;
+
+        RenderObject() = default;
+        
+        RenderObject(StringId mesh, StringId material, Transform transform, std::unique_ptr<Animation> anim = nullptr)
+            : mesh(mesh), material(material), transform(transform), animation(std::move(anim))
+        {
+        }
     };
 }

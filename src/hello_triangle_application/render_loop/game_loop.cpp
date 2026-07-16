@@ -2,23 +2,29 @@
 #include "game_loop.h"
 #include "../utilities/push_constants.h"
 #include "../geometry/mesh.h"
+#include "animations/spin.h"
+#include "animations/wobble.h"
 
 namespace HelloTriangleApplication::RenderLoop
 {
     void GameLoop::initialize()
     {
-        this->scene_ = {
-            {
-                .mesh = "utah_teapot",
-                .material = "coulter",
-                .transform { .s { 0.4f, 0.4f, 0.4f } }
-            },
-            {
-                .mesh = "utah_teapot",
-                .material = "laurent",
-                .transform { .t { 0.0f, 0.5f, 1.25f }, .r { 0.0f, -0.4f, 0.0f }, .s { 0.15f, 0.15f, 0.15f} }
-            }
-        };
+        this->scene_.emplace_back(
+            RenderObject(
+                "utah_teapot",
+                "coulter",
+                Transform { .s { 0.4f, 0.4f, 0.4f } },
+                std::make_unique<Animations::Wobble>(Animations::Wobble(1.25f, 0.35f, 0.0f))
+            )
+        );
+        this->scene_.emplace_back(
+            RenderObject(
+                "utah_teapot",
+                "laurent",
+                Transform { .t { 0.0f, 0.5f, 1.25f }, .r { 0.0f, -0.4f, 0.0f }, .s { 0.15f, 0.15f, 0.15f} },
+                std::make_unique<Animations::Spin>(Animations::Spin(-0.785f))
+            )
+        );
     }
 
     void GameLoop::startFrame()
@@ -32,6 +38,15 @@ namespace HelloTriangleApplication::RenderLoop
     
     void GameLoop::update(f32 delta)
     {
+        for (RenderObject& obj : this->scene_)
+        {
+            if (!obj.animation) continue;
+
+            AnimationResult result = obj.animation->animate(obj.transform, (f32)glfwGetTime(), delta);
+            obj.transform = std::move(result.xform);
+            if (result.newAnim)
+                obj.animation = std::move(result.newAnim).value();
+        }
     }
 
     void GameLoop::draw(App& app, vk::raii::CommandBuffer& commandBuffer)

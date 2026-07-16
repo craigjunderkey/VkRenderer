@@ -12,9 +12,9 @@ namespace HelloTriangleApplication::RenderLoop
     mat4 Transform::model() const
     {
         mat4 model = mat4(1.0f);
-        model = glm::translate(model, this->t);
-        model = glm::eulerAngleXYZ(this->r.x, this->r.y, this->r.z) * model;
-        model = glm::scale(model, this->s);
+        model = glm::translate(std::move(model), this->t);
+        model = glm::eulerAngleXYZ(this->r.x, this->r.y, this->r.z) * std::move(model);
+        model = glm::scale(std::move(model), this->s);
         return std::move(model);
     }
     
