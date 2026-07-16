@@ -39,7 +39,7 @@ NextImageResult nextImageInSwapChain(App& app)
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> drawFrame(App& app)
+    Result<Unit, std::string> drawFrame(App& app, RenderLoop::GameLoop& loop)
     {
         // wait for draw fence to be signaled
         vk::Result fenceResult = app.device.waitForFences(*app.inFlightFences[app.frameIndex], true, DISABLE_TIMEOUT);
@@ -64,7 +64,9 @@ namespace HelloTriangleApplication::Utilities
         app.graphicsQueue.commandBuffers[app.frameIndex].reset();
 
         HelloTriangleApplication::Geometry::updateUniformBuffer(app, app.frameIndex);
-        recordCommandBuffer(app, imageIndex);
+        beginRender(app, imageIndex);
+        loop.draw(app, app.graphicsQueue.commandBuffers[app.frameIndex]);
+        endRender(app, imageIndex);
 
         // submit draw call
         vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);

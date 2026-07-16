@@ -3,6 +3,9 @@
 #include "../geometry/vertex.h"
 #include "../geometry/mesh.h"
 #include "push_constants.h"
+#include "../render_loop/game_loop.h"
+
+using HelloTriangleApplication::RenderLoop::GameLoop;
 
 using HelloTriangleApplication::App;
 
@@ -65,7 +68,7 @@ namespace HelloTriangleApplication::Utilities
         return Ok();
     }
 
-    void recordCommandBuffer(App& app, u32 imageIndex)
+    void beginRender(App& app, u32 imageIndex)
     {
         const vk::raii::CommandBuffer& commandBuffer = app.graphicsQueue.commandBuffers[app.frameIndex];
         
@@ -155,29 +158,11 @@ namespace HelloTriangleApplication::Utilities
             },
             nullptr
         );
+    }
 
-        // draw all the render objects
-        for (const RenderObject& renderObject : app.renderObjects)
-        {
-            // bind the geometry
-        const Geometry::Mesh<u32>& mesh = app.resources.mesh(renderObject.mesh);
-            commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
-            commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
-
-            // upload per-object data
-            PushConstants pushConstants {
-                .matId = app.resources.materialManager().getMaterialId(renderObject.material),
-                .model = renderObject.transform.model()
-            };
-            commandBuffer.pushConstants(
-                *app.pipelineLayout,
-                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-                0, sizeof(PushConstants), &pushConstants
-            );
-            
-            // draw the damn thing
-            commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
-        }
+    void endRender(App& app, u32 imageIndex)
+    {
+        const vk::raii::CommandBuffer& commandBuffer = app.graphicsQueue.commandBuffers[app.frameIndex];
 
         // stop rendering
         commandBuffer.endRendering();

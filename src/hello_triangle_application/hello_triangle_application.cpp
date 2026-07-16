@@ -29,7 +29,6 @@ namespace HelloTriangleApplication
     {
         initWindow();
         initVulkan();
-        initScene();
         mainLoop();
         cleanup();
     }
@@ -70,31 +69,33 @@ namespace HelloTriangleApplication
         createProjectionTransform(*this);
     }
 
-    void App::initScene()
-    {
-        this->renderObjects = {
-            {
-                .mesh = "utah_teapot",
-                .material = "coulter",
-                .transform { .s { 0.4f, 0.4f, 0.4f } }
-            },
-            {
-                .mesh = "utah_teapot",
-                .material = "laurent",
-                .transform { .t { 0.0f, 0.5f, 1.25f }, .r { 0.0f, -0.4f, 0.0f }, .s { 0.15f, 0.15f, 0.15f} }
-            }
-        };
-    }
-
     void App::mainLoop()
     {
         std::cout << "Entering main loop\n";
+        
+        this->loop.initialize();
+
+        u64 startTime = 0;
 
         while (!glfwWindowShouldClose(*this->window))
         {
+            u64 nowTime = glfwGetTimerValue();
+            
             glfwPollEvents();
+            
+            // continue if the frame time hasn't elapsed
+            f32 timeElapsed = ((nowTime - startTime) / (f64)glfwGetTimerFrequency()) * 1000.0f;
+            if (timeElapsed < FRAME_TIME_MS) continue;
+
+            // start of frame
+            startTime = nowTime;
             keyboard.update(this->window);
-            drawFrame(*this).unwrap();
+            this->loop.startFrame();
+            this->loop.update(FRAME_TIME_SEC);
+            drawFrame(*this, this->loop).unwrap();
+
+            // end of frame
+            this->loop.endFrame();
         }
 
         this->device.waitIdle();

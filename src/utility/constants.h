@@ -27,3 +27,6 @@ constexpr bool VALIDATION_LAYERS_ENABLED = false;
 constexpr std::array<f32, 4> CLEAR_COLOR = {0.0f, 0.0f, 0.0f, 1.0f};
 
 constexpr u32 MAX_FRAMES_IN_FLIGHT = 2;
+
+constexpr f32 FRAME_TIME_SEC = 1.0f / 60.0f;
+constexpr f32 FRAME_TIME_MS = FRAME_TIME_SEC * 1000.0f;

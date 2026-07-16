@@ -6,7 +6,10 @@
 namespace HelloTriangleApplication::Utilities
 {
     Result<Unit, std::string> createCommandBuffers(App& app);
-    void recordCommandBuffer(App& app, u32 imageIndex);
+    
+    void beginRender(App& app, u32 imageIndex);
+    void endRender(App& app, u32 imageIndex);
+
     Result<vk::raii::CommandBuffer, std::string> beginSingleTimeCommands(App& app, FatQueue& queue);
     void endSingleTimeCommands(vk::raii::CommandBuffer&& commandBuffer, FatQueue& queue);
     
