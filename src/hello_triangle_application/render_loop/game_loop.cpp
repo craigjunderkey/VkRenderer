@@ -42,8 +42,8 @@ namespace HelloTriangleApplication::RenderLoop
         {
             if (!obj.animation) continue;
 
-            AnimationResult result = obj.animation->animate(obj.transform, (f32)glfwGetTime(), delta);
-            obj.transform = std::move(result.xform);
+            AnimationResult result = obj.animation->animate(obj.transform.trs(), (f32)glfwGetTime(), delta);
+            obj.transform.setFromTrs(std::move(result.out));
             if (result.newAnim)
                 obj.animation = std::move(result.newAnim).value();
         }
@@ -68,7 +68,7 @@ namespace HelloTriangleApplication::RenderLoop
         // upload per-object data
         PushConstants pushConstants {
             .matId = app.resources.materialManager().getMaterialId(obj.material),
-            .model = obj.transform.model()
+            .model = obj.transform.global()
         };
         commandBuffer.pushConstants(
             *app.pipelineLayout,

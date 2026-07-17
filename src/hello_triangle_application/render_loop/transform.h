@@ -5,13 +5,26 @@ namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::RenderLoop
 {
-    struct Transform
+    struct Trs
     {
-        vec3 t = vec3(0.0, 0.0, 0.0);
-        vec3 r = vec3(0.0, 0.0, 0.0);
-        vec3 s = vec3(1.0, 1.0, 1.0);
+        vec3 t = vec3(0.0f, 0.0f, 0.0f);
+        vec3 r = vec3(0.0f, 0.0f, 0.0f);
+        vec3 s = vec3(1.0f, 1.0f, 1.0f);
 
         mat4 model() const;
+    };
+
+    struct Transform
+    {
+        vec3 t = vec3(0.0f, 0.0f, 0.0f);
+        vec3 r = vec3(0.0f, 0.0f, 0.0f);
+        vec3 s = vec3(1.0f, 1.0f, 1.0f);
+
+        Trs trs() const;
+        mat4 local() const;
+        mat4 global() const;
+
+        void setFromTrs(const Trs& trs);
     };
 
     void createViewTransform(App& app);

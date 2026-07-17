@@ -9,13 +9,43 @@ constexpr f32 QUARTER_PI = std::numbers::pi / 4.0f;
 
 namespace HelloTriangleApplication::RenderLoop
 {
-    mat4 Transform::model() const
+    mat4 Trs::model() const
     {
         mat4 model = mat4(1.0f);
         model = glm::translate(std::move(model), this->t);
         model = glm::eulerAngleXYZ(this->r.x, this->r.y, this->r.z) * std::move(model);
         model = glm::scale(std::move(model), this->s);
         return std::move(model);
+    }
+
+    mat4 Transform::local() const
+    {
+        mat4 model = mat4(1.0f);
+        model = glm::translate(std::move(model), this->t);
+        model = glm::eulerAngleXYZ(this->r.x, this->r.y, this->r.z) * std::move(model);
+        model = glm::scale(std::move(model), this->s);
+        return std::move(model);
+    }
+
+    mat4 Transform::global() const
+    {
+        return this->local();
+    }
+
+    Trs Transform::trs() const
+    {
+        return Trs {
+            .t = this->t,
+            .r = this->r,
+            .s = this->s
+        };
+    }
+
+    void Transform::setFromTrs(const Trs& trs)
+    {
+        this->t = trs.t;
+        this->r = trs.r;
+        this->s = trs.s;
     }
     
     void createViewTransform(App& app)

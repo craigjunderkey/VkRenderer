@@ -11,13 +11,13 @@ namespace HelloTriangleApplication::RenderLoop::Animations
     public:
         Spin(f32 spinRate) : spinRate_(spinRate) {}
 
-        AnimationResult animate(const Transform& xform, f32 time, f32 delta) override
+        AnimationResult animate(Trs in, f32 time, f32 delta) override
         {
-            Transform out = xform;
+            Trs out = in;
             out.r.y = time * this->spinRate_;
             
             return AnimationResult {
-                .xform = out,
+                .out = out,
                 .newAnim = {}
             };
         }

@@ -13,13 +13,13 @@ namespace HelloTriangleApplication::RenderLoop::Animations
     public:
         Wobble(f32 frequency, f32 amplitude, f32 yOrigin) : frequency_(frequency), amplitude_(amplitude), yOrigin_(yOrigin) {}
 
-        AnimationResult animate(const Transform& in, f32 time, f32 delta)
+        AnimationResult animate(Trs in, f32 time, f32 delta)
         {   
-            Transform out = in;
+            Trs out = in;
             out.t.y = this->yOrigin_ + this->amplitude_ * glm::cos(time * this->frequency_);
             
             return AnimationResult {
-                .xform = out,
+                .out = out,
                 .newAnim = {}
             };
         }

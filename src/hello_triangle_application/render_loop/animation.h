@@ -11,13 +11,13 @@ namespace HelloTriangleApplication::RenderLoop
     class Animation
     {
     public:
-        virtual AnimationResult animate(const Transform& xform, f32 time, f32 delta) = 0;
+        virtual AnimationResult animate(const Trs in, f32 time, f32 delta) = 0;
         virtual ~Animation() {}
     };
 
     struct AnimationResult
     {
-        Transform xform;
+        Trs out;
         Option<std::unique_ptr<Animation>> newAnim;
     };
 }
