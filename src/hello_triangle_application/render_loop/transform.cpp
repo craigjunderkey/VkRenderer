@@ -29,7 +29,14 @@ namespace HelloTriangleApplication::RenderLoop
 
     mat4 Transform::global() const
     {
-        return this->local();
+        if (this->parent)
+        {
+            return this->parent.value()->global() * this->local();
+        }
+        else
+        {
+            return this->local();
+        }
     }
 
     Trs Transform::trs() const

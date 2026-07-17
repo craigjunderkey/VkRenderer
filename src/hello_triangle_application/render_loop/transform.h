@@ -19,6 +19,7 @@ namespace HelloTriangleApplication::RenderLoop
         vec3 t = vec3(0.0f, 0.0f, 0.0f);
         vec3 r = vec3(0.0f, 0.0f, 0.0f);
         vec3 s = vec3(1.0f, 1.0f, 1.0f);
+        Option<Transform*> parent = {};
 
         Trs trs() const;
         mat4 local() const;

@@ -25,6 +25,14 @@ namespace HelloTriangleApplication::RenderLoop
                 std::make_unique<Animations::Spin>(Animations::Spin(-0.785f))
             )
         );
+        this->scene_[1].addChild(
+            RenderObject(
+                "utah_teapot",
+                "fantl",
+                Transform { .t { 0.0f, 3.5f, 0.0f }, .s { 0.5f, 0.5f, 0.5f } },
+                std::make_unique<Animations::Spin>(Animations::Spin(1.65f))
+            )
+        );
     }
 
     void GameLoop::startFrame()
@@ -35,17 +43,28 @@ namespace HelloTriangleApplication::RenderLoop
     {
         this->frame_++;
     }
+
+    void animateObject(RenderObject& obj, f32 delta)
+    {
+        if (obj.animation)
+        {
+            AnimationResult result = obj.animation->animate(obj.transform.trs(), (f32)glfwGetTime(), delta);
+            obj.transform.setFromTrs(std::move(result.out));
+            if (result.newAnim)
+                obj.animation = std::move(result.newAnim).value();
+        }
+
+        for (RenderObject& child : obj.children)
+        {
+            animateObject(child, delta);
+        }
+    }
     
     void GameLoop::update(f32 delta)
     {
         for (RenderObject& obj : this->scene_)
         {
-            if (!obj.animation) continue;
-
-            AnimationResult result = obj.animation->animate(obj.transform.trs(), (f32)glfwGetTime(), delta);
-            obj.transform.setFromTrs(std::move(result.out));
-            if (result.newAnim)
-                obj.animation = std::move(result.newAnim).value();
+            animateObject(obj, delta);
         }
     }
 
@@ -54,7 +73,11 @@ namespace HelloTriangleApplication::RenderLoop
         for (const RenderObject& obj : this->scene_)
         {
             GameLoop::submitDraw(app, commandBuffer, obj);
-            // TODO: draw child
+            
+            for (const RenderObject& child : obj.children)
+            {
+                GameLoop::submitDraw(app, commandBuffer, child);
+            }
         }
     }
 

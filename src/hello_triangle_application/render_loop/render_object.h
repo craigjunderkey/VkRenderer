@@ -11,6 +11,7 @@ namespace HelloTriangleApplication::RenderLoop
         StringId material;
         Transform transform;
         std::unique_ptr<Animation> animation;
+        std::vector<RenderObject> children {};
 
         RenderObject() = default;
         
@@ -18,5 +19,7 @@ namespace HelloTriangleApplication::RenderLoop
             : mesh(mesh), material(material), transform(transform), animation(std::move(anim))
         {
         }
+
+        void addChild(RenderObject child, bool parentTransform = true);
     };
 }
