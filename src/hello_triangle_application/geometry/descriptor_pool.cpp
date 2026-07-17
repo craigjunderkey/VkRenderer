@@ -6,13 +6,9 @@ namespace HelloTriangleApplication::Geometry
 {
     Result<Unit, std::string> createDescriptorPool(App& app)
     {
-        std::array<vk::DescriptorPoolSize, 2> poolSizes {
+        std::array<vk::DescriptorPoolSize, 1> poolSizes {
             vk::DescriptorPoolSize {
                 .type = vk::DescriptorType::eUniformBuffer,
-                .descriptorCount = MAX_FRAMES_IN_FLIGHT
-            },
-            vk::DescriptorPoolSize {
-                .type = vk::DescriptorType::eCombinedImageSampler,
                 .descriptorCount = MAX_FRAMES_IN_FLIGHT
             }
         };
@@ -55,15 +51,7 @@ namespace HelloTriangleApplication::Geometry
                 .range = vk::WholeSize
             };
 
-            const Texture& tex = app.resources.texture(StringId("rcoulter"));
-
-            vk::DescriptorImageInfo imageInfo {
-                .sampler = *app.resources.samplerManager().sampler(tex.sampler),
-                .imageView = *tex.view,
-                .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
-            };
-
-            std::array<vk::WriteDescriptorSet, 2> descriptorWrites {
+            std::array<vk::WriteDescriptorSet, 1> descriptorWrites {
                 vk::WriteDescriptorSet {
                     .dstSet = *app.descriptorSets[i],
                     .dstBinding = 0,
@@ -71,21 +59,11 @@ namespace HelloTriangleApplication::Geometry
                     .descriptorCount = 1,
                     .descriptorType = vk::DescriptorType::eUniformBuffer,
                     .pBufferInfo = &bufferInfo
-                },
-                vk::WriteDescriptorSet {
-                    .dstSet = *app.descriptorSets[i],
-                    .dstBinding = 1,
-                    .dstArrayElement = 0,
-                    .descriptorCount = 1,
-                    .descriptorType = vk::DescriptorType::eCombinedImageSampler,
-                    .pImageInfo = &imageInfo
                 }
             };
 
             app.device.updateDescriptorSets(descriptorWrites, {});
         }
-
-        // app.resources.material("fantl").bind(app);
 
         return Ok();
     }

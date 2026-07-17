@@ -65,7 +65,6 @@ namespace HelloTriangleApplication
         createDescriptorSets(*this).unwrap();
         createCommandBuffers(*this).unwrap();
         createSyncObjects(*this).unwrap();
-        createViewTransform(*this);
         createProjectionTransform(*this);
     }
 

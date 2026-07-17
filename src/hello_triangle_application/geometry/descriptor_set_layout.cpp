@@ -5,18 +5,12 @@ namespace HelloTriangleApplication::Geometry
 {
     Result<Unit, std::string> createDescriptorSetLayout(App& app)
     {
-        std::array<vk::DescriptorSetLayoutBinding, 2> bindings {
+        std::array<vk::DescriptorSetLayoutBinding, 1> bindings {
             vk::DescriptorSetLayoutBinding {
                 .binding = 0,
                 .descriptorType = vk::DescriptorType::eUniformBuffer,
                 .descriptorCount = 1,
                 .stageFlags = vk::ShaderStageFlagBits::eVertex
-            },
-            vk::DescriptorSetLayoutBinding {
-                .binding = 1,
-                .descriptorType = vk::DescriptorType::eCombinedImageSampler,
-                .descriptorCount = 1,
-                .stageFlags = vk::ShaderStageFlagBits::eFragment
             }
         };
 

@@ -54,11 +54,6 @@ namespace HelloTriangleApplication::RenderLoop
         this->r = trs.r;
         this->s = trs.s;
     }
-    
-    void createViewTransform(App& app)
-    {
-        app.view = glm::lookAt(vec3(0, 2.0f, 3.0f), vec3(0.0f, 0, -1.0f), vec3(0.0f, 1.0f, 0.0f));
-    }
 
     void createProjectionTransform(App& app)
     {

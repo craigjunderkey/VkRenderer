@@ -2,10 +2,6 @@
 #include "uniform_buffer.h"
 #include "buffer.h"
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <chrono>
-#include <numbers>
-
 namespace HelloTriangleApplication::Geometry
 {
     Result<Unit, std::string> createUniformBuffers(App& app)
@@ -15,7 +11,7 @@ namespace HelloTriangleApplication::Geometry
             auto ubo = MappedBuffer::fromFatBufferResult(
                 FatBuffer::create(
                     app,
-                    sizeof(MVP),
+                    sizeof(PerFrameInfo),
                     vk::BufferUsageFlagBits::eUniformBuffer,
                     vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
                 )
@@ -32,22 +28,13 @@ namespace HelloTriangleApplication::Geometry
 
     void updateUniformBuffer(App& app, u32 frameIndex)
     {
-        // calculate time
-        static auto startTime = std::chrono::high_resolution_clock::now();
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        f32 time = std::chrono::duration<f32, std::chrono::seconds::period>(currentTime - startTime).count();
-
-        // compute MVP
-        constexpr f32 QUARTER_PI = std::numbers::pi / 4.0f;
-
-        MVP ubo {
-            .model = glm::rotate(mat4(1.0f), time * QUARTER_PI, vec3(0.0f, 1.0f, 0.0f)) * glm::scale(mat4(1.0f), {0.4f, 0.4f, 0.4f}),
-            .view = app.view,
+        PerFrameInfo ubo {
+            .view = app.camera.view(),
             .projection = app.projection
         };
+
         ubo.projection[1][1] *= -1;
 
-        // copy MVP to host memory
         memcpy(app.uniformBuffers[frameIndex].data, &ubo, sizeof(ubo));
     }
 }

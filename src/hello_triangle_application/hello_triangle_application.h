@@ -16,14 +16,15 @@
 #include "render_loop/resource_manager.h"
 #include "render_loop/render_object.h"
 #include "render_loop/game_loop.h"
+#include "render_loop/camera.h"
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Geometry::FatBuffer;
 using HelloTriangleApplication::Geometry::MappedBuffer;
 using HelloTriangleApplication::Geometry::Texture;
 using HelloTriangleApplication::RenderLoop::ResourceManager;
-using HelloTriangleApplication::RenderLoop::RenderObject;
 using HelloTriangleApplication::RenderLoop::GameLoop;
+using HelloTriangleApplication::RenderLoop::Camera;
 using HelloTriangleApplication::Input::InputManager;
 
 namespace HelloTriangleApplication
@@ -68,12 +69,12 @@ namespace HelloTriangleApplication
         vk::raii::DescriptorPool descriptorPool = nullptr;
         std::vector<vk::raii::DescriptorSet> descriptorSets = {};
         Texture depthTexture;
-        mat4 view;
         mat4 projection;
 
         // render loop
         ResourceManager resources;
         GameLoop loop = GameLoop(*this);
+        Camera camera;
 
     private:
         void initWindow();

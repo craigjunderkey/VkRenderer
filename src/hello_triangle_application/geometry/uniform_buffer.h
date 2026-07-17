@@ -5,9 +5,8 @@ namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::Geometry
 {
-    struct MVP
+    struct PerFrameInfo
     {
-        mat4 model      alignas(16);
         mat4 view       alignas(16);
         mat4 projection alignas(16);
     };

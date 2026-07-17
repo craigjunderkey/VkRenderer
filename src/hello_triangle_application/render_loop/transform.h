@@ -28,6 +28,5 @@ namespace HelloTriangleApplication::RenderLoop
         void setFromTrs(const Trs& trs);
     };
 
-    void createViewTransform(App& app);
     void createProjectionTransform(App& app);
 }

@@ -10,12 +10,6 @@ struct VSOutput
     float3 normal;
     float2 fragTexCoord;
 };
-struct MVP
-{
-    float4x4 model;
-    float4x4 view;
-    float4x4 projection;
-};
 struct Material
 {
     int texId;
@@ -35,10 +29,10 @@ struct OnCreate
     Texture2D textures[2];
     SamplerState samplers[1];
 };
-struct EveryFrame
+struct PerFrame
 {
-    ConstantBuffer<MVP> mvp;
-    Sampler2D texture;
+    float4x4 view;
+    float4x4 projection;
 };
 struct PerObject
 {
@@ -47,7 +41,7 @@ struct PerObject
 };
 
 ParameterBlock<OnCreate> onCreate;
-ParameterBlock<EveryFrame> everyFrame;
+ParameterBlock<PerFrame> frame;
 
 [[vk::push_constant]] PerObject obj;
 
@@ -56,8 +50,8 @@ VSOutput vertMain(VSInput input)
 {
     VSOutput output;
 
-    output.pos = mul(everyFrame.mvp.projection,
-        mul(everyFrame.mvp.view,
+    output.pos = mul(frame.projection,
+        mul(frame.view,
             mul(obj.model, float4(input.inPosition, 1.0))
         )
     );
