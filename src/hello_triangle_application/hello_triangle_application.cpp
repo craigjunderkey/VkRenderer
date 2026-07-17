@@ -89,14 +89,14 @@ namespace HelloTriangleApplication
 
             // start of frame
             startTime = nowTime;
-            this->keyboard.startFrame();
+            this->inputs.startFrame();
             this->loop.startFrame();
             this->loop.update(FRAME_TIME_SEC);
             drawFrame(*this, this->loop).unwrap();
 
             // end of frame
             this->loop.endFrame();
-            this->keyboard.endFrame();
+            this->inputs.endFrame();
         }
 
         this->device.waitIdle();
