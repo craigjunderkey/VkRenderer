@@ -9,8 +9,9 @@ namespace HelloTriangleApplication::RenderLoop
 {
     void GameLoop::initialize()
     {
-        // register actions
-        this->app_.inputs.keyboard().registerAction("quit", { GLFW_KEY_ESCAPE, GLFW_KEY_Q });
+        // input setup
+        this->app_.inputs.keyboard().registerAction("quit", { GLFW_KEY_Q });
+        this->app_.inputs.keyboard().registerAction("free_mouse", { GLFW_KEY_ESCAPE });
 
         // build scene
         this->scene_.emplace_back(
@@ -66,10 +67,14 @@ namespace HelloTriangleApplication::RenderLoop
     
     void GameLoop::update(f32 delta)
     {
-        // listen for quit request
+        // handle inputs
         if (this->app_.inputs.keyboard().released("quit"))
             this->app_.window.status.markedForClosure = true;
-
+        if (this->app_.inputs.keyboard().released("free_mouse"))
+            this->app_.inputs.mouse().setCursorMode(CursorMode::Default);
+        if (this->app_.inputs.mouse().pressed(MouseButton::Left))
+            this->app_.inputs.mouse().setCursorMode(CursorMode::Locked);
+        
         // animate each object in the scene
         for (RenderObject& obj : this->scene_)
         {

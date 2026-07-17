@@ -8,6 +8,8 @@ namespace HelloTriangleApplication::Input
 {
     class KeyboardController
     {
+        friend class InputManager;
+
     private:
         Window& window_;
         std::unordered_map<StringId, std::unordered_set<i32>> actionMap_;
@@ -16,6 +18,9 @@ namespace HelloTriangleApplication::Input
 
         bool readAction(StringId name) const;
         bool pressingInSet(const std::unordered_set<i32>& keys) const;
+
+        void startFrame();
+        void endFrame();
 
     public:
         KeyboardController(Window& window) : window_(window)
@@ -26,8 +31,6 @@ namespace HelloTriangleApplication::Input
         }
 
         void registerAction(StringId name, std::initializer_list<i32> keys);
-        void startFrame();
-        void endFrame();
         bool pressing(StringId action) const;
         bool pressed(StringId action) const;
         bool released(StringId action) const;
