@@ -12,6 +12,7 @@ namespace HelloTriangleApplication
         {
             bool framebufferResized = false;
             bool isMinimized = false;
+            bool markedForClosure = false;
         };
     
         GLFWwindow* handle = nullptr;
@@ -23,6 +24,7 @@ namespace HelloTriangleApplication
 
         GLFWwindow* operator*();
         void attachGlfwHandle(GLFWwindow* handle);
+        bool shouldClose();
 
     private:
         static void framebufferResizeCallback(GLFWwindow* handle, i32 width, i32 height);

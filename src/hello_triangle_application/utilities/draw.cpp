@@ -65,7 +65,7 @@ namespace HelloTriangleApplication::Utilities
 
         HelloTriangleApplication::Geometry::updateUniformBuffer(app, app.frameIndex);
         beginRender(app, imageIndex);
-        loop.draw(app, app.graphicsQueue.commandBuffers[app.frameIndex]);
+        loop.draw(app.graphicsQueue.commandBuffers[app.frameIndex]);
         endRender(app, imageIndex);
 
         // submit draw call

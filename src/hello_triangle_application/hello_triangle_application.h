@@ -8,7 +8,7 @@
 #include "../utility/types.h"
 #include "../utility/constants.h"
 #include "window.h"
-#include "keyboard_controller.h"
+#include "input/keyboard_controller.h"
 #include "utilities/queue.h"
 #include "geometry/buffer.h"
 #include "geometry/texture.h"
@@ -24,6 +24,7 @@ using HelloTriangleApplication::Geometry::Texture;
 using HelloTriangleApplication::RenderLoop::ResourceManager;
 using HelloTriangleApplication::RenderLoop::RenderObject;
 using HelloTriangleApplication::RenderLoop::GameLoop;
+using HelloTriangleApplication::Input::KeyboardController;
 
 namespace HelloTriangleApplication
 {
@@ -34,7 +35,7 @@ namespace HelloTriangleApplication
 
         // setup
         Window window;
-        KeyboardController keyboard;
+        KeyboardController keyboard = KeyboardController(this->window);
         vk::raii::Context context;
         vk::raii::Instance instance = nullptr;
         vk::raii::PhysicalDevice physicalDevice = nullptr;
@@ -72,7 +73,7 @@ namespace HelloTriangleApplication
 
         // render loop
         ResourceManager resources;
-        GameLoop loop = GameLoop();
+        GameLoop loop = GameLoop(*this);
 
     private:
         void initWindow();

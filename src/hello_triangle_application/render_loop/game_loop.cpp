@@ -9,6 +9,10 @@ namespace HelloTriangleApplication::RenderLoop
 {
     void GameLoop::initialize()
     {
+        // register actions
+        this->app_.keyboard.registerAction("quit", { GLFW_KEY_ESCAPE, GLFW_KEY_Q });
+
+        // build scene
         this->scene_.emplace_back(
             RenderObject(
                 "utah_teapot",
@@ -62,21 +66,26 @@ namespace HelloTriangleApplication::RenderLoop
     
     void GameLoop::update(f32 delta)
     {
+        // listen for quit request
+        if (this->app_.keyboard.released("quit"))
+            this->app_.window.status.markedForClosure = true;
+
+        // animate each object in the scene
         for (RenderObject& obj : this->scene_)
         {
             animateObject(obj, delta);
         }
     }
 
-    void GameLoop::draw(App& app, vk::raii::CommandBuffer& commandBuffer)
+    void GameLoop::draw(vk::raii::CommandBuffer& commandBuffer)
     {
         for (const RenderObject& obj : this->scene_)
         {
-            GameLoop::submitDraw(app, commandBuffer, obj);
+            GameLoop::submitDraw(this->app_, commandBuffer, obj);
             
             for (const RenderObject& child : obj.children)
             {
-                GameLoop::submitDraw(app, commandBuffer, child);
+                GameLoop::submitDraw(this->app_, commandBuffer, child);
             }
         }
     }

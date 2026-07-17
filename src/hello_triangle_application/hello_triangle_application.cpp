@@ -77,7 +77,7 @@ namespace HelloTriangleApplication
 
         u64 startTime = 0;
 
-        while (!glfwWindowShouldClose(*this->window))
+        while (!this->window.shouldClose())
         {
             u64 nowTime = glfwGetTimerValue();
             
@@ -89,13 +89,14 @@ namespace HelloTriangleApplication
 
             // start of frame
             startTime = nowTime;
-            keyboard.update(this->window);
+            this->keyboard.startFrame();
             this->loop.startFrame();
             this->loop.update(FRAME_TIME_SEC);
             drawFrame(*this, this->loop).unwrap();
 
             // end of frame
             this->loop.endFrame();
+            this->keyboard.endFrame();
         }
 
         this->device.waitIdle();

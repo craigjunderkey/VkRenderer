@@ -13,13 +13,16 @@ namespace HelloTriangleApplication::RenderLoop
     private:
         u64 frame_ = 0;
         std::vector<RenderObject> scene_;
+        App& app_;
 
     public:
+        GameLoop(App& app) : app_(app) {}
+
         void initialize();
         void startFrame();
         void endFrame();
         void update(f32 delta);
-        void draw(App& app, vk::raii::CommandBuffer& commandBuffer);
+        void draw(vk::raii::CommandBuffer& commandBuffer);
 
         static void submitDraw(App& app, const vk::raii::CommandBuffer& commandBuffer, const RenderObject& obj);
 

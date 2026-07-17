@@ -40,4 +40,9 @@ namespace HelloTriangleApplication
         auto status = reinterpret_cast<Window::Status*>(glfwGetWindowUserPointer(handle));
         status->isMinimized = isIconified == GLFW_TRUE;
     }
+
+    bool Window::shouldClose()
+    {
+        return glfwWindowShouldClose(this->handle) || this->status.markedForClosure;
+    }
 }
