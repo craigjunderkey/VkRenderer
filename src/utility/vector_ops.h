@@ -17,6 +17,24 @@ namespace VectorOps
             return vec / len;   
     }
 
+    inline vec3 normalize(vec3 vec)
+    {
+        f32 len = vec.length();
+        if (len == 0)
+            return vec3();
+        else
+            return vec / len;
+    }
+
+    inline vec4 normalize(vec4 vec)
+    {
+        f32 len = vec.length();
+        if (len == 0)
+            return vec4();
+        else
+            return vec / len;
+    }
+
     inline vec2 floor(vec2 vec)
     {
         return glm::floor(vec);

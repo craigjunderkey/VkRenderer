@@ -21,6 +21,9 @@ namespace HelloTriangleApplication::RenderLoop
 
     void CameraController::update(f32 delta)
     {
+        if (this->inputs_.mouse().cursorMode() != CursorMode::Locked)
+            return;
+        
         changePos(delta);
         changeRot(delta);
     }
@@ -47,6 +50,16 @@ namespace HelloTriangleApplication::RenderLoop
 
     void CameraController::changeRot(f32 delta)
     {
+        // get desired move
+        vec2 mouseDelta = this->inputs_.mouse().delta();
 
+        // calculate change in rotation
+        vec2 deltaRot = vec2(-mouseDelta.y, mouseDelta.x) * this->sensitivity_;
+
+        // apply change
+        CameraTransform xform = this->handle.transform();
+        xform.xRot += deltaRot.x;
+        xform.yRot += deltaRot.y;
+        this->handle.setTransform(xform);
     }
 }

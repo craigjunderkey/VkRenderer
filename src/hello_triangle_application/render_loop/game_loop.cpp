@@ -27,8 +27,7 @@ namespace HelloTriangleApplication::RenderLoop
             RenderObject(
                 "utah_teapot",
                 "coulter",
-                Transform { .s { 0.4f, 0.4f, 0.4f } },
-                std::make_unique<Animations::Wobble>(Animations::Wobble(1.25f, 0.35f, 0.0f))
+                Transform { .s { 0.4f, 0.4f, 0.4f } }
             )
         );
         this->scene_.emplace_back(

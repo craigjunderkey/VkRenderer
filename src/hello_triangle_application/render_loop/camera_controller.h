@@ -8,8 +8,9 @@ namespace HelloTriangleApplication::RenderLoop
     {
     private:
         HelloTriangleApplication::Input::InputManager& inputs_;
-        f32 xzSpeed_ = 1.0f;
-        f32 ySpeed_ = 0.5f;
+        f32 xzSpeed_ = 2.0f;
+        f32 ySpeed_ = 1.0f;
+        f32 sensitivity_ = 0.001f;
 
         void changePos(f32 delta);
         void changeRot(f32 delta);
