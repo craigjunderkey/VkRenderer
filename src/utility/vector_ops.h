@@ -10,7 +10,7 @@ namespace VectorOps
 
     inline vec2 normalize(vec2 vec)
     {
-        f32 len = vec.length();
+        f32 len = glm::length(vec);
         if (len == 0)
             return vec2();
         else
@@ -19,7 +19,7 @@ namespace VectorOps
 
     inline vec3 normalize(vec3 vec)
     {
-        f32 len = vec.length();
+        f32 len = glm::length(vec);
         if (len == 0)
             return vec3();
         else
@@ -28,7 +28,7 @@ namespace VectorOps
 
     inline vec4 normalize(vec4 vec)
     {
-        f32 len = vec.length();
+        f32 len = glm::length(vec);
         if (len == 0)
             return vec4();
         else

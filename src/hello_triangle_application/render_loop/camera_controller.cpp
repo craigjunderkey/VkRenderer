@@ -35,12 +35,27 @@ namespace HelloTriangleApplication::RenderLoop
         f32 wishY = inputs_.keyboard().axis("move_down", "move_up");
         
         // calculate change in position
-        vec3 rawDeltaPos = vec3(
-            wishDir.x * this->xzSpeed_,
-            wishY * this->ySpeed_,
-            wishDir.y * this->xzSpeed_
-        ) * delta;
-        vec3 deltaPos = this->handle.basis() * vec4(rawDeltaPos, 0.0f);
+        vec3 deltaPos;
+        if (this->config.followMouseStyle)
+        {
+            vec3 rawDeltaPos = vec3(
+                wishDir.x * this->config.xzSpeed,
+                wishY * this->config.ySpeed,
+                wishDir.y * this->config.xzSpeed
+            ) * delta;
+            deltaPos = this->handle.basis() * vec4(rawDeltaPos, 0.0f);
+        }
+        else
+        {
+            vec3 xzDir = glm::rotate(mat4(1.0f), -this->handle.transform().yRot, vec3(0.0f, 1.0f, 0.0f))
+                * vec4(wishDir.x, 0.0f, wishDir.y, 0.0f);
+            
+            deltaPos = vec3(
+                xzDir.x * this->config.xzSpeed,
+                wishY * this->config.ySpeed,
+                xzDir.z * this->config.xzSpeed
+            ) * delta;
+        }
         
         // apply change
         CameraTransform xform = this->handle.transform();
@@ -54,7 +69,7 @@ namespace HelloTriangleApplication::RenderLoop
         vec2 mouseDelta = this->inputs_.mouse().delta();
 
         // calculate change in rotation
-        vec2 deltaRot = vec2(-mouseDelta.y, mouseDelta.x) * this->sensitivity_;
+        vec2 deltaRot = vec2(-mouseDelta.y, mouseDelta.x) * this->config.sensitivity;
 
         // apply change
         CameraTransform xform = this->handle.transform();
