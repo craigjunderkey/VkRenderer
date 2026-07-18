@@ -11,12 +11,13 @@ namespace HelloTriangleApplication::RenderLoop
 
     void CameraController::registerControls()
     {
-        inputs_.keyboard().registerAction("move_forward", { GLFW_KEY_W, GLFW_KEY_UP });
-        inputs_.keyboard().registerAction("move_left", { GLFW_KEY_A, GLFW_KEY_LEFT });
-        inputs_.keyboard().registerAction("move_back", { GLFW_KEY_S, GLFW_KEY_DOWN });
-        inputs_.keyboard().registerAction("move_right", { GLFW_KEY_D, GLFW_KEY_RIGHT });
-        inputs_.keyboard().registerAction("move_up", { GLFW_KEY_SPACE });
-        inputs_.keyboard().registerAction("move_down", { GLFW_KEY_LEFT_SHIFT });
+        inputs_.keyboard().registerAction("cam_move_forward", { GLFW_KEY_W, GLFW_KEY_UP });
+        inputs_.keyboard().registerAction("cam_move_left", { GLFW_KEY_A, GLFW_KEY_LEFT });
+        inputs_.keyboard().registerAction("cam_move_back", { GLFW_KEY_S, GLFW_KEY_DOWN });
+        inputs_.keyboard().registerAction("cam_move_right", { GLFW_KEY_D, GLFW_KEY_RIGHT });
+        inputs_.keyboard().registerAction("cam_move_up", { GLFW_KEY_SPACE });
+        inputs_.keyboard().registerAction("cam_move_down", { GLFW_KEY_LEFT_SHIFT });
+        inputs_.keyboard().registerAction("cam_change_mode", { GLFW_KEY_C });
     }
 
     void CameraController::update(f32 delta)
@@ -24,6 +25,8 @@ namespace HelloTriangleApplication::RenderLoop
         if (this->inputs_.mouse().cursorMode() != CursorMode::Locked)
             return;
         
+        changeMode();
+        changeSpeed();
         changePos(delta);
         changeRot(delta);
     }
@@ -31,8 +34,8 @@ namespace HelloTriangleApplication::RenderLoop
     void CameraController::changePos(f32 delta)
     {
         // get desired move
-        vec2 wishDir = inputs_.keyboard().vector("move_left", "move_right", "move_forward", "move_back");
-        f32 wishY = inputs_.keyboard().axis("move_down", "move_up");
+        vec2 wishDir = inputs_.keyboard().vector("cam_move_left", "cam_move_right", "cam_move_forward", "cam_move_back");
+        f32 wishY = inputs_.keyboard().axis("cam_move_down", "cam_move_up");
         
         // calculate change in position
         vec3 deltaPos;
@@ -76,5 +79,59 @@ namespace HelloTriangleApplication::RenderLoop
         xform.xRot += deltaRot.x;
         xform.yRot += deltaRot.y;
         this->handle.setTransform(xform);
+    }
+
+    void CameraController::changeSpeed()
+    {
+        // get mouse wheel delta
+        f32 delta = this->inputs_.mouse().scrollDelta().y;
+        if (delta == 0.0f)
+            return;
+        
+        // change xz speed
+        vec2 wishXz = inputs_.keyboard().vector("cam_move_left", "cam_move_right", "cam_move_forward", "cam_move_back");
+        if (VectorOps::lengthSquared(wishXz) > VectorOps::EPSILON)
+        {
+            f32 newSpeed = this->config.xzSpeed + delta * this->config.xzSpeedIncrement;
+            if (newSpeed < VectorOps::EPSILON)
+                return;
+            this->config.xzSpeed = newSpeed;
+            
+            if (this->config.logCameraChanges)
+                std::cout << "Camera xz-speed changed to " << this->config.xzSpeed << std::endl;
+            
+            return;
+        }
+        
+        // change y speed
+        f32 wishY = inputs_.keyboard().axis("cam_move_down", "cam_move_up");
+        if (glm::abs(wishY) > VectorOps::EPSILON)
+        {
+            f32 newSpeed = this->config.ySpeed + delta * this->config.ySpeedIncrement;
+            if (newSpeed < VectorOps::EPSILON)
+                return;
+            this->config.ySpeed = newSpeed;
+
+            if (this->config.logCameraChanges)
+                std::cout << "Camera y-speed changed to " << this->config.ySpeed << std::endl;
+            
+            return;
+        }
+    }
+
+    void CameraController::changeMode()
+    {
+        if (this->inputs_.keyboard().pressed("cam_change_mode"))
+        {
+            this->config.followMouseStyle = !this->config.followMouseStyle;
+            if (this->config.logCameraChanges && this->config.followMouseStyle)
+            {
+                std::cout << "Camera now following mouse\n";
+            }
+            else
+            {
+                std::cout << "Camera no longer following mouse\n";
+            }
+        }
     }
 }

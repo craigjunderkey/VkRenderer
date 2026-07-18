@@ -9,15 +9,19 @@ namespace HelloTriangleApplication::RenderLoop
         f32 xzSpeed = 2.0f;
         f32 ySpeed = 1.0f;
         f32 sensitivity = 0.001f;
+        f32 xzSpeedIncrement = 1.0f;
+        f32 ySpeedIncrement = 0.5f;
         bool followMouseStyle = false;
+        bool logCameraChanges = false;
     };
 
     class CameraController
     {
     private:
         HelloTriangleApplication::Input::InputManager& inputs_;
-        CameraControlConfig config_;
 
+        void changeSpeed();
+        void changeMode();
         void changePos(f32 delta);
         void changeRot(f32 delta);
 
