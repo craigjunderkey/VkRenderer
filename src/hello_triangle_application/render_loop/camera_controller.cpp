@@ -21,16 +21,32 @@ namespace HelloTriangleApplication::RenderLoop
 
     void CameraController::update(f32 delta)
     {
+        changePos(delta);
+        changeRot(delta);
+    }
+
+    void CameraController::changePos(f32 delta)
+    {
+        // get desired move
         vec2 wishDir = inputs_.keyboard().vector("move_left", "move_right", "move_forward", "move_back");
         f32 wishY = inputs_.keyboard().axis("move_down", "move_up");
-        vec3 deltaPos = vec3(
+        
+        // calculate change in position
+        vec3 rawDeltaPos = vec3(
             wishDir.x * this->xzSpeed_,
             wishY * this->ySpeed_,
             wishDir.y * this->xzSpeed_
         ) * delta;
+        vec3 deltaPos = this->handle.basis() * vec4(rawDeltaPos, 0.0f);
         
+        // apply change
         CameraTransform xform = this->handle.transform();
         xform.pos += deltaPos;
         this->handle.setTransform(xform);
+    }
+
+    void CameraController::changeRot(f32 delta)
+    {
+
     }
 }

@@ -8,10 +8,14 @@ namespace HelloTriangleApplication::RenderLoop
 {
     mat4 Camera::view() const
     {
-        vec3 lookVec = glm::rotate(mat4(1.0f), this->xform_.xRot, SIDE)
-            * glm::rotate(mat4(1.0f), -this->xform_.yRot, UP)
-            * vec4(FORWARD, 1.0f);
+        vec3 lookVec = this->basis() * vec4(FORWARD, 0.0f);
         return glm::lookAt(this->xform_.pos, this->xform_.pos + lookVec, UP);
+    }
+
+    mat4 Camera::basis() const
+    {
+        return glm::rotate(mat4(1.0f), this->xform_.xRot, SIDE)
+            * glm::rotate(mat4(1.0f), -this->xform_.yRot, UP);
     }
 
     CameraTransform Camera::transform() const

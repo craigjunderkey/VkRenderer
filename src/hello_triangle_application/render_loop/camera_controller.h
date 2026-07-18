@@ -11,6 +11,9 @@ namespace HelloTriangleApplication::RenderLoop
         f32 xzSpeed_ = 1.0f;
         f32 ySpeed_ = 0.5f;
 
+        void changePos(f32 delta);
+        void changeRot(f32 delta);
+
     public:
         Camera handle;
         

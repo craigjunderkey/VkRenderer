@@ -25,6 +25,7 @@ namespace HelloTriangleApplication::RenderLoop
         Camera(CameraTransform transform) : xform_(transform) {}
 
         mat4 view() const;
+        mat4 basis() const;
         CameraTransform transform() const;
         void setTransform(CameraTransform transform);
     };
