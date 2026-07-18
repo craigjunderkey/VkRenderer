@@ -14,7 +14,9 @@ namespace HelloTriangleApplication::Input
     
     bool KeyboardController::readAction(StringId name) const
     {
-        const std::unordered_set<i32>& keys = this->actionMap_.find(name)->second;
+        auto result = this->actionMap_.find(name);
+        assert(result != this->actionMap_.end());
+        const std::unordered_set<i32>& keys = result->second;
         return this->pressingInSet(keys);
     }
 
@@ -50,16 +52,41 @@ namespace HelloTriangleApplication::Input
 
     bool KeyboardController::pressing(StringId action) const
     {
-        return this->keyboard_.find(action)->second;
+        auto result = this->keyboard_.find(action);
+        assert(result != this->keyboard_.end());
+        return result->second;
     }
 
     bool KeyboardController::pressed(StringId action) const
     {
-        return this->keyboard_.find(action)->second && !this->prevKeyboard_.find(action)->second;
+        auto currResult = this->keyboard_.find(action);
+        assert(currResult != this->keyboard_.end());
+        auto prevResult = this->prevKeyboard_.find(action);
+        assert(prevResult != this->prevKeyboard_.end());
+        return currResult->second && !prevResult->second;
     }
 
     bool KeyboardController::released(StringId action) const
     {
-        return !this->keyboard_.find(action)->second && this->prevKeyboard_.find(action)->second;
+        auto currResult = this->keyboard_.find(action);
+        assert(currResult != this->keyboard_.end());
+        auto prevResult = this->prevKeyboard_.find(action);
+        assert(prevResult != this->prevKeyboard_.end());
+        return !currResult->second && prevResult->second;
+    }
+
+    f32 KeyboardController::axis(StringId neg, StringId pos) const
+    {
+        f32 val = 0.0f;
+        if (this->pressing(neg))
+            val -= 1.0f;
+        if (this->pressing(pos))
+            val += 1.0f;
+        return val;
+    }
+
+    vec2 KeyboardController::vector(StringId negX, StringId posX, StringId negY, StringId posY) const
+    {
+        return VectorOps::normalize(vec2(this->axis(negX, posX), this->axis(negY, posY)));
     }
 }

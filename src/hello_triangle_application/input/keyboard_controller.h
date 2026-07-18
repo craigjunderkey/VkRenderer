@@ -34,5 +34,7 @@ namespace HelloTriangleApplication::Input
         bool pressing(StringId action) const;
         bool pressed(StringId action) const;
         bool released(StringId action) const;
+        f32 axis(StringId neg, StringId pos) const;
+        vec2 vector(StringId negX, StringId posX, StringId negY, StringId posY) const;
     };
 }

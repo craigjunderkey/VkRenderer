@@ -73,6 +73,7 @@ namespace HelloTriangleApplication
         std::cout << "Entering main loop\n";
         
         this->loop.initialize();
+        this->camera.registerControls();
 
         u64 startTime = 0;
 
@@ -90,6 +91,7 @@ namespace HelloTriangleApplication
             startTime = nowTime;
             this->inputs.startFrame();
             this->loop.startFrame();
+            this->camera.update(FRAME_TIME_SEC);
             this->loop.update(FRAME_TIME_SEC);
             drawFrame(*this, this->loop).unwrap();
 

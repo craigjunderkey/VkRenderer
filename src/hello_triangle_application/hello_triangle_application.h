@@ -16,7 +16,7 @@
 #include "render_loop/resource_manager.h"
 #include "render_loop/render_object.h"
 #include "render_loop/game_loop.h"
-#include "render_loop/camera.h"
+#include "render_loop/camera_controller.h"
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Geometry::FatBuffer;
@@ -24,7 +24,7 @@ using HelloTriangleApplication::Geometry::MappedBuffer;
 using HelloTriangleApplication::Geometry::Texture;
 using HelloTriangleApplication::RenderLoop::ResourceManager;
 using HelloTriangleApplication::RenderLoop::GameLoop;
-using HelloTriangleApplication::RenderLoop::Camera;
+using HelloTriangleApplication::RenderLoop::CameraController;
 using HelloTriangleApplication::Input::InputManager;
 
 namespace HelloTriangleApplication
@@ -74,7 +74,7 @@ namespace HelloTriangleApplication
         // render loop
         ResourceManager resources;
         GameLoop loop = GameLoop(*this);
-        Camera camera;
+        CameraController camera = CameraController(RenderLoop::Camera(), this->inputs);
 
     private:
         void initWindow();

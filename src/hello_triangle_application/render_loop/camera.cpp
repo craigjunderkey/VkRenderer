@@ -11,7 +11,7 @@ namespace HelloTriangleApplication::RenderLoop
         vec3 lookVec = glm::rotate(mat4(1.0f), this->xform_.xRot, SIDE)
             * glm::rotate(mat4(1.0f), -this->xform_.yRot, UP)
             * vec4(FORWARD, 1.0f);
-        return glm::lookAt(-this->xform_.pos, -this->xform_.pos + lookVec, UP);
+        return glm::lookAt(this->xform_.pos, this->xform_.pos + lookVec, UP);
     }
 
     CameraTransform Camera::transform() const
