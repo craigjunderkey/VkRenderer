@@ -10,6 +10,8 @@ namespace HelloTriangleApplication::RenderLoop
 {
     Result<Unit, std::string> ResourceManager::loadTextures(App& app, std::vector<std::filesystem::path> paths)
     {
+        u32 numTexturesLoaded = 0;
+
         for (const auto& path : paths)
         {
             // load texture
@@ -22,23 +24,25 @@ namespace HelloTriangleApplication::RenderLoop
             // add it to the map
             StringId id = pathToStringId(path);
             texture.name = id;
-            
-            #ifndef NDEBUG
-                std::cout << "Loaded texture " << id.string() << " (" << pathString << ")\n";
-            #endif
 
             auto pair = std::tuple<StringId, Texture>(std::move(id), std::move(texture));
             auto insertResult = this->textures.insert(std::move(pair));
             
             if (!insertResult.second)
                 return Err<std::string>("Tried to load " + pathString + " multiple times.");
+            else
+                numTexturesLoaded++;
         }
+
+        std::cout << "Loaded textures (" << numTexturesLoaded << "/" << paths.size() << ")\n";
 
         return Ok();
     }
 
     Result<Unit, std::string> ResourceManager::loadMaterials(App& app, std::vector<MaterialResourceData> data)
     {
+        u32 numMaterialsLoaded = 0;
+
         for (const MaterialResourceData& matData : data)
         {
             // load material
@@ -57,24 +61,26 @@ namespace HelloTriangleApplication::RenderLoop
             // add it to the map
             StringId id = std::move(matData.name);
 
-            #ifndef NDEBUG
-                std::cout << "Loaded material " << id.string() << "\n";
-            #endif
-
             auto pair = std::tuple<StringId, Material>(std::move(id), std::move(mat));
             auto insertResult = this->materials.insert(std::move(pair));
 
             if (!insertResult.second)
                 return Err<std::string>("Tried to load material " + std::string(id) + " multiple times.");
+            else
+                numMaterialsLoaded++;
         }
 
         this->matManager_.writeMaterialData(app, this->textures, this->materials);
+
+        std::cout << "Loaded materials (" << numMaterialsLoaded << "/" << data.size() << ")\n";
 
         return Ok();
     }
 
     Result<Unit, std::string> ResourceManager::loadMeshes(App& app, std::vector<std::filesystem::path> paths)
     {
+        u32 numMeshesLoaded = 0;
+
         for (const auto& path : paths)
         {
             //load mesh
@@ -88,16 +94,16 @@ namespace HelloTriangleApplication::RenderLoop
             StringId id = pathToStringId(path);
             mesh.name = id;
 
-            #ifndef NDEBUG
-                std::cout << "Loaded mesh " << id.string() << " (" << pathString << ")\n";
-            #endif
-
             auto pair = std::tuple<StringId, Mesh<u32>>(std::move(id), std::move(mesh));
             auto insertResult = this->meshes.insert(std::move(pair));
 
             if (!insertResult.second)
                 return Err<std::string>("Tried to load " + pathString + " multiple times.");
+            else
+                numMeshesLoaded++;
         }
+
+        std::cout << "Loaded meshes (" << numMeshesLoaded << "/" << paths.size() << ")\n";
 
         return Ok();
     }
