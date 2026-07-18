@@ -1,8 +1,7 @@
 #include "camera.h"
+#include "transform.h"
 
-#include <numbers>
-
-constexpr f32 HALF_PI = std::numbers::pi / 2.0f;
+constexpr f32 HALF_PI = glm::pi<f32>() / 2.0f;
 
 namespace HelloTriangleApplication::RenderLoop
 {
@@ -14,8 +13,9 @@ namespace HelloTriangleApplication::RenderLoop
 
     mat4 Camera::basis() const
     {
-        return glm::rotate(mat4(1.0f), this->xform_.xRot, SIDE)
-            * glm::rotate(mat4(1.0f), -this->xform_.yRot, UP);
+        mat4 yRotation = glm::rotate(mat4(1.0f), -this->xform_.yRot, UP);
+        mat4 xRotation = glm::rotate(mat4(1.0f), this->xform_.xRot, SIDE);
+        return yRotation * xRotation;
     }
 
     CameraTransform Camera::transform() const
