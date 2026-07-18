@@ -41,12 +41,13 @@ namespace HelloTriangleApplication::RenderLoop
         vec3 deltaPos;
         if (this->config.followMouseStyle)
         {
-            vec3 rawDeltaPos = vec3(
+            deltaPos = vec3(
                 wishDir.x * this->config.xzSpeed,
-                wishY * this->config.ySpeed,
+                0.0f,
                 wishDir.y * this->config.xzSpeed
             ) * delta;
-            deltaPos = this->handle.basis() * vec4(rawDeltaPos, 0.0f);
+            deltaPos = this->handle.basis() * vec4(deltaPos, 0.0f);
+            deltaPos.y += wishY * this->config.ySpeed * delta;
         }
         else
         {
@@ -124,13 +125,17 @@ namespace HelloTriangleApplication::RenderLoop
         if (this->inputs_.keyboard().pressed("cam_change_mode"))
         {
             this->config.followMouseStyle = !this->config.followMouseStyle;
-            if (this->config.logCameraChanges && this->config.followMouseStyle)
+            
+            if (this->config.logCameraChanges)
             {
-                std::cout << "Camera now following mouse\n";
-            }
-            else
-            {
-                std::cout << "Camera no longer following mouse\n";
+                if (this->config.followMouseStyle)
+                {
+                    std::cout << "Camera now following mouse\n";
+                }
+                else
+                {
+                    std::cout << "Camera no longer following mouse\n";
+                }
             }
         }
     }
