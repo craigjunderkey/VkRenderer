@@ -13,6 +13,15 @@ namespace HelloTriangleApplication::RenderLoop
         this->app_.inputs.keyboard().registerAction("quit", { GLFW_KEY_Q });
         this->app_.inputs.keyboard().registerAction("free_mouse", { GLFW_KEY_ESCAPE });
 
+        // camera setup
+        this->app_.camera.setTransform(
+            CameraTransform {
+                .pos = vec3(0.0f, -2.0f, -3.0f),
+                .xRot = -glm::pi<f32>() / 7,
+                .yRot = 0.0f
+            }
+        );
+
         // build scene
         this->scene_.emplace_back(
             RenderObject(
