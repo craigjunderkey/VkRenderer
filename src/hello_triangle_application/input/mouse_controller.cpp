@@ -2,8 +2,23 @@
 
 namespace HelloTriangleApplication::Input
 {
+    vec2 MouseController::scrollDelta_ = vec2(0.0f, 0.0f);
+
+    MouseController::MouseController(Window& window) : window_(window)
+    {
+        this->mouseButtons_ = { false };
+        this->prevMouseButtons_ = { false };
+    }
+
     void MouseController::startFrame()
     {
+        // register scrollback if we haven't already
+        if (!this->hasRegisteredCallback_)
+        {
+            glfwSetScrollCallback(*this->window_, scrollCallback);
+            this->hasRegisteredCallback_ = true;
+        }
+        
         // update mouse buttons
         this->mouseButtons_[MouseButton::Left] = glfwGetMouseButton(*this->window_, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
         this->mouseButtons_[MouseButton::Right] = glfwGetMouseButton(*this->window_, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
@@ -14,6 +29,7 @@ namespace HelloTriangleApplication::Input
     {
         this->prevMouseButtons_.swap(this->mouseButtons_);
         this->prevPos_ = this->pos();
+        MouseController::scrollDelta_ = vec2(0.0f, 0.0f);
     }
 
     bool MouseController::pressing(MouseButton button) const
@@ -57,5 +73,15 @@ namespace HelloTriangleApplication::Input
     {
         i32 mode = glfwGetInputMode(*this->window_, GLFW_CURSOR);
         return static_cast<CursorMode>(mode);
+    }
+
+    void MouseController::scrollCallback(GLFWwindow* window, f64 xOffset, f64 yOffset)
+    {
+        MouseController::scrollDelta_ += vec2(xOffset, yOffset);
+    }
+
+    vec2 MouseController::scrollDelta() const
+    {
+        return MouseController::scrollDelta_;
     }
 }
