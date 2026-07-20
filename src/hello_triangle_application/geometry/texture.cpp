@@ -40,8 +40,17 @@ namespace HelloTriangleApplication::Geometry
         return samplerResult.take();
     }
 
-    void generateMipmaps(vk::raii::CommandBuffer& commandBuffer, vk::raii::Image& image, u32 texWidth, u32 texHeight, u32 mipLevels)
+    Result<Unit, std::string> generateMipmaps(App& app, vk::raii::CommandBuffer& commandBuffer, vk::raii::Image& image, u32 texWidth, u32 texHeight, u32 mipLevels, vk::Format format)
     {
+        // check whether the image format supports blitting
+        vk::FormatProperties formatProperties = app.physicalDevice.getFormatProperties(format);
+        bool supportsLinearFiltering = static_cast<bool>(formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eSampledImageFilterLinear);
+        if (!supportsLinearFiltering)
+        {   
+            return Err<std::string>("Image format " + vk::to_string(format) + " does not support linear filtering, so mipmaps cannot be generated.");
+        }
+        
+        // prepare image barrier with shared properties
         vk::ImageMemoryBarrier barrier {
             .srcQueueFamilyIndex = vk::QueueFamilyIgnored,
             .dstQueueFamilyIndex = vk::QueueFamilyIgnored,
@@ -118,6 +127,8 @@ namespace HelloTriangleApplication::Geometry
 
         commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer,
             vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, barrier);
+        
+        return Ok();
     }
 
     Result<Texture, std::string> Texture::loadFromFile(App& app, std::string path, vk::Format format,
@@ -184,7 +195,7 @@ namespace HelloTriangleApplication::Geometry
         
         if (doMipmapping)
         {
-            generateMipmaps(copyCommand, texture.image, width, height, texture.mipLevels);
+            CHECK(generateMipmaps(app, copyCommand, texture.image, width, height, texture.mipLevels, format));
         }
         else
         {
