@@ -22,6 +22,6 @@ namespace HelloTriangleApplication
 
     constexpr AppConfig CONFIG {
         .logByDefault = true,
-        .antiAliasing = Setting::AntiAliasing::MSAAx8
+        .antiAliasing = Setting::AntiAliasing::MSAAx4
     };
 }

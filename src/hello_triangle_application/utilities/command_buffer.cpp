@@ -88,6 +88,20 @@ namespace HelloTriangleApplication::Utilities
             vk::ImageAspectFlagBits::eColor
         );
 
+        // then transition multisampled color attachment image to optimal layout
+        stageTransitionImageLayout(
+            app,
+            app.colorTexture.image,
+            app.graphicsQueue.commandBuffers[app.frameIndex],
+            vk::ImageLayout::eUndefined,
+            vk::ImageLayout::eColorAttachmentOptimal,
+            {},
+            vk::AccessFlagBits2::eColorAttachmentWrite,
+            vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+            vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+            vk::ImageAspectFlagBits::eColor
+        );
+
         // then transition depth image to optimal layout
         stageTransitionImageLayout(
             app, app.depthTexture.image, app.graphicsQueue.commandBuffers[app.frameIndex],
@@ -97,16 +111,6 @@ namespace HelloTriangleApplication::Utilities
             vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
             vk::ImageAspectFlagBits::eDepth
         );
-
-        // set up the color attachment
-        vk::ClearValue clearColor { .color = vk::ClearColorValue(CLEAR_COLOR) };
-        vk::RenderingAttachmentInfo colorAttachment {
-            .imageView = app.swapChainImageViews[imageIndex],
-            .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
-            .loadOp = vk::AttachmentLoadOp::eClear,
-            .storeOp = vk::AttachmentStoreOp::eStore,
-            .clearValue = clearColor
-        };
 
         // set up the depth attachment
         vk::ClearValue clearDepth { .depthStencil = {1.0f, 0} };
@@ -118,6 +122,19 @@ namespace HelloTriangleApplication::Utilities
             .clearValue = clearDepth
         };
 
+        // set up the multisampled color attachment
+        vk::ClearValue clearColor { .color = vk::ClearColorValue(CLEAR_COLOR) };
+        vk::RenderingAttachmentInfo multisampledColorAttachment {
+            .imageView = app.colorTexture.view,
+            .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+            .resolveMode = vk::ResolveModeFlagBits::eAverage,
+            .resolveImageView = app.swapChainImageViews[imageIndex],
+            .resolveImageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+            .loadOp = vk::AttachmentLoadOp::eClear,
+            .storeOp = vk::AttachmentStoreOp::eDontCare,
+            .clearValue = clearColor
+        };
+
         // set up rendering info
         vk::RenderingInfo renderingInfo {
             .renderArea = {
@@ -126,7 +143,7 @@ namespace HelloTriangleApplication::Utilities
             },
             .layerCount = 1,
             .colorAttachmentCount = 1,
-            .pColorAttachments = &colorAttachment,
+            .pColorAttachments = &multisampledColorAttachment,
             .pDepthAttachment = &depthAttachment
         };
 

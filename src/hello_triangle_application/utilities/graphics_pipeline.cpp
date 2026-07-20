@@ -123,7 +123,7 @@ namespace HelloTriangleApplication::Utilities
 
         // multisampling
         vk::PipelineMultisampleStateCreateInfo multisampleStateInfo {
-            .rasterizationSamples = vk::SampleCountFlagBits::e1,
+            .rasterizationSamples = app.msaaSamples,
             .sampleShadingEnable = false
         };
 
