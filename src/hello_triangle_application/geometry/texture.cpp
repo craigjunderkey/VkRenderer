@@ -28,7 +28,7 @@ namespace HelloTriangleApplication::Geometry
             .compareEnable = vk::False,
             .compareOp = vk::CompareOp::eAlways,
             .minLod = 0.0f,
-            .maxLod = 0.0f,
+            .maxLod = vk::LodClampNone,
             .borderColor = vk::BorderColor::eIntOpaqueBlack,
             .unnormalizedCoordinates = vk::False
         };
