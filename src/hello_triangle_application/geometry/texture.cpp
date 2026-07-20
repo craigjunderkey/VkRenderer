@@ -40,8 +40,89 @@ namespace HelloTriangleApplication::Geometry
         return samplerResult.take();
     }
 
+    void generateMipmaps(vk::raii::CommandBuffer& commandBuffer, vk::raii::Image& image, u32 texWidth, u32 texHeight, u32 mipLevels)
+    {
+        vk::ImageMemoryBarrier barrier {
+            .srcQueueFamilyIndex = vk::QueueFamilyIgnored,
+            .dstQueueFamilyIndex = vk::QueueFamilyIgnored,
+            .image = *image,
+            .subresourceRange {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .levelCount = 1,
+                .layerCount = 1,
+            }
+        };
+
+        u32 mipWidth = texWidth;
+        u32 mipHeight = texHeight;
+        for (u32 i = 1; i < mipLevels; i++)
+        {
+            // prepare image for copying previous mip
+            barrier.subresourceRange.baseMipLevel = i - 1;
+            barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+            barrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
+            barrier.oldLayout = vk::ImageLayout::eTransferDstOptimal;
+            barrier.newLayout = vk::ImageLayout::eTransferSrcOptimal;
+
+            commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eTransfer, {}, {}, {}, barrier);
+
+            // blit previous mip to current mip
+            u32 nextMipWidth = std::max(1u, mipWidth / 2);
+            u32 nextMipHeight = std::max(1u, mipHeight / 2);
+            vk::ImageBlit blit {
+                .srcSubresource = vk::ImageSubresourceLayers {
+                    .aspectMask = vk::ImageAspectFlagBits::eColor,
+                    .mipLevel = i - 1,
+                    .layerCount = 1
+                },
+                .srcOffsets = std::array<vk::Offset3D, 2>({
+                    {},
+                    { (i32)mipWidth, (i32)mipHeight, 1 }
+                }),
+                .dstSubresource = vk::ImageSubresourceLayers {
+                    .aspectMask = vk::ImageAspectFlagBits::eColor,
+                    .mipLevel = i,
+                    .layerCount = 1
+                },
+                .dstOffsets = std::array<vk::Offset3D, 2>({
+                    {},
+                    { (i32)nextMipWidth, (i32)nextMipHeight, 1 }
+                })
+            };
+
+            commandBuffer.blitImage(*image, vk::ImageLayout::eTransferSrcOptimal,
+                *image, vk::ImageLayout::eTransferDstOptimal,
+                blit, vk::Filter::eLinear);
+            
+            // prepare previous mip for being read by shaders
+            barrier.subresourceRange.baseMipLevel = i - 1;
+            barrier.srcAccessMask = vk::AccessFlagBits::eTransferRead;
+            barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+            barrier.oldLayout = vk::ImageLayout::eTransferSrcOptimal;
+            barrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
+            commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer,
+                vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, barrier);
+
+            // update current mip dimensions
+            mipWidth = nextMipWidth;
+            mipHeight = nextMipHeight;
+        }
+
+        // prepare final mip for being read by shaders, since we don't blit from it in the loop
+        barrier.subresourceRange.baseMipLevel = mipLevels - 1;
+        barrier.oldLayout = vk::ImageLayout::eTransferDstOptimal;
+        barrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+        barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+
+        commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, barrier);
+    }
+
     Result<Texture, std::string> Texture::loadFromFile(App& app, std::string path, vk::Format format,
-        vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags)
+        vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags,
+        bool doMipmapping)
     {
         // load image into main memory
         i32 texWidth, texHeight, texChannels;
@@ -74,17 +155,18 @@ namespace HelloTriangleApplication::Geometry
         // free copy of image in main memory
         stbi_image_free(pixels);
 
-        return Texture::loadFromBuffer(app, texWidth, texHeight, imageBuffer, format, tiling, usage, properties, aspectFlags);
+        return Texture::loadFromBuffer(app, texWidth, texHeight, imageBuffer, format, tiling, usage, properties, aspectFlags, doMipmapping);
     }
 
     Result<Texture, std::string> Texture::loadFromBuffer(App& app, u32 width, u32 height, FatBuffer& imageBuffer,
-        vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags)
+        vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags,
+        bool doMipmapping)
     {
         // create GPU-backed image
         Texture texture;
         TRY_ASSIGN(
             texture,
-            Texture::create(app, width, height, format, tiling, usage, properties, aspectFlags)
+            Texture::create(app, width, height, format, tiling, usage, properties, aspectFlags, doMipmapping)
         );
 
         // copy buffer to image
@@ -95,24 +177,44 @@ namespace HelloTriangleApplication::Geometry
             beginSingleTimeCommands(app, app.graphicsQueue)
         );
 
-        transitionImageLayout(copyCommand, texture.image, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
-        copyBufferToImage(copyCommand, imageBuffer.buffer, texture.image, width, height);
-        transitionImageLayout(copyCommand, texture.image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+        CHECK(transitionImageLayout(copyCommand, texture.image, vk::ImageLayout::eUndefined,
+            vk::ImageLayout::eTransferDstOptimal, texture.mipLevels));
         
+        copyBufferToImage(copyCommand, imageBuffer.buffer, texture.image, width, height);
+        
+        if (doMipmapping)
+        {
+            generateMipmaps(copyCommand, texture.image, width, height, texture.mipLevels);
+        }
+        else
+        {
+            CHECK(transitionImageLayout(copyCommand, texture.image, vk::ImageLayout::eTransferDstOptimal,
+                vk::ImageLayout::eShaderReadOnlyOptimal, 1));
+        }
+
         endSingleTimeCommands(std::move(copyCommand), app.graphicsQueue);
 
         return std::move(texture);
     }
 
     Result<Texture, std::string> Texture::create(App& app, u32 width, u32 height, vk::Format format,
-            vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags)
+            vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags,
+            bool doMipmapping)
     {
+        // compute miplevels
+        u32 mipLevels = 1;
+        if (doMipmapping)
+            mipLevels = Texture::computeMipLevels(width, height);
+        
+        // create texture object
+        Texture texture { .format = format, .width = width, .height = height, .mipLevels = mipLevels };    
+        
         // create GPU-backed image
         vk::ImageCreateInfo imageInfo {
             .imageType = vk::ImageType::e2D,
             .format = format,
             .extent = { width, height, 1 },
-            .mipLevels = 1,
+            .mipLevels = mipLevels,
             .arrayLayers = 1,
             .samples = vk::SampleCountFlagBits::e1,
             .tiling = tiling,
@@ -121,7 +223,6 @@ namespace HelloTriangleApplication::Geometry
             .initialLayout = vk::ImageLayout::eUndefined
         };
 
-        Texture texture { .format = format };
         TRY_ASSIGN(
             texture.image,
             castVkResult(app.device.createImage(imageInfo))
@@ -144,9 +245,19 @@ namespace HelloTriangleApplication::Geometry
         // create image view
         TRY_ASSIGN(
             texture.view,
-            createImageView(app, texture.image, format, aspectFlags)
+            createImageView(app, texture.image, format, aspectFlags, texture.mipLevels)
         );
 
         return std::move(texture);
+    }
+
+    u32 Texture::computeMipLevels(u32 texWidth, u32 texHeight)
+    {
+        return static_cast<u32>(std::floor(std::log2(std::max(texWidth, texHeight))) + 1);
+    }
+
+    bool Texture::isMipmapped() const
+    {
+        return this->mipLevels == 1;
     }
 }

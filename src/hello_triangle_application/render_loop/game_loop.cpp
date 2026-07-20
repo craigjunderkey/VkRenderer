@@ -21,13 +21,15 @@ namespace HelloTriangleApplication::RenderLoop
                 .yRot = 0.0f
             }
         );
+        this->app_.camera.config.logCameraChanges = true;
 
         // build scene
         this->scene_.emplace_back(
             RenderObject(
                 "utah_teapot",
                 "coulter",
-                Transform { .s { 0.4f, 0.4f, 0.4f } }
+                Transform { .s { 0.4f, 0.4f, 0.4f } },
+                std::make_unique<Animations::Wobble>(Animations::Wobble(0.785, 0.5f, 0.0f))
             )
         );
         this->scene_.emplace_back(

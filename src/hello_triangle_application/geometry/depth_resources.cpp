@@ -39,7 +39,8 @@ namespace HelloTriangleApplication::Geometry
                 vk::ImageTiling::eOptimal,
                 vk::ImageUsageFlagBits::eDepthStencilAttachment,
                 vk::MemoryPropertyFlagBits::eDeviceLocal,
-                vk::ImageAspectFlagBits::eDepth
+                vk::ImageAspectFlagBits::eDepth,
+                false
             )
         );
 

@@ -5,7 +5,8 @@ using HelloTriangleApplication::App;
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<vk::raii::ImageView, std::string> createImageView(App& app, const vk::Image& image, vk::Format format, vk::ImageAspectFlags aspectFlags)
+    Result<vk::raii::ImageView, std::string> createImageView(App& app, const vk::Image& image,
+        vk::Format format, vk::ImageAspectFlags aspectFlags, u32 mipLevels)
     {
         vk::ImageViewCreateInfo viewInfo {
             .image = image,
@@ -14,7 +15,7 @@ namespace HelloTriangleApplication::Utilities
             .subresourceRange {
                 .aspectMask = aspectFlags,
                 .baseMipLevel = 0,
-                .levelCount = 1,
+                .levelCount = mipLevels,
                 .baseArrayLayer = 0,
                 .layerCount = 1
             }
