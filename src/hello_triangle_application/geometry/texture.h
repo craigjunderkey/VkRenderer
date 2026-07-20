@@ -28,19 +28,19 @@ namespace HelloTriangleApplication::Geometry
             vk::ImageUsageFlags usage = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
             vk::MemoryPropertyFlags properties = vk::MemoryPropertyFlagBits::eDeviceLocal,
             vk::ImageAspectFlags aspectFlags = vk::ImageAspectFlagBits::eColor,
-            bool doMipmapping = true
+            bool doMipmapping = true, vk::SampleCountFlagBits sampleCount = vk::SampleCountFlagBits::e1
         );
 
         static Result<Texture, std::string> loadFromBuffer(App& app, u32 width, u32 height, FatBuffer& imageBuffer,
             vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties,
             vk::ImageAspectFlags aspectFlags = vk::ImageAspectFlagBits::eColor,
-            bool doMipmapping = true
+            bool doMipmapping = true, vk::SampleCountFlagBits sampleCount = vk::SampleCountFlagBits::e1
         );
         
         static Result<Texture, std::string> create(App& app, u32 width, u32 height, vk::Format format,
             vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties,
             vk::ImageAspectFlags aspectFlags = vk::ImageAspectFlagBits::eColor,
-            bool doMipmapping = true
+            bool doMipmapping = true, vk::SampleCountFlagBits sampleCount = vk::SampleCountFlagBits::e1
         );
         
         static Result<vk::raii::Sampler, std::string> makeDefaultSampler(App& app);

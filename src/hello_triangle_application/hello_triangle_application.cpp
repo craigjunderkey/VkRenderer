@@ -16,6 +16,7 @@
 #include "geometry/descriptor_pool.h"
 #include "geometry/texture.h"
 #include "geometry/depth_resources.h"
+#include "geometry/color_resources.h"
 #include "geometry/mesh.h"
 #include "render_loop/transform.h"
 
@@ -56,6 +57,7 @@ namespace HelloTriangleApplication
         createImageViews(*this).unwrap();
         createDescriptorSetLayout(*this).unwrap();
         this->resources.prepareResources(*this, "src/assets.json").unwrap();
+        createColorTexture(*this).unwrap();
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();

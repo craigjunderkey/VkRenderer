@@ -133,7 +133,7 @@ namespace HelloTriangleApplication::Geometry
 
     Result<Texture, std::string> Texture::loadFromFile(App& app, std::string path, vk::Format format,
         vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags,
-        bool doMipmapping)
+        bool doMipmapping, vk::SampleCountFlagBits sampleCount)
     {
         // load image into main memory
         i32 texWidth, texHeight, texChannels;
@@ -166,18 +166,19 @@ namespace HelloTriangleApplication::Geometry
         // free copy of image in main memory
         stbi_image_free(pixels);
 
-        return Texture::loadFromBuffer(app, texWidth, texHeight, imageBuffer, format, tiling, usage, properties, aspectFlags, doMipmapping);
+        return Texture::loadFromBuffer(app, texWidth, texHeight, imageBuffer, format, tiling,
+            usage, properties, aspectFlags, doMipmapping, sampleCount);
     }
 
     Result<Texture, std::string> Texture::loadFromBuffer(App& app, u32 width, u32 height, FatBuffer& imageBuffer,
         vk::Format format, vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags,
-        bool doMipmapping)
+        bool doMipmapping, vk::SampleCountFlagBits sampleCount)
     {
         // create GPU-backed image
         Texture texture;
         TRY_ASSIGN(
             texture,
-            Texture::create(app, width, height, format, tiling, usage, properties, aspectFlags, doMipmapping)
+            Texture::create(app, width, height, format, tiling, usage, properties, aspectFlags, doMipmapping, sampleCount)
         );
 
         // copy buffer to image
@@ -210,7 +211,7 @@ namespace HelloTriangleApplication::Geometry
 
     Result<Texture, std::string> Texture::create(App& app, u32 width, u32 height, vk::Format format,
             vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags,
-            bool doMipmapping)
+            bool doMipmapping, vk::SampleCountFlagBits sampleCount)
     {
         // compute miplevels
         u32 mipLevels = 1;
@@ -227,7 +228,7 @@ namespace HelloTriangleApplication::Geometry
             .extent = { width, height, 1 },
             .mipLevels = mipLevels,
             .arrayLayers = 1,
-            .samples = vk::SampleCountFlagBits::e1,
+            .samples = sampleCount,
             .tiling = tiling,
             .usage = usage,
             .sharingMode = vk::SharingMode::eExclusive,

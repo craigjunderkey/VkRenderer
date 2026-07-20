@@ -78,6 +78,7 @@ namespace HelloTriangleApplication
 
         // post-processing
         vk::SampleCountFlagBits msaaSamples = vk::SampleCountFlagBits::e1;
+        Texture colorTexture;
 
     private:
         void initWindow();

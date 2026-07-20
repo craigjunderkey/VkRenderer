@@ -1,6 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "swap_chain.h"
 #include "image_views.h"
+#include "../geometry/color_resources.h"
 #include "../geometry/depth_resources.h"
 #include "../render_loop/transform.h"
 
@@ -176,6 +177,7 @@ namespace HelloTriangleApplication::Utilities
         CHECK(cleanupSwapChain(app));
         CHECK(createSwapChain(app));
         CHECK(createImageViews(app));
+        CHECK(Geometry::createColorTexture(app));
         CHECK(Geometry::createDepthTexture(app));
         RenderLoop::createProjectionTransform(app);
 

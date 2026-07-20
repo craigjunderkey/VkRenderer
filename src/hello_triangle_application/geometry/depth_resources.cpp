@@ -40,7 +40,8 @@ namespace HelloTriangleApplication::Geometry
                 vk::ImageUsageFlagBits::eDepthStencilAttachment,
                 vk::MemoryPropertyFlagBits::eDeviceLocal,
                 vk::ImageAspectFlagBits::eDepth,
-                false
+                false,
+                app.msaaSamples
             )
         );
 
