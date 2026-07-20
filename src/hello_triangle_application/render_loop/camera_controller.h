@@ -12,7 +12,7 @@ namespace HelloTriangleApplication::RenderLoop
         f32 xzSpeedIncrement = 1.0f;
         f32 ySpeedIncrement = 0.5f;
         bool followMouseStyle = false;
-        bool logCameraChanges = false;
+        bool logCameraChanges = CONFIG.logByDefault;
     };
 
     class CameraController

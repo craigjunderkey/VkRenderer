@@ -21,7 +21,6 @@ namespace HelloTriangleApplication::RenderLoop
                 .yRot = 0.0f
             }
         );
-        this->app_.camera.config.logCameraChanges = true;
 
         // build scene
         this->scene_.emplace_back(

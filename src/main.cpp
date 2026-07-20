@@ -1,8 +1,10 @@
 #include "hello_triangle_application/hello_triangle_application.h"
 
+using namespace HelloTriangleApplication;
+
 int main()
 {
-    HelloTriangleApplication::App app;
+    App app;
     app.run();
 
     return EXIT_SUCCESS;
