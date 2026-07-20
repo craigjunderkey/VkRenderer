@@ -1,5 +1,6 @@
 #include "../hello_triangle_application.h"
 #include "physical_device.h"
+#include "msaa.h"
 
 using HelloTriangleApplication::App;
 
@@ -75,6 +76,11 @@ namespace HelloTriangleApplication::Utilities
         }
 
         app.physicalDevice = *deviceIter;
+        
+        // store sample count for device
+        auto sampleCountResult = getSampleCount(app);
+        CHECK_KEEP(sampleCountResult);
+        app.msaaSamples = sampleCountResult.take();
 
         return Ok();
     }

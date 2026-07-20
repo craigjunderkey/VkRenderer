@@ -13,7 +13,7 @@ namespace HelloTriangleApplication::Geometry
     struct Texture
     {
         StringId name = StringId();
-        HelloTriangleApplication::RenderLoop::SamplerName sampler;
+        HelloTriangleApplication::RenderLoop::SamplerName sampler = HelloTriangleApplication::RenderLoop::SamplerName::None;
         vk::raii::Image image = nullptr;
         vk::raii::ImageView view = nullptr;
         vk::raii::DeviceMemory memory = nullptr;

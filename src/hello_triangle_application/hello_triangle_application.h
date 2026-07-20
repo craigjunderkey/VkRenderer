@@ -76,6 +76,9 @@ namespace HelloTriangleApplication
         GameLoop loop = GameLoop(*this);
         CameraController camera = CameraController(RenderLoop::Camera(), this->inputs);
 
+        // post-processing
+        vk::SampleCountFlagBits msaaSamples = vk::SampleCountFlagBits::e1;
+
     private:
         void initWindow();
         void initVulkan();

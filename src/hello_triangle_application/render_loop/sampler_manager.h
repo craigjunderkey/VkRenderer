@@ -9,13 +9,13 @@ namespace HelloTriangleApplication::RenderLoop
     enum SamplerName
     {
         Default,
-        Count
+        None
     };
 
     class SamplerManager
     {
     private:
-        std::array<vk::raii::Sampler, SamplerName::Count> samplers_ {nullptr};
+        std::array<vk::raii::Sampler, SamplerName::None> samplers_ {nullptr};
     
     public:
         Result<Unit, std::string> loadSamplers(App& app);
