@@ -112,6 +112,34 @@ namespace HelloTriangleApplication::Utilities
             vk::ImageAspectFlagBits::eDepth
         );
 
+        // set up the color attachment
+        vk::ClearValue clearColor { .color = vk::ClearColorValue(CLEAR_COLOR) };
+        vk::RenderingAttachmentInfo colorAttachment;
+
+        if (CONFIG.antiAliasing == Setting::AntiAliasing::None)
+        {
+            colorAttachment = {
+                .imageView = app.swapChainImageViews[imageIndex],
+                .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+                .loadOp = vk::AttachmentLoadOp::eClear,
+                .storeOp = vk::AttachmentStoreOp::eStore,
+                .clearValue = clearColor
+            };
+        }
+        else
+        {
+            colorAttachment = {
+                .imageView = app.colorTexture.view,
+                .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+                .resolveMode = vk::ResolveModeFlagBits::eAverage,
+                .resolveImageView = app.swapChainImageViews[imageIndex],
+                .resolveImageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+                .loadOp = vk::AttachmentLoadOp::eClear,
+                .storeOp = vk::AttachmentStoreOp::eDontCare,
+                .clearValue = clearColor
+            };
+        }
+        
         // set up the depth attachment
         vk::ClearValue clearDepth { .depthStencil = {1.0f, 0} };
         vk::RenderingAttachmentInfo depthAttachment {
@@ -122,19 +150,6 @@ namespace HelloTriangleApplication::Utilities
             .clearValue = clearDepth
         };
 
-        // set up the multisampled color attachment
-        vk::ClearValue clearColor { .color = vk::ClearColorValue(CLEAR_COLOR) };
-        vk::RenderingAttachmentInfo multisampledColorAttachment {
-            .imageView = app.colorTexture.view,
-            .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
-            .resolveMode = vk::ResolveModeFlagBits::eAverage,
-            .resolveImageView = app.swapChainImageViews[imageIndex],
-            .resolveImageLayout = vk::ImageLayout::eColorAttachmentOptimal,
-            .loadOp = vk::AttachmentLoadOp::eClear,
-            .storeOp = vk::AttachmentStoreOp::eDontCare,
-            .clearValue = clearColor
-        };
-
         // set up rendering info
         vk::RenderingInfo renderingInfo {
             .renderArea = {
@@ -143,7 +158,7 @@ namespace HelloTriangleApplication::Utilities
             },
             .layerCount = 1,
             .colorAttachmentCount = 1,
-            .pColorAttachments = &multisampledColorAttachment,
+            .pColorAttachments = &colorAttachment,
             .pDepthAttachment = &depthAttachment
         };
 
