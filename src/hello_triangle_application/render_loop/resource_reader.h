@@ -1,6 +1,7 @@
 #pragma once
 #include "../utilities/common.h"
 #include "resource_data.h"
+#include "sampler_manager.h"
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -84,6 +85,7 @@ namespace HelloTriangleApplication::RenderLoop
             MaterialResourceData mat { .name = StringId(name) };
             
             if (data.contains("texture")) mat.texture = StringId(data["texture"]);
+            if (data.contains("sampler")) mat.sampler = SamplerManager::samplerNameFromString(std::string(data["sampler"]).data());
             if (data.contains("texOffset")) mat.texOffset = vec2(data["texOffset"][0], data["texOffset"][1]);
             if (data.contains("texScale")) mat.texScale = vec2(data["texScale"][0], data["texScale"][1]);
             if (data.contains("ambient")) mat.ambient = vec3(data["ambient"][0], data["ambient"][1], data["ambient"][2]);

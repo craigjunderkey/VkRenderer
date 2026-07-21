@@ -1,5 +1,6 @@
 #pragma once
 #include "../utilities/common.h"
+#include "sampler_manager.h"
 #include <iostream>
 
 namespace HelloTriangleApplication::RenderLoop
@@ -8,6 +9,7 @@ namespace HelloTriangleApplication::RenderLoop
     {
         StringId name;
         StringId texture = StringId();
+        SamplerName sampler = SamplerName::Repeat;
         vec2 texOffset = vec2(0, 0);
         vec2 texScale = vec2(1.0f, 1.0f);
         vec3 ambient = vec3(1.0f, 1.0f, 1.0f);
@@ -21,6 +23,7 @@ namespace HelloTriangleApplication::RenderLoop
     inline std::ostream& operator<<(std::ostream& os, const MaterialResourceData& mat)
     {
         return os << mat.name.string() << ": {\n" << "\ttexture: " << mat.texture.string() << ",\n"
+            << "\tsampler: " << mat.sampler << ",\n"
             << "\ttexOffset: " << mat.texOffset << ",\n" << "\ttexScale: " << mat.texScale << ",\n"
             << "\tambient: " << mat.ambient << ",\n" << "\tdiffuse: " << mat.diffuse << ",\n"
             << "\tspecular: " << mat.specular << ",\n" << "\tshininess: " << mat.shininess << ",\n"

@@ -11,7 +11,7 @@ using namespace HelloTriangleApplication::Utilities;
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<vk::raii::Sampler, std::string> Texture::makeDefaultSampler(App& app)
+    vk::SamplerCreateInfo Texture::defaultSamplerInfo(App& app)
     {
         vk::PhysicalDeviceProperties deviceProperties = app.physicalDevice.getProperties();
 
@@ -19,9 +19,9 @@ namespace HelloTriangleApplication::Geometry
             .magFilter = vk::Filter::eLinear,
             .minFilter = vk::Filter::eLinear,
             .mipmapMode = vk::SamplerMipmapMode::eLinear,
-            .addressModeU = vk::SamplerAddressMode::eMirroredRepeat,
-            .addressModeV = vk::SamplerAddressMode::eMirroredRepeat,
-            .addressModeW = vk::SamplerAddressMode::eMirroredRepeat,
+            .addressModeU = vk::SamplerAddressMode::eRepeat,
+            .addressModeV = vk::SamplerAddressMode::eRepeat,
+            .addressModeW = vk::SamplerAddressMode::eRepeat,
             .mipLodBias = 0.0f,
             .anisotropyEnable = vk::True,
             .maxAnisotropy = deviceProperties.limits.maxSamplerAnisotropy,
@@ -33,11 +33,7 @@ namespace HelloTriangleApplication::Geometry
             .unnormalizedCoordinates = vk::False
         };
 
-        auto samplerResult = castVkResult(app.device.createSampler(samplerInfo));
-        if (!samplerResult)
-            return Err<std::string>("Failed to create texture sampler.");
-        
-        return samplerResult.take();
+        return samplerInfo;
     }
 
     Result<Unit, std::string> generateMipmaps(App& app, vk::raii::CommandBuffer& commandBuffer, vk::raii::Image& image, u32 texWidth, u32 texHeight, u32 mipLevels, vk::Format format)

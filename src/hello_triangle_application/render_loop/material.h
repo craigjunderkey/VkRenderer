@@ -1,6 +1,7 @@
 #pragma once
 #include "../utilities/common.h"
 #include "../geometry/texture.h"
+#include "sampler_manager.h"
 
 namespace HelloTriangleApplication { class App; }
 
@@ -18,6 +19,7 @@ namespace HelloTriangleApplication::RenderLoop
     {
         StringId name;
         const Geometry::Texture& texture;
+        SamplerName sampler;
         vec2 texOffset;
         vec2 texScale;
         vec3 ambient;

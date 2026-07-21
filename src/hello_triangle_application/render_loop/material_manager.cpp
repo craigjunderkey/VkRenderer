@@ -101,7 +101,7 @@ namespace HelloTriangleApplication::RenderLoop
         {
             matData.push_back(MaterialUniformData {
                 .texId = texIdMap.find(matVec[i]->texture.name)->second,
-                .samplerId = (u32)matVec[i]->texture.sampler,
+                .samplerId = (u32)matVec[i]->sampler,
                 .shininess = matVec[i]->shininess,
                 .isUnlit = matVec[i]->isUnlit,
                 .texOffset = matVec[i]->texOffset,

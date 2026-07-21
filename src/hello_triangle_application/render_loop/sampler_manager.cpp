@@ -6,15 +6,32 @@ namespace HelloTriangleApplication::RenderLoop
 {
     Result<Unit, std::string> SamplerManager::loadSamplers(App& app)
     {
-        vk::PhysicalDeviceProperties deviceProperties = app.physicalDevice.getProperties();
-
-        // make default sampler
+        // make repeat sampler
         {
-            auto samplerResult = Texture::makeDefaultSampler(app);
+            vk::SamplerCreateInfo samplerInfo = Texture::defaultSamplerInfo(app);
+            samplerInfo.addressModeU = vk::SamplerAddressMode::eRepeat;
+            samplerInfo.addressModeV = vk::SamplerAddressMode::eRepeat;
+            samplerInfo.addressModeW = vk::SamplerAddressMode::eRepeat;
+
+            auto samplerResult = castVkResult(app.device.createSampler(samplerInfo));
             if (!samplerResult)
-                return Err<std::string>("Failed to create texture sampler.");
-            
-            this->samplers_[SamplerName::Default] = samplerResult.take();
+                return Err<std::string>("Failed to create repeat sampler.");
+
+            this->samplers_[SamplerName::Repeat] = samplerResult.take();
+        }
+
+        // make mirrored repeat sampler
+        {
+            vk::SamplerCreateInfo samplerInfo = Texture::defaultSamplerInfo(app);
+            samplerInfo.addressModeU = vk::SamplerAddressMode::eMirroredRepeat;
+            samplerInfo.addressModeV = vk::SamplerAddressMode::eMirroredRepeat;
+            samplerInfo.addressModeW = vk::SamplerAddressMode::eMirroredRepeat;
+
+            auto samplerResult = castVkResult(app.device.createSampler(samplerInfo));
+            if (!samplerResult)
+                return Err<std::string>("Failed to create mirrored repeat sampler.");
+
+            this->samplers_[SamplerName::MirroredRepeat] = samplerResult.take();
         }
 
         return Ok();
@@ -34,5 +51,21 @@ namespace HelloTriangleApplication::RenderLoop
     u32 SamplerManager::numSamplers() const
     {
         return SamplerName::None;
+    }
+
+    SamplerName SamplerManager::samplerNameFromString(const char* str)
+    {
+        if (strcmp(str, "repeat") == 0)
+        {
+            return SamplerName::Repeat;
+        }
+        else if (strcmp(str, "mirrored_repeat") == 0)
+        {
+            return SamplerName::MirroredRepeat;
+        }
+        else
+        {
+            return SamplerName::None;
+        }
     }
 }

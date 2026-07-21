@@ -8,7 +8,7 @@ namespace HelloTriangleApplication::RenderLoop
         for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
             vk::DescriptorImageInfo imageInfo {
-                .sampler = *app.resources.samplerManager().sampler(this->texture.sampler),
+                .sampler = *app.resources.samplerManager().sampler(this->sampler),
                 .imageView = *this->texture.view,
                 .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
             };

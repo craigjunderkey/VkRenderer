@@ -19,7 +19,6 @@ namespace HelloTriangleApplication::RenderLoop
             auto loadResult = Texture::loadFromFile(app, pathString);
             CHECK_KEEP(loadResult);
             Texture texture = loadResult.take();
-            texture.sampler = SamplerName::Default;
 
             // add it to the map
             StringId id = pathToStringId(path);
@@ -49,6 +48,7 @@ namespace HelloTriangleApplication::RenderLoop
             Material mat {
                 .name = std::move(matData.name),
                 .texture = this->texture(matData.texture),
+                .sampler = matData.sampler,
                 .texOffset = matData.texOffset,
                 .texScale = matData.texScale,
                 .ambient = matData.ambient,

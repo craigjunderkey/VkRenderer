@@ -13,7 +13,6 @@ namespace HelloTriangleApplication::Geometry
     struct Texture
     {
         StringId name = StringId();
-        HelloTriangleApplication::RenderLoop::SamplerName sampler = HelloTriangleApplication::RenderLoop::SamplerName::None;
         vk::raii::Image image = nullptr;
         vk::raii::ImageView view = nullptr;
         vk::raii::DeviceMemory memory = nullptr;
@@ -43,7 +42,7 @@ namespace HelloTriangleApplication::Geometry
             bool doMipmapping = true, vk::SampleCountFlagBits sampleCount = vk::SampleCountFlagBits::e1
         );
         
-        static Result<vk::raii::Sampler, std::string> makeDefaultSampler(App& app);
+        static vk::SamplerCreateInfo defaultSamplerInfo(App& app);
 
         static u32 computeMipLevels(u32 texWidth, u32 texHeight);
 
