@@ -36,7 +36,6 @@ struct PerFrame
 {
     float4x4 view;
     float4x4 projection;
-    float4x4 normal;
     Environment env;
 };
 
@@ -44,6 +43,7 @@ struct PerObject
 {
     uint matId;
     float4x4 model;
+    float3x3 normal;
 };
 
 ParameterBlock<OnCreate> onCreate;

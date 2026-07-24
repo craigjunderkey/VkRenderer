@@ -6,10 +6,12 @@ struct VSInput
     float3 normal;
     float2 texCoord;
 };
+
 struct VSOutput
 {
     float4 vertPos : SV_POSITION;
-    float3 fragNormal; // view space
+    float3 normal;
+    //float3 fragNormal; // view space
     float3 fragPos; // view space
     float2 fragTexCoord;
 };
@@ -18,8 +20,8 @@ LightCalculationVars cacheLightVars(VSOutput vertIn)
 {
     LightCalculationVars lightVars;
 
-    // store stuff we already have
-    lightVars.fragNormal = vertIn.fragNormal;
+    // store stuff we already have GRUMB
+    lightVars.fragNormal = normalize(mul(obj.normal, vertIn.normal));
     lightVars.fragPos = vertIn.fragPos;
     lightVars.matShininess = onCreate.materials[obj.matId].shininess;
 
@@ -61,7 +63,7 @@ VSOutput vertMain(VSInput input)
     output.vertPos = mul(frame.projection, float4(output.fragPos, 1.0));
 
     // calculate frag normal
-    output.fragNormal = normalize(mul(frame.normal, float4(input.normal, 0.0))).xyz;
+    output.normal = input.normal;
 
     // calculate tex coords
     float2 texOffset = onCreate.materials[obj.matId].texOffset;

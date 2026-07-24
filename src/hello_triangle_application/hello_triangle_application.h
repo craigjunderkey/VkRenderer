@@ -17,6 +17,7 @@
 #include "render_loop/render_object.h"
 #include "render_loop/game_loop.h"
 #include "render_loop/camera_controller.h"
+#include "render_loop/light.h"
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Geometry::FatBuffer;
@@ -70,11 +71,13 @@ namespace HelloTriangleApplication
         std::vector<vk::raii::DescriptorSet> descriptorSets = {};
         Texture depthTexture;
         mat4 projection;
+        mat4 view;
 
         // render loop
         ResourceManager resources;
         GameLoop loop = GameLoop(*this);
         CameraController camera = CameraController(RenderLoop::Camera(), this->inputs);
+        Environment environment = Environment();
 
         // post-processing
         vk::SampleCountFlagBits msaaSamples = vk::SampleCountFlagBits::e1;

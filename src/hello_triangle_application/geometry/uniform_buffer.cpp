@@ -29,8 +29,9 @@ namespace HelloTriangleApplication::Geometry
     void updateUniformBuffer(App& app, u32 frameIndex)
     {
         PerFrameInfo ubo {
-            .view = app.camera.handle.view(),
-            .projection = app.projection
+            .view = app.view,
+            .projection = app.projection,
+            .env = app.environment
         };
 
         ubo.projection[1][1] *= -1;

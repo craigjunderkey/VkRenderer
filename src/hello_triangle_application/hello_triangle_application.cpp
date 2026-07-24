@@ -94,6 +94,7 @@ namespace HelloTriangleApplication
             this->inputs.startFrame();
             this->loop.startFrame();
             this->camera.update(FRAME_TIME_SEC);
+            this->view = this->camera.handle.view();
             this->loop.update(FRAME_TIME_SEC);
             drawFrame(*this, this->loop).unwrap();
 

@@ -47,6 +47,12 @@ namespace HelloTriangleApplication::RenderLoop
                 std::make_unique<Animations::Spin>(Animations::Spin(1.65f))
             )
         );
+
+        // add lights
+        PointLight& light = this->app_.environment.pointLights[this->app_.environment.numPointLights];
+        light = PointLight();
+        light.setWorldPos(this->app_.view, vec3(0.0f, 3.0f, 1.0f));
+        this->app_.environment.numPointLights++;
     }
 
     void GameLoop::startFrame()
@@ -112,9 +118,11 @@ namespace HelloTriangleApplication::RenderLoop
         commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
 
         // upload per-object data
+        mat4 model = obj.transform.global();
         PushConstants pushConstants {
             .matId = app.resources.materialManager().getMaterialId(obj.material),
-            .model = obj.transform.global()
+            .model = model,
+            .normal = glm::transpose(glm::inverse(mat3(app.view * model)))
         };
         commandBuffer.pushConstants(
             *app.pipelineLayout,
