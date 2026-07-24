@@ -1,3 +1,5 @@
+#include "prelude.slang"
+
 struct VSInput
 {
     float3 inPosition;
@@ -10,40 +12,6 @@ struct VSOutput
     float3 normal;
     float2 fragTexCoord;
 };
-struct Material
-{
-    int texId;
-    int samplerId;
-    float shininess;
-    bool isUnlit;
-    float2 texOffset;
-    float2 texScale;
-    float3 ambient;
-    float3 diffuse;
-    float3 specular;
-};
-
-struct OnCreate
-{
-    Material materials[2];
-    Texture2D textures[2];
-    SamplerState samplers[1];
-};
-struct PerFrame
-{
-    float4x4 view;
-    float4x4 projection;
-};
-struct PerObject
-{
-    uint matId;
-    float4x4 model;
-};
-
-ParameterBlock<OnCreate> onCreate;
-ParameterBlock<PerFrame> frame;
-
-[[vk::push_constant]] PerObject obj;
 
 [shader("vertex")]
 VSOutput vertMain(VSInput input)
@@ -69,10 +37,18 @@ VSOutput vertMain(VSInput input)
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_Target
 {
-    int texId = onCreate.materials[obj.matId].texId;
+    int diffMap = onCreate.materials[obj.matId].diffMap;
     int samplerId = onCreate.materials[obj.matId].samplerId;
-    return float4(
-        onCreate.textures[texId].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb,
-        1.0
-    );
+    float3 color;
+
+    if (diffMap != -1)
+    {
+        color = onCreate.textures[diffMap].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb;
+    }
+    else
+    {
+        color = onCreate.materials[obj.matId].diffColor;
+    }
+
+    return float4(color, 1.0);
 }

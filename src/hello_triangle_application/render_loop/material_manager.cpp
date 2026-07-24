@@ -9,12 +9,36 @@ namespace HelloTriangleApplication::RenderLoop
 {
     u32 MaterialManager::getMaterialId(const Material& material) const
     {
-        return this->matIdMap_.find(material.name)->second;
+        auto result = this->matIdMap_.find(material.name);
+        assert(result != this->matIdMap_.end());
+        return result->second;
     }
     
     u32 MaterialManager::getMaterialId(StringId name) const
     {
-        return this->matIdMap_.find(name)->second;
+        auto result = this->matIdMap_.find(name);
+        assert(result != this->matIdMap_.end());
+        return result->second;
+    }
+
+    Result<i32, std::string> getTextureId(std::unordered_map<StringId, u32>& texIdMap, StringId name)
+    {
+        if (name.isNull())
+        {
+            return -1;
+        }
+        else
+        {
+            auto result = texIdMap.find(name);
+            if (result != texIdMap.end())
+            {
+                return result->second;
+            }
+            else
+            {
+                return Err<std::string>("Material tried to reference unknown texture " + std::string(name) + ".");
+            }
+        }
     }
 
     Result<MaterialManager, std::string> MaterialManager::create(App& app, u32 numMaterials, u32 numTextures, u32 numSamplers)
@@ -99,16 +123,22 @@ namespace HelloTriangleApplication::RenderLoop
         matData.reserve(matVec.size());
         for (u32 i = 0; i < matVec.size(); i++)
         {
+            auto diffMapResult = getTextureId(texIdMap, matVec[i]->diffuseTexture);
+            CHECK_KEEP(diffMapResult);
+
+            auto specMapResult = getTextureId(texIdMap, matVec[i]->specularTexture);
+            CHECK_KEEP(specMapResult);
+
             matData.push_back(MaterialUniformData {
-                .texId = texIdMap.find(matVec[i]->texture.name)->second,
-                .samplerId = (u32)matVec[i]->sampler,
+                .diffMap = diffMapResult.take(),
+                .specMap = specMapResult.take(),
+                .samplerId = matVec[i]->sampler,
                 .shininess = matVec[i]->shininess,
                 .isUnlit = matVec[i]->isUnlit,
                 .texOffset = matVec[i]->texOffset,
                 .texScale = matVec[i]->texScale,
-                .ambient = matVec[i]->ambient,
-                .diffuse = matVec[i]->diffuse,
-                .specular = matVec[i]->specular
+                .diffColor = matVec[i]->diffuseColor,
+                .specColor = matVec[i]->specularColor
             });
         }
 
@@ -189,15 +219,5 @@ namespace HelloTriangleApplication::RenderLoop
         // save the StringId to material shader id map for outside use
         this->matIdMap_ = std::move(matIdMap);
         return Ok();
-    }
-
-    StringId MaterialManager::getMaterialName(u32 id) const
-    {
-        auto matIter = this->matIdMap_.begin();
-        for (u32 i = 0; i < id; i++)
-        {
-            matIter++;
-        }
-        return matIter->first;
     }
 }

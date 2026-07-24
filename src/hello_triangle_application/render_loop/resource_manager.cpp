@@ -38,28 +38,17 @@ namespace HelloTriangleApplication::RenderLoop
         return Ok();
     }
 
-    Result<Unit, std::string> ResourceManager::loadMaterials(App& app, std::vector<MaterialResourceData> data)
+    Result<Unit, std::string> ResourceManager::loadMaterials(App& app, std::vector<Material> data)
     {
         u32 numMaterialsLoaded = 0;
 
-        for (const MaterialResourceData& matData : data)
+        for (u32 i = 0; i < data.size(); i++)
         {
-            // load material
-            Material mat {
-                .name = std::move(matData.name),
-                .texture = this->texture(matData.texture),
-                .sampler = matData.sampler,
-                .texOffset = matData.texOffset,
-                .texScale = matData.texScale,
-                .ambient = matData.ambient,
-                .diffuse = matData.diffuse,
-                .specular = matData.specular,
-                .shininess = matData.shininess,
-                .isUnlit = matData.isUnlit
-            };
+            // fetch material
+            Material mat = std::move(data[i]);
 
             // add it to the map
-            StringId id = std::move(matData.name);
+            StringId id = mat.name;
 
             auto pair = std::tuple<StringId, Material>(std::move(id), std::move(mat));
             auto insertResult = this->materials.insert(std::move(pair));

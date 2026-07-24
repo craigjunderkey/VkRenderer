@@ -14,15 +14,15 @@ namespace HelloTriangleApplication::RenderLoop
 
     struct MaterialUniformData
     {
-        u32 texId       alignas(4);
-        u32 samplerId   alignas(4);
+        i32 diffMap     alignas(4);
+        i32 specMap     alignas(4);
+        i32 samplerId   alignas(4);
         f32 shininess   alignas(4);
         bool isUnlit    alignas(4);
         vec2 texOffset  alignas(8);
         vec2 texScale   alignas(8);
-        vec3 ambient    alignas(16);
-        vec3 diffuse    alignas(16);
-        vec3 specular   alignas(16);
+        vec3 diffColor  alignas(16);
+        vec3 specColor  alignas(16);
     };
     
     class MaterialManager
@@ -42,7 +42,6 @@ namespace HelloTriangleApplication::RenderLoop
         
         u32 getMaterialId(const Material& material) const;
         u32 getMaterialId(StringId name) const;
-        StringId getMaterialName(u32 id) const;
 
         const vk::raii::DescriptorSetLayout& descriptorSetLayout() const { return this->layout_; }
         const vk::raii::DescriptorSet& descriptorSet() const { return this->set_; }
