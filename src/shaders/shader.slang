@@ -41,13 +41,13 @@ float4 fragMain(VSOutput vertIn) : SV_Target
     int samplerId = onCreate.materials[obj.matId].samplerId;
     float3 color;
 
-    if (diffMap != -1)
+    if (diffMap == NO_TEXTURE)
     {
-        color = onCreate.textures[diffMap].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb;
+        color = onCreate.materials[obj.matId].diffColor;
     }
     else
     {
-        color = onCreate.materials[obj.matId].diffColor;
+        color = onCreate.textures[diffMap].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb;
     }
 
     return float4(color, 1.0);

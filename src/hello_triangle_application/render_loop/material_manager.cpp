@@ -132,7 +132,7 @@ namespace HelloTriangleApplication::RenderLoop
             matData.push_back(MaterialUniformData {
                 .diffMap = diffMapResult.take(),
                 .specMap = specMapResult.take(),
-                .samplerId = matVec[i]->sampler,
+                .samplerId = static_cast<u32>(matVec[i]->sampler),
                 .shininess = matVec[i]->shininess,
                 .isUnlit = matVec[i]->isUnlit,
                 .texOffset = matVec[i]->texOffset,

@@ -2,7 +2,7 @@ struct Material
 {
     int diffMap;
     int specMap;
-    int samplerId;
+    uint samplerId;
     float shininess;
     bool isUnlit;
     float2 texOffset;
@@ -12,6 +12,7 @@ struct Material
 };
 
 #define UNKNOWN_SIZE 1
+#define NO_TEXTURE -1
 
 struct OnCreate
 {

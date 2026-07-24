@@ -16,7 +16,7 @@ namespace HelloTriangleApplication::RenderLoop
     {
         i32 diffMap     alignas(4);
         i32 specMap     alignas(4);
-        i32 samplerId   alignas(4);
+        u32 samplerId   alignas(4);
         f32 shininess   alignas(4);
         bool isUnlit    alignas(4);
         vec2 texOffset  alignas(8);
