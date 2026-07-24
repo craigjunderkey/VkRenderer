@@ -8,23 +8,60 @@ struct VSInput
 };
 struct VSOutput
 {
-    float4 pos : SV_POSITION;
-    float3 normal;
+    float4 vertPos : SV_POSITION;
+    float3 fragNormal; // view space
+    float3 fragPos; // view space
     float2 fragTexCoord;
 };
+
+LightCalculationVars cacheLightVars(VSOutput vertIn)
+{
+    LightCalculationVars lightVars;
+
+    // store stuff we already have
+    lightVars.fragNormal = vertIn.fragNormal;
+    lightVars.fragPos = vertIn.fragPos;
+    lightVars.matShininess = onCreate.materials[obj.matId].shininess;
+
+    // get material diffuse and specular colors
+    int diffMap = onCreate.materials[obj.matId].diffMap;
+    int specMap = onCreate.materials[obj.matId].specMap;
+    uint samplerId = onCreate.materials[obj.matId].samplerId;
+
+    if (diffMap == NO_TEXTURE)
+    {
+        lightVars.matDiff = onCreate.materials[obj.matId].diffColor;
+    }
+    else
+    {
+        lightVars.matDiff = onCreate.textures[diffMap].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb;
+    }
+
+    if (specMap == NO_TEXTURE)
+    {
+        lightVars.matSpec = onCreate.materials[obj.matId].specColor;
+    }
+    else
+    {
+        lightVars.matSpec = onCreate.textures[specMap].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb;
+    }
+
+    // finish and return
+    lightVars.finish();
+    return lightVars;
+}
 
 [shader("vertex")]
 VSOutput vertMain(VSInput input)
 {
     VSOutput output;
 
-    output.pos = mul(frame.projection,
-        mul(frame.view,
-            mul(obj.model, float4(input.inPosition, 1.0))
-        )
-    );
+    // calculate vert and frag positions
+    output.fragPos = mul(frame.view, mul(obj.model, float4(input.inPosition, 1.0))).xyz;
+    output.vertPos = mul(frame.projection, float4(output.fragPos, 1.0));
 
-    output.normal = input.normal;
+    // calculate frag normal
+    output.fragNormal = normalize(mul(frame.normal, float4(input.normal, 0.0))).xyz;
 
     // calculate tex coords
     float2 texOffset = onCreate.materials[obj.matId].texOffset;
@@ -34,20 +71,17 @@ VSOutput vertMain(VSInput input)
     return output;
 }
 
+// TODO: don't light unlit materials
+
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_Target
 {
-    int diffMap = onCreate.materials[obj.matId].diffMap;
-    int samplerId = onCreate.materials[obj.matId].samplerId;
-    float3 color;
+    float3 color = float3(0.0, 0.0, 0.0);
+    LightCalculationVars lightVars = cacheLightVars(vertIn);
 
-    if (diffMap == NO_TEXTURE)
+    for (uint i = 0; i < frame.env.numPointLights; i++)
     {
-        color = onCreate.materials[obj.matId].diffColor;
-    }
-    else
-    {
-        color = onCreate.textures[diffMap].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb;
+        color += frame.env.pointLights[i].calculateContribution(lightVars);
     }
 
     return float4(color, 1.0);

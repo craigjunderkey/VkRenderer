@@ -1,3 +1,11 @@
+#include "light.slang"
+
+#define UNKNOWN_SIZE 1
+#define NO_TEXTURE -1
+#define MAX_DIRECTIONAL_LIGHTS 1
+#define MAX_POINT_LIGHTS 64
+#define MAX_SPOT_LIGHTS 16
+
 struct Material
 {
     int diffMap;
@@ -11,8 +19,11 @@ struct Material
     float3 specColor;
 };
 
-#define UNKNOWN_SIZE 1
-#define NO_TEXTURE -1
+struct Environment
+{
+    PointLight pointLights[MAX_POINT_LIGHTS];
+    uint numPointLights;
+};
 
 struct OnCreate
 {
@@ -20,11 +31,15 @@ struct OnCreate
     Texture2D textures[UNKNOWN_SIZE];
     SamplerState samplers[UNKNOWN_SIZE];
 };
+
 struct PerFrame
 {
     float4x4 view;
     float4x4 projection;
+    float4x4 normal;
+    Environment env;
 };
+
 struct PerObject
 {
     uint matId;
