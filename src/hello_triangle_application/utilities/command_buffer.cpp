@@ -164,7 +164,7 @@ namespace HelloTriangleApplication::Utilities
 
         // begin rendering
         commandBuffer.beginRendering(renderingInfo);
-        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *app.graphicsPipeline);
+        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **app.pipeline);
 
         // viewport and scissor are dynamic, so we must set them here
         commandBuffer.setViewport(0, vk::Viewport {
@@ -183,7 +183,7 @@ namespace HelloTriangleApplication::Utilities
 
         // bind our descriptor sets
         commandBuffer.bindDescriptorSets(
-            vk::PipelineBindPoint::eGraphics, *app.pipelineLayout, 0,
+            vk::PipelineBindPoint::eGraphics, *app.pipeline.layout, 0,
             {
                 *app.resources.materialManager().descriptorSet(),
                 *app.descriptorSets[app.frameIndex]

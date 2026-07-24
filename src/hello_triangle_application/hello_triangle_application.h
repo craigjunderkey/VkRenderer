@@ -10,6 +10,7 @@
 #include "window.h"
 #include "input/input_manager.h"
 #include "utilities/queue.h"
+#include "utilities/pipeline_builder.h"
 #include "geometry/buffer.h"
 #include "geometry/texture.h"
 #include "geometry/mesh.h"
@@ -20,6 +21,7 @@
 #include "render_loop/light.h"
 
 using HelloTriangleApplication::Utilities::FatQueue;
+using HelloTriangleApplication::Utilities::FatPipeline;
 using HelloTriangleApplication::Geometry::FatBuffer;
 using HelloTriangleApplication::Geometry::MappedBuffer;
 using HelloTriangleApplication::Geometry::Texture;
@@ -56,8 +58,7 @@ namespace HelloTriangleApplication
 
         // graphics pipeline
         vk::raii::DescriptorSetLayout descriptorSetLayout = nullptr;
-        vk::raii::PipelineLayout pipelineLayout = nullptr;
-        vk::raii::Pipeline graphicsPipeline = nullptr;
+        FatPipeline pipeline;
 
         // drawing
         std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
