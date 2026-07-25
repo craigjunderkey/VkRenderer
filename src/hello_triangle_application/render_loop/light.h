@@ -5,6 +5,12 @@
 #define MAX_POINT_LIGHTS 64
 #define MAX_SPOT_LIGHTS 16
 
+struct DebugLightPushConstants
+{
+    mat4 mvp    alignas(16);
+    vec4 color  alignas(16);
+};
+
 struct LightColorComponents
 {
     vec3 ambient    alignas(16) = vec3(0.1f, 0.1f, 0.1f);
@@ -14,13 +20,8 @@ struct LightColorComponents
 
 struct PointLight
 {
-    void setWorldPos(const mat4& viewMatrix, vec3 worldPos)
-    {
-        this->position = viewMatrix * vec4(worldPos, 1.0);
-    }
-
-    vec3 position alignas(16);
-    LightColorComponents components;
+    vec3 position                   alignas(16);
+    LightColorComponents components alignas(16);
 };
 
 struct Environment

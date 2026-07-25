@@ -10,7 +10,8 @@
         "rlaurent.png"
     ],
     "meshes": [
-        "utah_teapot.obj"
+        "utah_teapot.obj",
+        "light_ball.obj"
     ],
     "materials": {
         "coulter": {

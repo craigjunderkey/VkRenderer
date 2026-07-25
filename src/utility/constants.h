@@ -16,8 +16,6 @@ const std::vector<const char*> REQUIRED_DEVICE_EXTENSIONS = {
     "VK_KHR_swapchain"
 };
 
-constexpr const char* SHADER_PATH = "shaders/shader.spv";
-
 #ifndef NDEBUG
 constexpr bool VALIDATION_LAYERS_ENABLED = true;
 #else

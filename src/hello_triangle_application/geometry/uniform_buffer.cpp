@@ -34,8 +34,6 @@ namespace HelloTriangleApplication::Geometry
             .env = app.environment
         };
 
-        ubo.projection[1][1] *= -1;
-
         memcpy(app.uniformBuffers[frameIndex].data, &ubo, sizeof(ubo));
     }
 }

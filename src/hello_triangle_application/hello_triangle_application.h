@@ -59,6 +59,7 @@ namespace HelloTriangleApplication
         // graphics pipeline
         vk::raii::DescriptorSetLayout descriptorSetLayout = nullptr;
         FatPipeline pipeline;
+        FatPipeline debugLightPipeline;
 
         // drawing
         std::vector<vk::raii::Semaphore> presentCompleteSemaphores;

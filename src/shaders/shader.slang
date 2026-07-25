@@ -11,7 +11,6 @@ struct VSOutput
 {
     float4 vertPos : SV_POSITION;
     float3 normal;
-    //float3 fragNormal; // view space
     float3 fragPos; // view space
     float2 fragTexCoord;
 };
@@ -24,6 +23,7 @@ LightCalculationVars cacheLightVars(VSOutput vertIn)
     lightVars.fragNormal = normalize(mul(obj.normal, vertIn.normal));
     lightVars.fragPos = vertIn.fragPos;
     lightVars.matShininess = onCreate.materials[obj.matId].shininess;
+    lightVars.viewMatrix = frame.view;
 
     // get material diffuse and specular colors
     int diffMap = onCreate.materials[obj.matId].diffMap;

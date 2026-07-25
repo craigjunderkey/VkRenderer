@@ -192,9 +192,40 @@ namespace HelloTriangleApplication::Utilities
         );
     }
 
+    void drawLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
+    {
+        // change to debug light pipeline
+        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **app.debugLightPipeline);
+        
+        // bind debug light mesh
+        const Geometry::Mesh<u32>& mesh = app.resources.mesh("light_ball");
+        commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
+        commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
+        
+        // draw each light
+        for (u32 i = 0; i < app.environment.numPointLights; i++)
+        {
+            const PointLight& light = app.environment.pointLights[i];
+            DebugLightPushConstants pushConstants {
+                // the problem is in the view matrix (why?)
+                .mvp = app.projection * app.view * glm::translate(mat4(1.0f), light.position),
+                .color = vec4(light.components.diffuse, 1.0f),
+            };
+            commandBuffer.pushConstants(
+                *app.debugLightPipeline.layout,
+                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+                0, sizeof(DebugLightPushConstants), &pushConstants
+            );
+            commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
+        }
+    }
+
     void endRender(App& app, u32 imageIndex)
     {
         const vk::raii::CommandBuffer& commandBuffer = app.graphicsQueue.commandBuffers[app.frameIndex];
+
+        // draw all the lights
+        drawLights(app, commandBuffer);
 
         // stop rendering
         commandBuffer.endRendering();

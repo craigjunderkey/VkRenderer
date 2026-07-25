@@ -62,5 +62,6 @@ namespace HelloTriangleApplication::RenderLoop
             static_cast<f32>(app.swapChainExtent.width) / static_cast<f32>(app.swapChainExtent.height),
             0.1f, 10.0f
         );
+        app.projection[1][1] *= -1;
     }
 }

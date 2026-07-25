@@ -8,6 +8,7 @@ struct LightCalculationVars
     float matShininess;
     float3 fragNormal;  // must arrive normalized
     float3 fragPos;
+    float4x4 viewMatrix;
 
     // computed by finish
     float3 viewDir;
@@ -33,13 +34,14 @@ struct LightColorComponents
 
 struct PointLight : ILightCaster
 {
-    float3 position; // view space
+    float3 position; // world space
     LightColorComponents components;
 
     float3 calculateContribution(LightCalculationVars data)
     {
+        float3 position = mul(data.viewMatrix, float4(this.position, 1.0)).xyz;
         float3 color = float3(0.0, 0.0, 0.0);
-        float3 lightDir = normalize(this.position - data.fragPos); // dir from frag to light
+        float3 lightDir = normalize(position - data.fragPos); // dir from frag to light
 
         // ambient
         color += this.components.ambient * data.matDiff;

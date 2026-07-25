@@ -13,7 +13,7 @@ set(JSON_INCLUDEDIR ${nlohmann_json_INCLUDE_DIRS})
 target_include_directories (${TEMPLATE_NAME} PRIVATE ${JSON_INCLUDEDIR})
 
 # compile shaders
-set(SHADER_SLANG_SOURCES "shader")
+set(SHADER_SLANG_SOURCES "shader" "light_debug")
 set(IN_SHADERS_DIR ${CMAKE_CURRENT_LIST_DIR}/shaders)
 set(OUT_SHADERS_DIR ${CMAKE_CURRENT_LIST_DIR}/../shaders) # this sucks
 add_slang_shader_target(SHADER_TARGETS SOURCES ${SHADER_SLANG_SOURCES})
