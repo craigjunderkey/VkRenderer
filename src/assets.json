@@ -18,7 +18,6 @@
             "texture": "rcoulter",
             "texOffset": [1.0, 1.25],
             "texScale": [4.0, 4.0],
-            "shininess": 50.0,
             "isUnlit": false,
             "sampler": "mirrored_repeat"
         },

@@ -26,6 +26,6 @@ struct PointLight
 
 struct Environment
 {
-    std::array<PointLight, MAX_POINT_LIGHTS> pointLights;
+    std::array<PointLight, MAX_POINT_LIGHTS> pointLights alignas(16);
     u32 numPointLights alignas(4);
 };

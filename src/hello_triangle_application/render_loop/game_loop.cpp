@@ -27,8 +27,8 @@ namespace HelloTriangleApplication::RenderLoop
             RenderObject(
                 "utah_teapot",
                 "coulter",
-                Transform { .s { 0.4f, 0.4f, 0.4f } }
-                //std::make_unique<Animations::Wobble>(Animations::Wobble(0.785, 0.5f, 0.0f))
+                Transform { .s { 0.4f, 0.4f, 0.4f } },
+                std::make_unique<Animations::Wobble>(Animations::Wobble(0.785, 0.5f, 0.0f))
             )
         );
         this->scene_.emplace_back(
@@ -50,7 +50,7 @@ namespace HelloTriangleApplication::RenderLoop
 
         // add lights
         PointLight& light = this->app_.environment.pointLights[this->app_.environment.numPointLights];
-        light = PointLight { .position = vec3(0.0f, 3.0f, 1.0f) };
+        light = PointLight { .position = vec3(0.0f, 1.0f, 3.0f) };
         this->app_.environment.numPointLights++;
     }
 
@@ -121,7 +121,7 @@ namespace HelloTriangleApplication::RenderLoop
         PushConstants pushConstants {
             .matId = app.resources.materialManager().getMaterialId(obj.material),
             .model = model,
-            .normal = glm::transpose(glm::inverse(mat3(app.view * model)))
+            .normal = glm::transpose(glm::inverse(app.view * model))
         };
         commandBuffer.pushConstants(
             *app.pipeline.layout,

@@ -24,29 +24,3 @@ struct Environment
     PointLight pointLights[MAX_POINT_LIGHTS];
     uint numPointLights;
 };
-
-struct OnCreate
-{
-    Material materials[UNKNOWN_SIZE];
-    Texture2D textures[UNKNOWN_SIZE];
-    SamplerState samplers[UNKNOWN_SIZE];
-};
-
-struct PerFrame
-{
-    float4x4 view;
-    float4x4 projection;
-    Environment env;
-};
-
-struct PerObject
-{
-    uint matId;
-    float4x4 model;
-    float3x3 normal;
-};
-
-ParameterBlock<OnCreate> onCreate;
-ParameterBlock<PerFrame> frame;
-
-[[vk::push_constant]] PerObject obj;

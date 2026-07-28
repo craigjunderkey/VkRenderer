@@ -10,20 +10,44 @@ struct VSInput
 struct VSOutput
 {
     float4 vertPos : SV_POSITION;
-    float3 normal;
-    float3 fragPos; // view space
+    float4 vertNormalLocal;  // local space
+    float4 vertPosView;     // view space
     float2 fragTexCoord;
 };
 
-LightCalculationVars cacheLightVars(VSOutput vertIn)
+struct OnCreate
 {
-    LightCalculationVars lightVars;
+    Material materials[UNKNOWN_SIZE];
+    Texture2D textures[UNKNOWN_SIZE];
+    SamplerState samplers[UNKNOWN_SIZE];
+};
 
-    // store stuff we already have GRUMB
-    lightVars.fragNormal = normalize(mul(obj.normal, vertIn.normal));
-    lightVars.fragPos = vertIn.fragPos;
-    lightVars.matShininess = onCreate.materials[obj.matId].shininess;
-    lightVars.viewMatrix = frame.view;
+struct PerFrame
+{
+    float4x4 view;
+    float4x4 projection;
+    Environment env;
+};
+
+struct PerObject
+{
+    uint matId;
+    float4x4 model;
+    float4x4 normal;
+};
+
+ParameterBlock<OnCreate> onCreate;
+ParameterBlock<PerFrame> frame;
+
+[[vk::push_constant]] PerObject obj;
+
+LightCalculationVars cacheLightCalculationVars(VSOutput vertIn)
+{
+    LightCalculationVars data;
+    data.vertPosView = vertIn.vertPosView;
+    data.vertNormalView = float4(normalize(mul(float3x3(obj.normal), normalize(vertIn.vertNormalLocal).xyz)), 0.0);
+    data.viewMatrix = frame.view;
+    data.matShininess = onCreate.materials[obj.matId].shininess;
 
     // get material diffuse and specular colors
     int diffMap = onCreate.materials[obj.matId].diffMap;
@@ -31,26 +55,16 @@ LightCalculationVars cacheLightVars(VSOutput vertIn)
     uint samplerId = onCreate.materials[obj.matId].samplerId;
 
     if (diffMap == NO_TEXTURE)
-    {
-        lightVars.matDiff = onCreate.materials[obj.matId].diffColor;
-    }
+        data.matDiff = onCreate.materials[obj.matId].diffColor;
     else
-    {
-        lightVars.matDiff = onCreate.textures[diffMap].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb;
-    }
+        data.matDiff = onCreate.textures[diffMap].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb;
 
     if (specMap == NO_TEXTURE)
-    {
-        lightVars.matSpec = onCreate.materials[obj.matId].specColor;
-    }
+        data.matSpec = onCreate.materials[obj.matId].specColor;
     else
-    {
-        lightVars.matSpec = onCreate.textures[specMap].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb;
-    }
+        data.matSpec = onCreate.textures[specMap].Sample(onCreate.samplers[samplerId], vertIn.fragTexCoord).rgb;
 
-    // finish and return
-    lightVars.finish();
-    return lightVars;
+    return data;
 }
 
 [shader("vertex")]
@@ -58,12 +72,12 @@ VSOutput vertMain(VSInput input)
 {
     VSOutput output;
 
-    // calculate vert and frag positions
-    output.fragPos = mul(frame.view, mul(obj.model, float4(input.inPosition, 1.0))).xyz;
-    output.vertPos = mul(frame.projection, float4(output.fragPos, 1.0));
+    // calculate positions
+    output.vertPos = mul(frame.projection, mul(frame.view, mul(obj.model, float4(input.inPosition, 1.0))));
+    output.vertPosView = mul(frame.view, mul(obj.model, float4(input.inPosition, 1.0)));
 
-    // calculate frag normal
-    output.normal = input.normal;
+    // calculate normal
+    output.vertNormalLocal = float4(input.normal, 0.0);
 
     // calculate tex coords
     float2 texOffset = onCreate.materials[obj.matId].texOffset;
@@ -73,17 +87,18 @@ VSOutput vertMain(VSInput input)
     return output;
 }
 
-// TODO: don't light unlit materials
-
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_Target
 {
     float3 color = float3(0.0, 0.0, 0.0);
-    LightCalculationVars lightVars = cacheLightVars(vertIn);
 
+    LightCalculationVars data = cacheLightCalculationVars(vertIn);
+    data.finish();
+
+    // get color contribution of all the lights
     for (uint i = 0; i < frame.env.numPointLights; i++)
     {
-        color += frame.env.pointLights[i].calculateContribution(lightVars);
+        color += frame.env.pointLights[i].calculateContribution(data);
     }
 
     return float4(color, 1.0);

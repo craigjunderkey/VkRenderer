@@ -13,7 +13,7 @@ namespace HelloTriangleApplication::RenderLoop
         vec2 texOffset = vec2(0, 0);
         vec2 texScale = vec2(1.0f, 1.0f);
         vec3 diffuseColor = vec3(1.0f, 1.0f, 1.0f);
-        vec3 specularColor = vec3(0.9f, 0.9f, 0.9f);
+        vec3 specularColor = vec3(1.0f, 1.0f, 1.0f);
         f32 shininess = 16.0f;
         bool isUnlit = false;
     };

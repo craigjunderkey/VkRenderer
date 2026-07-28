@@ -6,17 +6,17 @@ struct LightCalculationVars
     float3 matDiff;
     float3 matSpec;
     float matShininess;
-    float3 fragNormal;  // must arrive normalized
-    float3 fragPos;
+    float4 vertNormalView;
+    float4 vertPosView;
     float4x4 viewMatrix;
 
     // computed by finish
-    float3 viewDir;
+    float4 viewDir;
 
     [mutating]
     void finish()
     {
-        this.viewDir = normalize(-this.fragPos); // dir from frag to eye
+        this.viewDir = normalize(-this.vertPosView); // dir from frag to eye
     }
 };
 
@@ -39,20 +39,23 @@ struct PointLight : ILightCaster
 
     float3 calculateContribution(LightCalculationVars data)
     {
-        float3 position = mul(data.viewMatrix, float4(this.position, 1.0)).xyz;
         float3 color = float3(0.0, 0.0, 0.0);
-        float3 lightDir = normalize(position - data.fragPos); // dir from frag to light
 
-        // ambient
+        // calculate helpful vectors
+        float4 lightPosView = mul(data.viewMatrix, float4(this.position, 1.0)); // light pos: world -> view
+        float4 lightDir = normalize(lightPosView - data.vertPosView);           // from surface to light
+
+        // ambient term
         color += this.components.ambient * data.matDiff;
 
-        // diffuse
-        float diffCoeff = max(0.0, dot(data.fragNormal, lightDir));
+        // diffuse term
+        float diffCoeff = max(0.0, dot(lightDir, data.vertNormalView));
         color += diffCoeff * this.components.diffuse * data.matDiff;
 
-        // specular
-        float3 halfway = normalize(data.viewDir + lightDir);
-        float specCoeff = pow(max(0.0, dot(halfway, data.fragNormal)), data.matShininess);
+        // specular term
+        float4 halfway = normalize(lightDir + data.viewDir);
+        float hDotN = max(0.0, dot(halfway, data.vertNormalView));
+        float specCoeff = pow(hDotN, data.matShininess);
         color += specCoeff * this.components.specular * data.matSpec;
 
         return color;
