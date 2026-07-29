@@ -266,7 +266,7 @@ float4 fragMain(VSOutput vertIn) : SV_Target
     LightCalculationVars data = cacheLightCalculationVars(vertIn);
     data.finish();
 
-    // get color contribution of all the lights
+    // add color contribution from each light
     for (uint i = 0; i < frame.env.numPointLights; i++)
     {
         color += frame.env.pointLights[i].calculateContribution(data);
