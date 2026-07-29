@@ -20,8 +20,9 @@ struct LightColorComponents
 
 struct PointLight
 {
-    vec3 position                   alignas(16);
+    vec3 worldPosition              alignas(16);
     LightColorComponents components alignas(16);
+    vec3 attenuationFactors         alignas(16);
 };
 
 struct Environment

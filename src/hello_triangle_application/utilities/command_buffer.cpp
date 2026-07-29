@@ -207,8 +207,7 @@ namespace HelloTriangleApplication::Utilities
         {
             const PointLight& light = app.environment.pointLights[i];
             DebugLightPushConstants pushConstants {
-                // the problem is in the view matrix (why?)
-                .mvp = app.projection * app.view * glm::translate(mat4(1.0f), light.position),
+                .mvp = app.projection * app.view * glm::translate(mat4(1.0f), light.worldPosition),
                 .color = vec4(light.components.diffuse, 1.0f),
             };
             commandBuffer.pushConstants(
