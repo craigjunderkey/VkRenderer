@@ -20,13 +20,21 @@ struct LightColorComponents
 
 struct PointLight
 {
-    vec3 worldPosition              alignas(16);
+    vec3 positionWorld              alignas(16);
     LightColorComponents components alignas(16);
     vec3 attenuationFactors         alignas(16);
 };
 
+struct DirectionalLight
+{
+    vec3 dirWorld                   alignas(16);
+    LightColorComponents components alignas(16);
+};
+
 struct Environment
 {
-    std::array<PointLight, MAX_POINT_LIGHTS> pointLights alignas(16);
-    u32 numPointLights alignas(4);
+    std::array<PointLight, MAX_POINT_LIGHTS> pointLights                    alignas(16);
+    u32 numPointLights                                                      alignas(4);
+    std::array<DirectionalLight, MAX_DIRECTIONAL_LIGHTS> directionalLights  alignas(16);
+    u32 numDirectionalLights                                                alignas(4);
 };

@@ -53,7 +53,7 @@ namespace HelloTriangleApplication::RenderLoop
         {
             PointLight& light = this->app_.environment.pointLights[this->app_.environment.numPointLights];
             light = PointLight {
-                .worldPosition = vec3(0.0f, 1.0f, 3.0f),
+                .positionWorld = vec3(0.0f, 1.0f, 3.0f),
                 .attenuationFactors = LightHelper::attenuationFactorsFromRadius(25.0f)
             };
             this->app_.environment.numPointLights++;
@@ -61,10 +61,16 @@ namespace HelloTriangleApplication::RenderLoop
         {
             PointLight& light = this->app_.environment.pointLights[this->app_.environment.numPointLights];
             light = PointLight {
-                .worldPosition = vec3(0.0f, 3.0f, -0.5f),
+                .positionWorld = vec3(0.0f, 3.0f, -0.5f),
                 .attenuationFactors = LightHelper::attenuationFactorsFromRadius(10.0f)
             };
             this->app_.environment.numPointLights++;
+        }
+        {
+            DirectionalLight& light =
+                this->app_.environment.directionalLights[this->app_.environment.numDirectionalLights];
+            light = DirectionalLight { .dirWorld = glm::normalize(vec3(-3.0f, 3.0f, -1.0f)) };
+            this->app_.environment.numDirectionalLights++;
         }
     }
 

@@ -207,7 +207,7 @@ namespace HelloTriangleApplication::Utilities
         {
             const PointLight& light = app.environment.pointLights[i];
             DebugLightPushConstants pushConstants {
-                .mvp = app.projection * app.view * glm::translate(mat4(1.0f), light.worldPosition),
+                .mvp = app.projection * app.view * glm::translate(mat4(1.0f), light.positionWorld),
                 .color = vec4(light.components.diffuse, 1.0f),
             };
             commandBuffer.pushConstants(

@@ -23,6 +23,8 @@ struct Environment
 {
     PointLight pointLights[MAX_POINT_LIGHTS];
     uint numPointLights;
+    DirectionalLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
+    uint numDirectionalLights;
 };
 
 
@@ -63,7 +65,7 @@ struct LightColorComponents
 
 struct PointLight : ILightCaster
 {
-    float3 worldPosition;           // world space
+    float3 positionWorld;           // world space
     LightColorComponents components;
     float3 attenuationFactors;      // constant (k_c), linear (k_l), quadratic (k_q)
 
@@ -72,7 +74,7 @@ struct PointLight : ILightCaster
         float3 color = float3(0.0, 0.0, 0.0);
 
         // calculate helpful vectors
-        float4 lightPosView = mul(data.viewMatrix, float4(this.worldPosition, 1.0));    // light pos: world -> view
+        float4 lightPosView = mul(data.viewMatrix, float4(this.positionWorld, 1.0));    // light pos: world -> view
         float4 lightDir = normalize(lightPosView - data.vertPosView);                   // from surface to light
 
         // ambient term
@@ -84,14 +86,39 @@ struct PointLight : ILightCaster
 
         // specular term
         float4 halfway = normalize(lightDir + data.viewDir);
-        float hDotN = max(0.0, dot(halfway, data.vertNormalView));
-        float specCoeff = pow(hDotN, data.matShininess);
+        float specCoeff = pow(max(0.0, dot(halfway, data.vertNormalView)), data.matShininess);
         color += specCoeff * this.components.specular * data.matSpec;
 
         // attenuate with distance
         float distance = length(data.vertPosView - lightPosView);
         float attenuation = 1.0 / dot(this.attenuationFactors, float3(1.0, distance, distance * distance));
         color *= attenuation;
+
+        return color;
+    }
+};
+
+struct DirectionalLight : ILightCaster
+{
+    float3 dirWorld; // world space
+    LightColorComponents components;
+
+    float3 calculateContribution(LightCalculationVars data)
+    {
+        float3 color = float3(0.0, 0.0, 0.0);
+        float4 lightDirView = normalize(mul(data.viewMatrix, float4(this.dirWorld, 0.0)));
+
+        // ambient term
+        color += this.components.ambient * data.matDiff;
+
+        // diffuse term
+        float diffCoeff = max(0.0, dot(lightDirView, data.vertNormalView));
+        color += diffCoeff * this.components.diffuse * data.matDiff;
+
+        // specular term
+        float4 halfway = normalize(lightDirView + data.viewDir);
+        float specCoeff = pow(max(0.0, dot(halfway, data.vertNormalView)), data.matShininess);
+        color += specCoeff * this.components.specular * data.matSpec;
 
         return color;
     }
@@ -199,6 +226,10 @@ float4 fragMain(VSOutput vertIn) : SV_Target
     for (uint i = 0; i < frame.env.numPointLights; i++)
     {
         color += frame.env.pointLights[i].calculateContribution(data);
+    }
+    for (uint i = 0; i < frame.env.numDirectionalLights; i++)
+    {
+        color += frame.env.directionalLights[i].calculateContribution(data);
     }
 
     return float4(color, 1.0);
