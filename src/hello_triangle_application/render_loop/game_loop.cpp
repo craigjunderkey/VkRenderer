@@ -53,7 +53,7 @@ namespace HelloTriangleApplication::RenderLoop
         {
             PointLight& light = this->app_.environment.pointLights[this->app_.environment.numPointLights];
             light = PointLight {
-                .positionWorld = vec3(0.0f, 1.0f, 3.0f),
+                .posWorld = vec3(0.0f, 1.0f, 3.0f),
                 .attenuationFactors = LightHelper::attenuationFactorsFromRadius(25.0f)
             };
             this->app_.environment.numPointLights++;
@@ -61,7 +61,7 @@ namespace HelloTriangleApplication::RenderLoop
         {
             PointLight& light = this->app_.environment.pointLights[this->app_.environment.numPointLights];
             light = PointLight {
-                .positionWorld = vec3(0.0f, 3.0f, -0.5f),
+                .posWorld = vec3(0.0f, 3.0f, -0.5f),
                 .attenuationFactors = LightHelper::attenuationFactorsFromRadius(10.0f)
             };
             this->app_.environment.numPointLights++;
@@ -71,6 +71,16 @@ namespace HelloTriangleApplication::RenderLoop
                 this->app_.environment.directionalLights[this->app_.environment.numDirectionalLights];
             light = DirectionalLight { .dirWorld = glm::normalize(vec3(-3.0f, 3.0f, -1.0f)) };
             this->app_.environment.numDirectionalLights++;
+        }
+        {
+            SpotLight& light = this->app_.environment.spotLights[this->app_.environment.numSpotLights];
+            light = SpotLight {
+                .posWorld = vec3(0.0f, -3.0f, 1.0f),
+                .dirWorld = glm::normalize(vec3(0.0f, 3.0f, -1.0f)),
+                .cosInner = glm::cos(glm::pi<f32>() / 6.0f),
+                .cosOuter = glm::cos(glm::pi<f32>() / 4.0f)
+            };
+            this->app_.environment.numSpotLights++;
         }
     }
 

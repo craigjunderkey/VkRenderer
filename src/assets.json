@@ -12,6 +12,7 @@
     "meshes": [
         "utah_teapot.obj",
         "light_ball.obj",
+        "light_cone.obj",
         "cube.obj",
         "sphere.obj"
     ],

@@ -25,6 +25,8 @@ struct Environment
     uint numPointLights;
     DirectionalLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
     uint numDirectionalLights;
+    SpotLight spotLights[MAX_SPOT_LIGHTS];
+    uint numSpotLights;
 };
 
 
@@ -65,7 +67,7 @@ struct LightColorComponents
 
 struct PointLight : ILightCaster
 {
-    float3 positionWorld;           // world space
+    float3 posWorld;           // world space
     LightColorComponents components;
     float3 attenuationFactors;      // constant (k_c), linear (k_l), quadratic (k_q)
 
@@ -74,8 +76,8 @@ struct PointLight : ILightCaster
         float3 color = float3(0.0, 0.0, 0.0);
 
         // calculate helpful vectors
-        float4 lightPosView = mul(data.viewMatrix, float4(this.positionWorld, 1.0));    // light pos: world -> view
-        float4 lightDir = normalize(lightPosView - data.vertPosView);                   // from surface to light
+        float4 lightPosView = mul(data.viewMatrix, float4(this.posWorld, 1.0));    // light pos: world -> view
+        float4 lightDir = normalize(lightPosView - data.vertPosView);              // from surface to light
 
         // ambient term
         color += this.components.ambient * data.matDiff;
@@ -121,6 +123,48 @@ struct DirectionalLight : ILightCaster
         color += specCoeff * this.components.specular * data.matSpec;
 
         return color;
+    }
+};
+
+struct SpotLight : ILightCaster
+{
+    float3 posWorld; // world space
+    float3 dirWorld; // world space
+    LightColorComponents components;
+    float cosInner;
+    float cosOuter;
+
+    float3 calculateContribution(LightCalculationVars data)
+    {
+        float3 color = float3(0.0, 0.0, 0.0);
+
+        // ambient term
+        color += this.components.ambient * data.matDiff;
+
+        // get angle between light direction and light-to-frag vector
+        float4 lightDirView = normalize(mul(data.viewMatrix, float4(dirWorld, 0.0)));
+        float4 fragDirView = normalize(data.vertPosView - mul(data.viewMatrix, float4(this.posWorld, 1.0)));
+        float cosAngle = dot(lightDirView, fragDirView);
+
+        // compute attenuation
+        float attenuation;
+        if (cosAngle >= this.cosInner)
+            attenuation = 1.0;
+        else if (cosAngle <= this.cosOuter)
+            return color; // attenuation = 0.0 (so, only ambient light)
+        else
+            attenuation = (cosAngle - this.cosOuter) / (this.cosInner - this.cosOuter);
+
+        // diffuse term
+        float diffCoeff = max(0.0, dot(data.vertNormalView, -fragDirView));
+        color += attenuation * diffCoeff * this.components.diffuse * data.matDiff;
+
+        // specular term
+        float4 halfway = normalize(data.viewDir - fragDirView); // dir from frag to eye + dir from frag to light
+        float specCoeff = pow(max(0.0, dot(halfway, data.vertNormalView)), data.matShininess);
+        color += attenuation * specCoeff * this.components.specular * data.matSpec;
+
+        return attenuation * color;
     }
 };
 
@@ -230,6 +274,10 @@ float4 fragMain(VSOutput vertIn) : SV_Target
     for (uint i = 0; i < frame.env.numDirectionalLights; i++)
     {
         color += frame.env.directionalLights[i].calculateContribution(data);
+    }
+    for (uint i = 0; i < frame.env.numSpotLights; i++)
+    {
+        color += frame.env.spotLights[i].calculateContribution(data);
     }
 
     return float4(color, 1.0);

@@ -5,6 +5,8 @@
 #include "push_constants.h"
 #include "../render_loop/game_loop.h"
 
+#include <glm/gtx/string_cast.hpp>
+
 using HelloTriangleApplication::RenderLoop::GameLoop;
 
 using HelloTriangleApplication::App;
@@ -192,22 +194,24 @@ namespace HelloTriangleApplication::Utilities
         );
     }
 
-    void drawLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
+    void bindMesh(const vk::raii::CommandBuffer& commandBuffer, const Geometry::Mesh<u32>& mesh)
     {
-        // change to debug light pipeline
-        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **app.debugLightPipeline);
-        
-        // bind debug light mesh
-        const Geometry::Mesh<u32>& mesh = app.resources.mesh("light_ball");
         commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
         commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
+    }
+
+    void drawPointLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
+    {
+        // bind debug point light mesh
+        const Geometry::Mesh<u32>& mesh = app.resources.mesh("light_ball");
+        bindMesh(commandBuffer, mesh);
         
-        // draw each light
+        // draw each point light
         for (u32 i = 0; i < app.environment.numPointLights; i++)
         {
             const PointLight& light = app.environment.pointLights[i];
             DebugLightPushConstants pushConstants {
-                .mvp = app.projection * app.view * glm::translate(mat4(1.0f), light.positionWorld),
+                .mvp = app.projection * app.view * glm::translate(mat4(1.0f), light.posWorld),
                 .color = vec4(light.components.diffuse, 1.0f),
             };
             commandBuffer.pushConstants(
@@ -217,6 +221,48 @@ namespace HelloTriangleApplication::Utilities
             );
             commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
         }
+    }
+
+    void drawSpotLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
+    {
+        // bind debug spot light mesh
+        const Geometry::Mesh<u32>& mesh = app.resources.mesh("light_cone");
+        bindMesh(commandBuffer, mesh);
+
+        // draw each spot light
+        for (u32 i = 0; i < app.environment.numSpotLights; i++)
+        {
+            const SpotLight& light = app.environment.spotLights[i];
+            
+            // model matrix follows light direction and uses x+ for orientation
+            mat4 model = mat4(1.0f);
+            vec3 right = vec3(1.0f, 0.0f, 0.0f);
+            model[0] = vec4(right, 0.0f);
+            model[1] = vec4(glm::cross(right, -light.dirWorld), 0.0f);
+            model[2] = vec4(-light.dirWorld, 0.0f);
+            model[3] = vec4(light.posWorld, 1.0f);
+            
+            DebugLightPushConstants pushConstants {
+                .mvp = app.projection * app.view * model,
+                .color = vec4(light.components.diffuse, 1.0f)
+            };
+            commandBuffer.pushConstants(
+                *app.debugLightPipeline.layout,
+                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+                0, sizeof(DebugLightPushConstants), &pushConstants
+            );
+            commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
+        }
+    }
+
+    void drawLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
+    {
+        // change to debug light pipeline
+        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **app.debugLightPipeline);
+        
+        // draw each light
+        drawPointLights(app, commandBuffer);
+        drawSpotLights(app, commandBuffer);
     }
 
     void endRender(App& app, u32 imageIndex)
