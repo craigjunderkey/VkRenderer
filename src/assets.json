@@ -11,11 +11,13 @@
     ],
     "meshes": [
         "utah_teapot.obj",
-        "light_ball.obj"
+        "light_ball.obj",
+        "cube.obj",
+        "sphere.obj"
     ],
     "materials": {
         "coulter": {
-            "texture": "rcoulter",
+            "diffuseColor": [1.0, 0.0, 0.0],
             "texOffset": [1.0, 1.25],
             "texScale": [4.0, 4.0],
             "isUnlit": false,
