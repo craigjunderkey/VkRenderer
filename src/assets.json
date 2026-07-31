@@ -1,7 +1,7 @@
 {
     "directories": {
         "textures": "textures",
-        "meshes": "models"
+        "meshes": "meshes"
     },
     "textures": [
         "rcoulter.jpg",
