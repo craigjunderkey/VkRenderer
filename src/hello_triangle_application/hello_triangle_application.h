@@ -19,6 +19,7 @@
 #include "render_loop/game_loop.h"
 #include "render_loop/camera_controller.h"
 #include "render_loop/light.h"
+#include "resources/resource_manager.h"
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Utilities::FatPipeline;
@@ -29,6 +30,7 @@ using HelloTriangleApplication::RenderLoop::ResourceManager;
 using HelloTriangleApplication::RenderLoop::GameLoop;
 using HelloTriangleApplication::RenderLoop::CameraController;
 using HelloTriangleApplication::Input::InputManager;
+using HelloTriangleApplication::Resources::NewResourceManager;
 
 namespace HelloTriangleApplication
 {
@@ -77,6 +79,7 @@ namespace HelloTriangleApplication
 
         // render loop
         ResourceManager resources;
+        NewResourceManager resources2;
         GameLoop loop = GameLoop(*this);
         CameraController camera = CameraController(RenderLoop::Camera(), this->inputs);
         Environment environment = Environment();
@@ -86,6 +89,7 @@ namespace HelloTriangleApplication
         Texture colorTexture;
 
     private:
+        void initResources();
         void initWindow();
         void initVulkan();
         void mainLoop();

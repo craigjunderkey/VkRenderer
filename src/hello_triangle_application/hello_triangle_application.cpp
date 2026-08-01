@@ -19,19 +19,29 @@
 #include "geometry/color_resources.h"
 #include "geometry/mesh.h"
 #include "render_loop/transform.h"
+#include "resources/prepare_app_resources.h"
 
 using namespace HelloTriangleApplication::Utilities;
 using namespace HelloTriangleApplication::Geometry;
 using namespace HelloTriangleApplication::RenderLoop;
+using namespace HelloTriangleApplication::Resources;
 
 namespace HelloTriangleApplication
 {
     void App::run()
     {
+        initResources();
         initWindow();
         initVulkan();
         mainLoop();
         cleanup();
+    }
+
+    void App::initResources()
+    {
+        std::cout << "Initializing resources\n";
+        initializeResourceManager(*this).unwrap();
+        this->resources2.conditioningPipeline().conditionAssets().unwrap();
     }
 
     void App::initWindow()
