@@ -1,5 +1,7 @@
-"michael" {
-    "wisdom": 5,
-    "strength": 1,
-    "intelligence": 1
+{
+    "michael": {
+        "wisdom": 5,
+        "strength": 1,
+        "intelligence": 1
+    }
 }

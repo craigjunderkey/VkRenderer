@@ -8,6 +8,6 @@ namespace HelloTriangleApplication::Resources
 {
     struct TextData
     {
-        std::vector<std::string> data;
+        std::vector<std::string> lines;
     };
 }

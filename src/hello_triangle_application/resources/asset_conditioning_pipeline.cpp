@@ -3,14 +3,11 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    const std::filesystem::path AssetConditioningPipeline::IMPORT_DIRECTORY = "src/assets";
-    const std::filesystem::path AssetConditioningPipeline::EXPORT_DIRECTORY = "src/assets_export";
-
     Result<std::vector<std::filesystem::path>, std::string> AssetConditioningPipeline::findAssets(const ResourceType& resourceType)
     {
         std::vector<std::filesystem::path> paths = {};
 
-        for (const std::filesystem::directory_entry& file : std::filesystem::recursive_directory_iterator(IMPORT_DIRECTORY))
+        for (const std::filesystem::directory_entry& file : std::filesystem::recursive_directory_iterator(RES_IMPORT_DIR))
         {
             std::filesystem::path path = file.path();
             std::filesystem::path extension = path.extension();
@@ -35,13 +32,13 @@ namespace HelloTriangleApplication::Resources
     Result<Unit, std::string> AssetConditioningPipeline::prepareExportDirectory()
     {
         // clear the export directory
-        std::filesystem::remove_all(EXPORT_DIRECTORY);
-        std::filesystem::create_directory(EXPORT_DIRECTORY);
+        std::filesystem::remove_all(RES_EXPORT_DIR);
+        std::filesystem::create_directory(RES_EXPORT_DIR);
 
         // create resource output directories
         for (const ResourceType& type : this->types_)
         {
-            std::filesystem::path dir = EXPORT_DIRECTORY / type.resourceDirectory;
+            std::filesystem::path dir = RES_EXPORT_DIR / type.resourceDirectory;
             std::filesystem::create_directory(dir);
         }
 
@@ -100,7 +97,7 @@ namespace HelloTriangleApplication::Resources
             }
 
             // compile each exported asset
-            std::filesystem::path dir = EXPORT_DIRECTORY / type.resourceDirectory;
+            std::filesystem::path dir = RES_EXPORT_DIR / type.resourceDirectory;
             for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
             {
                 std::filesystem::path path = file.path();
@@ -124,7 +121,7 @@ namespace HelloTriangleApplication::Resources
             }
 
             // link each compiled asset
-            std::filesystem::path dir = EXPORT_DIRECTORY / type.resourceDirectory;
+            std::filesystem::path dir = RES_EXPORT_DIR / type.resourceDirectory;
             for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
             {
                 std::filesystem::path path = file.path();

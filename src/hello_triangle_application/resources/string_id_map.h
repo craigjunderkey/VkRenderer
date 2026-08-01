@@ -8,9 +8,9 @@ class StringIdMap
 private:
     std::unordered_map<StringId, T> map_ = std::unordered_map<StringId, T>();
 public:
-    const std::unordered_map<StringId, T>& map() const { return this->map_; }
+    std::unordered_map<StringId, T>& map() { return this->map_; }
     
-    Option<T*> tryGet(StringId id) const
+    Option<T*> tryGet(StringId id)
     {
         auto searchResult = this->map_.find(id);
         if (searchResult == this->map_.end())
@@ -23,7 +23,30 @@ public:
         }
     }
     
-    T& get(StringId id) const
+    T& get(StringId id)
+    {
+        auto searchResult = this->map_.find(id);
+        if (searchResult == this->map_.end())
+        {
+            panic("Couldn't find " + std::string(id) + ".");
+        }
+        return searchResult->second;
+    }
+
+    Option<const T*> tryGet(StringId id) const
+    {
+        auto searchResult = this->map_.find(id);
+        if (searchResult == this->map_.end())
+        {
+            return {};
+        }
+        else
+        {
+            return Option<T*>(&searchResult->second);
+        }
+    }
+    
+    const T& get(StringId id) const
     {
         auto searchResult = this->map_.find(id);
         if (searchResult == this->map_.end())

@@ -13,6 +13,9 @@ namespace HelloTriangleApplication::Resources
     class ResourceLoader;
     class ResourceUnloader;
 
+    static const std::filesystem::path RES_IMPORT_DIR = "src/assets";
+    static const std::filesystem::path RES_EXPORT_DIR = "src/assets_export";
+    
     struct OfflineResourceProcessors
     {
         Option<ResourceExporter*> exporter;
@@ -82,7 +85,7 @@ namespace HelloTriangleApplication::Resources
 
         // std::any resource must be a pointer to an instance of the resource type, which loadResource
         // will load data into using the file described by the path
-        virtual Result<Unit, std::string> loadResource(const std::filesystem::path path, std::any resource, RuntimeProcessingData& processingData) = 0;
+        virtual Result<Unit, std::string> loadResource(const std::filesystem::path& path, std::any resource, RuntimeProcessingData& processingData) = 0;
         
         virtual ~ResourceLoader() = default;
     };

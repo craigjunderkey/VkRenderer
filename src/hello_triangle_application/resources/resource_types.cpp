@@ -1,9 +1,12 @@
 #include "resource_types.h"
+#include "resource_loaders.h"
 
 namespace HelloTriangleApplication::Resources::Types
 {
     ResourceType textData()
     {
+        static TextDataLoader loader = TextDataLoader();
+
         return ResourceType {
             .resourceName = "text",
             .resourceDirectory = "text",
@@ -15,7 +18,7 @@ namespace HelloTriangleApplication::Resources::Types
                 .linker = {}
             },
             .runtime {
-                .loader = nullptr,
+                .loader = &loader,
                 .unloader = {}
             }
         };
@@ -23,6 +26,8 @@ namespace HelloTriangleApplication::Resources::Types
 
     ResourceType jsonData()
     {
+        static JsonDataLoader loader = JsonDataLoader();
+
         return ResourceType {
             .resourceName = "json",
             .resourceDirectory = "json",
@@ -34,7 +39,7 @@ namespace HelloTriangleApplication::Resources::Types
                 .linker = {}
             },
             .runtime {
-                .loader = nullptr,
+                .loader = &loader,
                 .unloader = {}
             }
         };

@@ -5,7 +5,7 @@ namespace HelloTriangleApplication::Resources
 {
     std::filesystem::path ResourceExporter::getExportDirectory(const char* resourceDirectory)
     {
-        return AssetConditioningPipeline::EXPORT_DIRECTORY / resourceDirectory;
+        return RES_EXPORT_DIR / resourceDirectory;
     }
 
     std::filesystem::path ResourceExporter::getExportPath(const char* resourceDirectory,
@@ -23,6 +23,6 @@ namespace HelloTriangleApplication::Resources
         name.replace_extension(fileExtension);
         
         // generate export path
-        return AssetConditioningPipeline::EXPORT_DIRECTORY / resourceDirectory / name;
+        return RES_EXPORT_DIR / resourceDirectory / name;
     }
 }
