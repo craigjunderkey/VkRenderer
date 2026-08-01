@@ -6,11 +6,6 @@ namespace HelloTriangleApplication::Resources
     const std::filesystem::path AssetConditioningPipeline::IMPORT_DIRECTORY = "src/assets";
     const std::filesystem::path AssetConditioningPipeline::EXPORT_DIRECTORY = "src/assets_export";
 
-    struct ProcessorPtrs
-    {
-        ResourceExporter* exporter;
-    };
-
     Result<std::vector<std::filesystem::path>, std::string> AssetConditioningPipeline::findAssets(const ResourceType& resourceType)
     {
         std::vector<std::filesystem::path> paths = {};
@@ -54,44 +49,88 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    ProcessorPtrs getProcessorPointers(const ResourceType& type, CopyExporter& defaultExporter)
-    {
-        ProcessorPtrs ptrs;
-
-        // exporter
-        if (type.offline.exporter)
-        {
-            ptrs.exporter = type.offline.exporter.value();
-        }
-        else
-        {
-            defaultExporter = CopyExporter(type);
-            ptrs.exporter = &defaultExporter;
-        }
-
-        return std::move(ptrs);
-    }
-
     Result<Unit, std::string> AssetConditioningPipeline::buildAssets()
     {
         this->prepareExportDirectory();
 
         CopyExporter defaultExporter;
+        NullCompiler defaultCompiler;
+        NullLinker defaultLinker;
 
+        // 1. export
         for (const ResourceType& type : this->types_)
         {
             // get all paths for this resource type
             auto assetSearchResult = this->findAssets(type);
             CHECK_KEEP(assetSearchResult);
 
-            // prepare pointers
-            ProcessorPtrs ptrs = getProcessorPointers(type, defaultExporter);
+            // prepare exporter pointer
+            ResourceExporter* exporter;
+            if (type.offline.exporter)
+            {
+                exporter = type.offline.exporter.value();
+            }
+            else
+            {
+                defaultExporter = CopyExporter(type);
+                exporter = &defaultExporter;
+            }
 
+            // export each found asset
             for (const std::filesystem::path& path : assetSearchResult.take())
             {
-                // 1. export
-                std::filesystem::path out = ptrs.exporter->exportResource(path);
+                std::filesystem::path out = exporter->exportResource(path);
                 std::cout << "Exported " << std::string(type.resourceName) << " " << path << " to " << out << std::endl;
+            }
+        }
+
+        // 2. compile
+        for (const ResourceType& type : this->types_)
+        {
+            // prepare compiler pointer
+            ResourceCompiler* compiler;
+            if (type.offline.compiler)
+            {
+                compiler = type.offline.compiler.value();
+            }
+            else
+            {
+                defaultCompiler = NullCompiler();
+                compiler = &defaultCompiler;
+            }
+
+            // compile each exported asset
+            std::filesystem::path dir = EXPORT_DIRECTORY / type.resourceDirectory;
+            for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
+            {
+                std::filesystem::path path = file.path();
+                compiler->compileResource(path);
+                std::cout << "Compiled " << std::string(type.resourceName) << " " << path << std::endl;
+            }
+        }
+
+        // 3. link
+        for (const ResourceType& type : this->types_)
+        {
+            // prepare linker pointer
+            ResourceLinker* linker;
+            if (type.offline.linker)
+            {
+                linker = type.offline.linker.value();
+            }
+            else
+            {
+                defaultLinker = NullLinker();
+                linker = &defaultLinker;
+            }
+
+            // link each compiled asset
+            std::filesystem::path dir = EXPORT_DIRECTORY / type.resourceDirectory;
+            for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
+            {
+                std::filesystem::path path = file.path();
+                linker->linkResource(path);
+                std::cout << "Linked " << std::string(type.resourceName) << " " << path << std::endl;
             }
         }
 

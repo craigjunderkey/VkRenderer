@@ -23,4 +23,20 @@ namespace HelloTriangleApplication::Resources
             return std::move(dstPath);
         }
     };
+
+    class NullCompiler : public ResourceCompiler
+    {
+    public:
+        void compileResource(const std::filesystem::path& path) override
+        {
+        }
+    };
+
+    class NullLinker : public ResourceLinker
+    {
+    public:
+        void linkResource(const std::filesystem::path& path) override
+        {
+        }
+    };
 }
