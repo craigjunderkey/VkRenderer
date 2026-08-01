@@ -10,7 +10,12 @@ namespace HelloTriangleApplication::Resources
         const std::vector<ResourceType>& types_;
     
     public:
+        static const std::filesystem::path EXPORT_DIRECTORY;
+        static const std::filesystem::path IMPORT_DIRECTORY;
+
         AssetConditioningPipeline(const std::vector<ResourceType>& types) : types_(types) {}
-        Result<Unit, std::string> conditionAssets();
+        Result<std::vector<std::filesystem::path>, std::string> findAssets(const ResourceType& resourceType);
+        Result<Unit, std::string> prepareExportDirectory();
+        Result<Unit, std::string> buildAssets();
     };
 }

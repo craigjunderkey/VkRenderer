@@ -41,7 +41,7 @@ namespace HelloTriangleApplication
     {
         std::cout << "Initializing resources\n";
         initializeResourceManager(*this).unwrap();
-        this->resources2.conditioningPipeline().conditionAssets().unwrap();
+        this->resources2.conditioningPipeline().buildAssets().unwrap();
     }
 
     void App::initWindow()

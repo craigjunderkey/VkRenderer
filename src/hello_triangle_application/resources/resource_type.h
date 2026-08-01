@@ -29,7 +29,7 @@ namespace HelloTriangleApplication::Resources
     struct ResourceType
     {
         const char* resourceName;
-        const char* resourceDirectory;
+        const char* resourceDirectory;                      // name of the export sub-directory
         const char* inFileExtensions[MAX_FILE_EXTENSIONS];  // file extensions must begin with `.`
         const char* outFileExtension;
         OfflineResourceProcessors offline;
@@ -39,7 +39,6 @@ namespace HelloTriangleApplication::Resources
     class ResourceExporter
     {
     public:
-        static const std::filesystem::path EXPORT_DIRECTORY;
         virtual std::filesystem::path exportResource(const std::filesystem::path& path) = 0;
         virtual ~ResourceExporter() = default;
     

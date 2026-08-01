@@ -1,12 +1,11 @@
 #include "resource_type.h"
+#include "asset_conditioning_pipeline.h"
 
 namespace HelloTriangleApplication::Resources
 {
-    const std::filesystem::path ResourceExporter::EXPORT_DIRECTORY = "src/assets_export";
-
     std::filesystem::path ResourceExporter::getExportDirectory(const char* resourceDirectory)
     {
-        return EXPORT_DIRECTORY / resourceDirectory;
+        return AssetConditioningPipeline::EXPORT_DIRECTORY / resourceDirectory;
     }
 
     std::filesystem::path ResourceExporter::getExportPath(const char* resourceDirectory,
@@ -24,6 +23,6 @@ namespace HelloTriangleApplication::Resources
         name.replace_extension(fileExtension);
         
         // generate export path
-        return EXPORT_DIRECTORY / resourceDirectory / name;
+        return AssetConditioningPipeline::EXPORT_DIRECTORY / resourceDirectory / name;
     }
 }

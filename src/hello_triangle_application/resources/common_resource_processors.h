@@ -8,17 +8,19 @@ namespace HelloTriangleApplication::Resources
     class CopyExporter : public ResourceExporter
     {
     private:
-        ResourceType& type_;
+        const ResourceType* type_;
 
     public:
-        CopyExporter(ResourceType& type) : type_(type) {}
+        CopyExporter() : type_(nullptr) {}
+        CopyExporter(const ResourceType& type) : type_(&type) {}
 
         std::filesystem::path exportResource(const std::filesystem::path& srcPath) override
         {
-            std::filesystem::path dstPath = getExportPath(this->type_.resourceDirectory, srcPath);
+            std::filesystem::path dstPath = getExportPath(this->type_->resourceDirectory, srcPath);
             std::ifstream src = std::ifstream(srcPath);
             std::ofstream dst = std::ofstream(dstPath);
             dst << src.rdbuf();
+            return std::move(dstPath);
         }
     };
 }
