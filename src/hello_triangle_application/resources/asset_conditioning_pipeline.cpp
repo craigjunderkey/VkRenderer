@@ -22,7 +22,6 @@ namespace HelloTriangleApplication::Resources
             {
                 if (strcmp(resourceType.inFileExtensions[i], extension.c_str()) == 0)
                 {
-                    std::cout << "Found " << std::string(resourceType.resourceName) << " " << path << std::endl;
                     paths.emplace_back(std::move(path));
                     found = true;
                 }
@@ -57,6 +56,8 @@ namespace HelloTriangleApplication::Resources
         NullCompiler defaultCompiler;
         NullLinker defaultLinker;
 
+        OfflineProcessingData processingData;
+
         // 1. export
         for (const ResourceType& type : this->types_)
         {
@@ -79,8 +80,7 @@ namespace HelloTriangleApplication::Resources
             // export each found asset
             for (const std::filesystem::path& path : assetSearchResult.take())
             {
-                std::filesystem::path out = exporter->exportResource(path);
-                std::cout << "Exported " << std::string(type.resourceName) << " " << path << " to " << out << std::endl;
+                std::filesystem::path out = exporter->exportResource(path, processingData);
             }
         }
 
@@ -104,8 +104,7 @@ namespace HelloTriangleApplication::Resources
             for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
             {
                 std::filesystem::path path = file.path();
-                compiler->compileResource(path);
-                std::cout << "Compiled " << std::string(type.resourceName) << " " << path << std::endl;
+                compiler->compileResource(path, processingData);
             }
         }
 
@@ -129,8 +128,7 @@ namespace HelloTriangleApplication::Resources
             for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
             {
                 std::filesystem::path path = file.path();
-                linker->linkResource(path);
-                std::cout << "Linked " << std::string(type.resourceName) << " " << path << std::endl;
+                linker->linkResource(path, processingData);
             }
         }
 

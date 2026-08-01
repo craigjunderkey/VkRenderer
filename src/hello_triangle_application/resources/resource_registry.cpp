@@ -2,8 +2,4 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> ResourceRegistry::loadAssets()
-    {
-        return Ok();
-    }
 }

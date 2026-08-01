@@ -10,7 +10,7 @@ private:
 public:
     const std::unordered_map<StringId, T>& map() const { return this->map_; }
     
-    Option<T*> tryGet(StringId id)
+    Option<T*> tryGet(StringId id) const
     {
         auto searchResult = this->map_.find(id);
         if (searchResult == this->map_.end())
@@ -23,7 +23,7 @@ public:
         }
     }
     
-    T& get(StringId id)
+    T& get(StringId id) const
     {
         auto searchResult = this->map_.find(id);
         if (searchResult == this->map_.end())

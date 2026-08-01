@@ -6,4 +6,5 @@ namespace HelloTriangleApplication { class App; }
 namespace HelloTriangleApplication::Resources
 {
     Result<Unit, std::string> initializeResourceManager(App& app);
+    Result<Unit, std::string> loadAllResources(App& app);
 }

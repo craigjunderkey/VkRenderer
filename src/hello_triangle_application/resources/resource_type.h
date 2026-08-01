@@ -20,10 +20,18 @@ namespace HelloTriangleApplication::Resources
         Option<ResourceLinker*> linker;
     };
 
+    struct OfflineProcessingData
+    {
+    };
+
     struct RuntimeResourceProcessors
     {
         ResourceLoader* loader;
         Option<ResourceUnloader*> unloader;
+    };
+
+    struct RuntimeProcessingData
+    {
     };
 
     struct ResourceType
@@ -39,7 +47,7 @@ namespace HelloTriangleApplication::Resources
     class ResourceExporter
     {
     public:
-        virtual std::filesystem::path exportResource(const std::filesystem::path& path) = 0;
+        virtual std::filesystem::path exportResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
         virtual ~ResourceExporter() = default;
     
     protected:
@@ -55,26 +63,26 @@ namespace HelloTriangleApplication::Resources
     class ResourceCompiler
     {
     public:
-        virtual void compileResource(const std::filesystem::path& path) = 0;
+        virtual void compileResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
         virtual ~ResourceCompiler() = default;
     };
 
     class ResourceLinker
     {
     public:
-        virtual void linkResource(const std::filesystem::path& path) = 0;
+        virtual void linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
         virtual ~ResourceLinker() = default;
     };
 
     class ResourceLoader
     {
     public:
-        virtual void begin() {}
-        virtual void end() {}
+        virtual void begin(RuntimeProcessingData& processingData) {}
+        virtual void end(RuntimeProcessingData& processingData) {}
 
         // std::any resource must be a pointer to an instance of the resource type, which loadResource
         // will load data into using the file described by the path
-        virtual Result<Unit, std::string> loadResource(const std::filesystem::path path, std::any resource) = 0;
+        virtual Result<Unit, std::string> loadResource(const std::filesystem::path path, std::any resource, RuntimeProcessingData& processingData) = 0;
         
         virtual ~ResourceLoader() = default;
     };
@@ -83,7 +91,7 @@ namespace HelloTriangleApplication::Resources
     {
     public:
         // std::any resource must be a pointer to an instance of the resource type to unload
-        virtual Result<Unit, std::string> unloadResource(std::any resource) = 0;
+        virtual Result<Unit, std::string> unloadResource(std::any resource, RuntimeProcessingData& processingData) = 0;
         virtual ~ResourceUnloader() = default;
     };
 }

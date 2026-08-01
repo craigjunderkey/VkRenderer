@@ -2,6 +2,7 @@
 #include "resource_type.h"
 #include "asset_conditioning_pipeline.h"
 #include "resource_registry.h"
+#include "string_id_map.h"
 
 namespace HelloTriangleApplication::Resources
 {
@@ -9,12 +10,13 @@ namespace HelloTriangleApplication::Resources
     {
     private:
         std::vector<ResourceType> types_;
+        StringIdMap<u32> typeMap_;
         AssetConditioningPipeline conditioningPipeline_;
         ResourceRegistry registry_;
     
     public:
         NewResourceManager()
-            : types_({}), conditioningPipeline_(this->types_), registry_(this->types_)
+            : types_({}), conditioningPipeline_(this->types_), registry_({ this->types_, this->typeMap_ })
         {
         }
 
@@ -23,6 +25,7 @@ namespace HelloTriangleApplication::Resources
 
         void addResourceType(ResourceType type)
         {
+            this->typeMap_.add(StringId(type.resourceName), this->types_.size());
             this->types_.emplace_back(std::move(type));
         }
     };

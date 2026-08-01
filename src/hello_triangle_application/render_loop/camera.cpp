@@ -1,7 +1,7 @@
 #include "camera.h"
 #include "transform.h"
 
-constexpr f32 HALF_PI = glm::pi<f32>() / 2.0f;
+constexpr f32 X_LIMIT = (glm::pi<f32>() / 2.0f) - (10.0f * glm::epsilon<f32>());
 
 namespace HelloTriangleApplication::RenderLoop
 {
@@ -25,7 +25,7 @@ namespace HelloTriangleApplication::RenderLoop
 
     void Camera::setTransform(CameraTransform transform)
     {
-        transform.xRot = glm::clamp<f32>(transform.xRot, -HALF_PI, HALF_PI);
+        transform.xRot = glm::clamp<f32>(transform.xRot, -X_LIMIT, X_LIMIT);
         this->xform_ = transform;
     }
 }

@@ -67,6 +67,7 @@ namespace HelloTriangleApplication
         createImageViews(*this).unwrap();
         createDescriptorSetLayout(*this).unwrap();
         this->resources.prepareResources(*this, "src/assets.json").unwrap();
+        loadAllResources(*this).unwrap();
         createColorTexture(*this).unwrap();
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
