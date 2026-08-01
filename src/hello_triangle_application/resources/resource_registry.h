@@ -2,6 +2,7 @@
 #include "../utilities/common.h"
 #include "resource_type.h"
 #include "string_id_map.h"
+#include "common_resource_processors.h"
 
 #include "text_data.h"
 #include <nlohmann/json.hpp>
@@ -64,6 +65,32 @@ namespace HelloTriangleApplication::Resources
         T& get(StringId id)
         {
             return this->getMap<T>().get(id);
+        }
+
+        template <typename T>
+        Result<Unit, std::string> unloadResources(StringId resourceName)
+        {
+            StringIdMap<T>& map = this->getMap<T>();
+            const ResourceType& type = this->types_[this->typeMap_.get(resourceName)];
+
+            // prepare unloader pointer
+            ResourceUnloader* unloader;
+            NullUnloader defaultUnloader;
+            if (type.runtime.unloader)
+                unloader = type.runtime.unloader.value();
+            else
+                unloader = &defaultUnloader;
+
+            // unload each item in the resource map
+            for (auto& pair : map)
+            {
+                CHECK(unloader->unloadResource(&pair.second, this->processingData_));
+            }
+
+            // clear the map / free the resources from memory
+            map.clear();
+
+            return Ok();
         }
     };
 }

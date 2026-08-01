@@ -17,11 +17,6 @@ namespace HelloTriangleApplication::Resources
         ResourceRegistry& registry = app.resources2.registry();
         registry.loadResources<TextData>("text").unwrap();
         registry.loadResources<nlohmann::json>("json").unwrap();
-
-        // test!
-        std::cout << registry.get<TextData>("chungus").lines[0] << std::endl;
-        std::cout << registry.get<nlohmann::json>("michael")["michael"]["wisdom"] << std::endl;
-
         return Ok();
     }
 }

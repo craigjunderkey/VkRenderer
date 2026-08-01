@@ -39,4 +39,13 @@ namespace HelloTriangleApplication::Resources
         {
         }
     };
+
+    class NullUnloader : public ResourceUnloader
+    {
+    public:
+        Result<Unit, std::string> unloadResource(std::any resource, RuntimeProcessingData& processingData) override
+        {
+            return Ok();
+        }
+    };
 }

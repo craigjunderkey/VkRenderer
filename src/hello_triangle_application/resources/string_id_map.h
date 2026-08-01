@@ -7,9 +7,8 @@ class StringIdMap
 {
 private:
     std::unordered_map<StringId, T> map_ = std::unordered_map<StringId, T>();
+
 public:
-    std::unordered_map<StringId, T>& map() { return this->map_; }
-    
     Option<T*> tryGet(StringId id)
     {
         auto searchResult = this->map_.find(id);
@@ -74,4 +73,17 @@ public:
         auto addResult = this->tryAdd(id, std::move(item));
         addResult.unwrap();
     }
+
+    void clear()
+    {
+        this->map_ = std::unordered_map<StringId, T>();
+    }
+
+    // iterators
+    auto begin() { return this->map_.begin(); }
+    auto end() { return this->map_.end(); }
+    auto begin() const { return this->map_.begin(); }
+    auto end() const { return this->map_.end(); }
+    auto cbegin() { return this->map_.cbegin(); }
+    auto cend() { return this->map_.cend(); }
 };
