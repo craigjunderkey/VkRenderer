@@ -2,12 +2,8 @@
 #include <iostream>
 #include <fstream>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
 #include "text_data.h"
 #include <nlohmann/json.hpp>
-#include "image_data.h"
 
 namespace HelloTriangleApplication::Resources
 {
@@ -38,25 +34,6 @@ namespace HelloTriangleApplication::Resources
             *jsonData = nlohmann::json::parse(file);
         }
 
-        return Ok();
-    }
-
-    Result<Unit, std::string> ImageDataLoader::loadResource(const std::filesystem::path& path,
-            std::any resource, RuntimeProcessingData& processingData)
-    {
-        ImageData* imageData = std::any_cast<ImageData*>(resource);
-        imageData->name = pathToName(path);
-        imageData->pixels = stbi_load(
-            path.c_str(),
-            &imageData->width,
-            &imageData->height,
-            &imageData->numChannels,
-            STBI_rgb_alpha
-        );
-
-        if (!imageData->pixels)
-            return Err<std::string>("Failed to load image " + path.string() + ".");
-        
         return Ok();
     }
 }

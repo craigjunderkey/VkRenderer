@@ -1,7 +1,7 @@
 #include "resource_types.h"
 #include "resource_loaders.h"
-#include "resource_unloaders.h"
 #include "mesh_processing.h"
+#include "image_processing.h"
 
 namespace HelloTriangleApplication::Resources::Types
 {
