@@ -75,16 +75,16 @@ namespace HelloTriangleApplication::RenderLoop
         {
             //load mesh
             std::string pathString = path.string();
-            auto dataResult = loadMeshData<u32>(pathString);
+            auto dataResult = loadMeshData(pathString);
             CHECK_KEEP(dataResult);
-            Mesh<u32> mesh = Mesh<u32>::fromData(std::move(dataResult.take()));
+            Mesh mesh = Mesh::fromData(std::move(dataResult.take()));
             CHECK(mesh.makeBuffers(app));
 
             // add it to the map
             StringId id = pathToStringId(path);
             mesh.name = id;
 
-            auto pair = std::tuple<StringId, Mesh<u32>>(std::move(id), std::move(mesh));
+            auto pair = std::tuple<StringId, Mesh>(std::move(id), std::move(mesh));
             auto insertResult = this->meshes.insert(std::move(pair));
 
             if (!insertResult.second)

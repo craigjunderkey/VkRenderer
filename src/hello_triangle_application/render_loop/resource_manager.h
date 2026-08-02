@@ -28,7 +28,7 @@ namespace HelloTriangleApplication::RenderLoop
         Option<RawLoadedResources> loaded_;
         std::unordered_map<StringId, Geometry::Texture> textures;
         std::unordered_map<StringId, Material> materials;
-        std::unordered_map<StringId, Geometry::Mesh<u32>> meshes;
+        std::unordered_map<StringId, Geometry::Mesh> meshes;
         MaterialManager matManager_;
         SamplerManager samplerManager_;
 
@@ -47,7 +47,7 @@ namespace HelloTriangleApplication::RenderLoop
             return result->second;
         }
         
-        inline const Geometry::Mesh<u32>& mesh(StringId id) const
+        inline const Geometry::Mesh& mesh(StringId id) const
         {
             auto result = this->meshes.find(id);
             assert(result != this->meshes.end());

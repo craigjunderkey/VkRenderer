@@ -10,26 +10,24 @@ namespace HelloTriangleApplication::Geometry
 {
     std::vector<u32> meshQueueFamilies(App& app);
 
-    template<typename T>
     struct MeshData
     {
         std::vector<Vertex> vertices = {};
-        std::vector<T> indices = {};
+        std::vector<u32> indices = {};
     };
     
-    template <typename T>
     struct Mesh
     {
         StringId name = StringId();
         std::vector<Vertex> vertices = {};
-        std::vector<T> indices = {};
-        T numIndices;
+        std::vector<u32> indices = {};
+        u32 numIndices;
         FatBuffer vertexBuffer = {};
         FatBuffer indexBuffer = {};
 
-        static Mesh fromData(MeshData<T> data)
+        static Mesh fromData(MeshData data)
         {
-            Mesh<T> mesh {
+            Mesh mesh {
                 .vertices = std::move(data.vertices),
                 .indices = std::move(data.indices)
             };

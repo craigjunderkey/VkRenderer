@@ -194,7 +194,7 @@ namespace HelloTriangleApplication::Utilities
         );
     }
 
-    void bindMesh(const vk::raii::CommandBuffer& commandBuffer, const Geometry::Mesh<u32>& mesh)
+    void bindMesh(const vk::raii::CommandBuffer& commandBuffer, const Geometry::Mesh& mesh)
     {
         commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
         commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
@@ -203,7 +203,7 @@ namespace HelloTriangleApplication::Utilities
     void drawPointLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
     {
         // bind debug point light mesh
-        const Geometry::Mesh<u32>& mesh = app.resources.mesh("light_ball");
+        const Geometry::Mesh& mesh = app.resources.mesh("light_ball");
         bindMesh(commandBuffer, mesh);
         
         // draw each point light
@@ -226,7 +226,7 @@ namespace HelloTriangleApplication::Utilities
     void drawSpotLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
     {
         // bind debug spot light mesh
-        const Geometry::Mesh<u32>& mesh = app.resources.mesh("light_cone");
+        const Geometry::Mesh& mesh = app.resources.mesh("light_cone");
         bindMesh(commandBuffer, mesh);
 
         // draw each spot light

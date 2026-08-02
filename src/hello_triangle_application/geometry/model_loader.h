@@ -10,8 +10,7 @@
 
 namespace HelloTriangleApplication::Geometry
 {
-    template<typename T>
-    Result<MeshData<T>, std::string> loadMeshData(std::string path)
+    Result<MeshData, std::string> loadMeshData(std::string path)
     {
         // load the obj file
         tinyobj::attrib_t attributes;
@@ -31,9 +30,9 @@ namespace HelloTriangleApplication::Geometry
             return Err<std::string>(errText);
 
         // make a mesh from the faces 
-        MeshData<T> mesh {};
+        MeshData mesh {};
 
-        std::unordered_map<Vertex, T> uniqueVertices {};
+        std::unordered_map<Vertex, u32> uniqueVertices {};
 
         for (const tinyobj::shape_t& shape : shapes)
         {
@@ -58,7 +57,7 @@ namespace HelloTriangleApplication::Geometry
                     1.0f - attributes.texcoords[2 * index.texcoord_index + 1]
                 };
 
-                auto [it, inserted] = uniqueVertices.insert({vertex, static_cast<T>(mesh.vertices.size())});
+                auto [it, inserted] = uniqueVertices.insert({vertex, static_cast<u32>(mesh.vertices.size())});
                 if (inserted)
                 {
                     mesh.vertices.push_back(std::move(vertex));                    
