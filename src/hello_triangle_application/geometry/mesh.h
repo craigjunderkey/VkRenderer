@@ -14,25 +14,15 @@ namespace HelloTriangleApplication::Geometry
     {
         std::vector<Vertex> vertices = {};
         std::vector<u32> indices = {};
+        u32 numIndices = 0;
     };
     
     struct Mesh
     {
         StringId name = StringId();
-        std::vector<Vertex> vertices = {};
-        std::vector<u32> indices = {};
-        u32 numIndices;
+        MeshData data = {};
         FatBuffer vertexBuffer = {};
         FatBuffer indexBuffer = {};
-
-        static Mesh fromData(MeshData data)
-        {
-            Mesh mesh {
-                .vertices = std::move(data.vertices),
-                .indices = std::move(data.indices)
-            };
-            return mesh;
-        }
 
         Result<Unit, std::string> makeBuffers(App& app)
         {
@@ -41,8 +31,8 @@ namespace HelloTriangleApplication::Geometry
 
             // create vertex buffer
             FatBuffer stagingBuffer;
-            vk::DeviceSize verticesSize = sizeof(this->vertices[0]) * this->vertices.size();
-            TRY_ASSIGN(stagingBuffer, createStagingBuffer(app, (void*)this->vertices.data(), verticesSize));
+            vk::DeviceSize verticesSize = sizeof(this->data.vertices[0]) * this->data.vertices.size();
+            TRY_ASSIGN(stagingBuffer, createStagingBuffer(app, (void*)this->data.vertices.data(), verticesSize));
             TRY_ASSIGN(this->vertexBuffer,
                 FatBuffer::create(
                     app, verticesSize, vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
@@ -52,9 +42,9 @@ namespace HelloTriangleApplication::Geometry
             CHECK(copyBuffer(app, stagingBuffer, this->vertexBuffer));
 
             // create index buffer
-            this->numIndices = this->indices.size();
-            vk::DeviceSize indicesSize = sizeof(this->indices[0]) * this->indices.size();
-            TRY_ASSIGN(stagingBuffer, createStagingBuffer(app, (void*)this->indices.data(), indicesSize));
+            assert(this->data.numIndices == this->data.indices.size());
+            vk::DeviceSize indicesSize = sizeof(this->data.indices[0]) * this->data.indices.size();
+            TRY_ASSIGN(stagingBuffer, createStagingBuffer(app, (void*)this->data.indices.data(), indicesSize));
             TRY_ASSIGN(this->indexBuffer,
                 FatBuffer::create(
                     app, indicesSize, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst,
@@ -64,8 +54,8 @@ namespace HelloTriangleApplication::Geometry
             CHECK(copyBuffer(app, stagingBuffer, this->indexBuffer));
 
             // drop vertices and indices from main memory
-            this->vertices = {};
-            this->indices = {};
+            this->data.vertices = {};
+            this->data.indices = {};
 
             return Ok();
         }

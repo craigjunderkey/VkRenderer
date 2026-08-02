@@ -144,7 +144,7 @@ namespace HelloTriangleApplication::RenderLoop
         // bind the geometry
         const Geometry::Mesh& mesh = app.resources.mesh(obj.mesh);
         commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
-        commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
+        commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.data.indices)::value_type>::value);
 
         // upload per-object data
         mat4 model = obj.transform.global();
@@ -160,6 +160,6 @@ namespace HelloTriangleApplication::RenderLoop
         );
         
         // draw the damn thing
-        commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
+        commandBuffer.drawIndexed(mesh.data.numIndices, 1, 0, 0, 0);
     }
 }

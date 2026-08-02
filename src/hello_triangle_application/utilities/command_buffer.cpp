@@ -197,7 +197,7 @@ namespace HelloTriangleApplication::Utilities
     void bindMesh(const vk::raii::CommandBuffer& commandBuffer, const Geometry::Mesh& mesh)
     {
         commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
-        commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.indices)::value_type>::value);
+        commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.data.indices)::value_type>::value);
     }
 
     void drawPointLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
@@ -219,7 +219,7 @@ namespace HelloTriangleApplication::Utilities
                 vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
                 0, sizeof(DebugLightPushConstants), &pushConstants
             );
-            commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
+            commandBuffer.drawIndexed(mesh.data.numIndices, 1, 0, 0, 0);
         }
     }
 
@@ -251,7 +251,7 @@ namespace HelloTriangleApplication::Utilities
                 vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
                 0, sizeof(DebugLightPushConstants), &pushConstants
             );
-            commandBuffer.drawIndexed(mesh.numIndices, 1, 0, 0, 0);
+            commandBuffer.drawIndexed(mesh.data.numIndices, 1, 0, 0, 0);
         }
     }
 

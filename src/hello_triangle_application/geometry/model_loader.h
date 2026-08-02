@@ -66,6 +66,7 @@ namespace HelloTriangleApplication::Geometry
             }
         }
 
+        mesh.numIndices = mesh.indices.size();
         return std::move(mesh);
     }
 }
