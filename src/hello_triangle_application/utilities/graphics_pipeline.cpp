@@ -1,12 +1,14 @@
 #include "../hello_triangle_application.h"
 #include "graphics_pipeline.h"
 #include "../geometry/vertex.h"
+#include "../geometry/vertex_info.h"
 #include "push_constants.h"
 #include "shader_module.h"
 #include "../render_loop/light.h"
 
 using HelloTriangleApplication::App;
 using HelloTriangleApplication::Geometry::Vertex;
+using HelloTriangleApplication::Geometry::VertexInfo;
 
 namespace HelloTriangleApplication::Utilities
 {
@@ -23,8 +25,8 @@ namespace HelloTriangleApplication::Utilities
         pipelineBuilder.addShaderStage(vk::ShaderStageFlagBits::eFragment, shaderModule);
 
         // vertex input
-        pipelineBuilder.vertBindingDescriptions = { Vertex::bindingDescription() };
-        for (const auto& desc : Vertex::attributeDescriptions())
+        pipelineBuilder.vertBindingDescriptions = { VertexInfo::bindingDescription() };
+        for (const auto& desc : VertexInfo::attributeDescriptions())
         {
             pipelineBuilder.vertAttributeDescriptions.emplace_back(desc);            
         }

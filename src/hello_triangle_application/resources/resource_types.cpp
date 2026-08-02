@@ -1,6 +1,7 @@
 #include "resource_types.h"
 #include "resource_loaders.h"
 #include "resource_unloaders.h"
+#include "mesh_processing.h"
 
 namespace HelloTriangleApplication::Resources::Types
 {
@@ -12,11 +13,7 @@ namespace HelloTriangleApplication::Resources::Types
             .resourceName = "text",
             .resourceDirectory = "text",
             .inFileExtensions = { ".txt" },
-            .offline {
-                .exporter = {},
-                .compiler = {},
-                .linker = {}
-            },
+            .offline {},
             .runtime {
                 .loader = &loader,
                 .unloader = {}
@@ -32,11 +29,7 @@ namespace HelloTriangleApplication::Resources::Types
             .resourceName = "json",
             .resourceDirectory = "json",
             .inFileExtensions = { ".json" },
-            .offline {
-                .exporter = {},
-                .compiler = {},
-                .linker = {}
-            },
+            .offline {},
             .runtime {
                 .loader = &loader,
                 .unloader = {}
@@ -53,14 +46,29 @@ namespace HelloTriangleApplication::Resources::Types
             .resourceName = "image",
             .resourceDirectory = "images",
             .inFileExtensions = { ".png", ".jpg" },
-            .offline {
-                .exporter = {},
-                .compiler = {},
-                .linker = {}
-            },
+            .offline {},
             .runtime {
                 .loader = &loader,
                 .unloader = &unloader
+            }
+        };
+    }
+
+    ResourceType mesh()
+    {
+        static MeshExporter exporter = MeshExporter();
+        static MeshLoader loader = MeshLoader();
+
+        return ResourceType {
+            .resourceName = "mesh",
+            .resourceDirectory = "meshes",
+            .inFileExtensions = { ".obj" },
+            .offline {
+                .exporter = &exporter
+            },
+            .runtime {
+                .loader = &loader,
+                .unloader = {}
             }
         };
     }

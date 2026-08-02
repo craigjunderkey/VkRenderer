@@ -1,3 +1,4 @@
+#include "vertex_info.h"
 #include "vertex.h"
 
 const auto vkFloat = vk::Format::eR32Sfloat;
@@ -7,7 +8,7 @@ const auto vkFloat4 = vk::Format::eR32G32B32A32Sfloat;
 
 namespace HelloTriangleApplication::Geometry
 {
-    vk::VertexInputBindingDescription Vertex::bindingDescription()
+    vk::VertexInputBindingDescription VertexInfo::bindingDescription()
     {
         return {
             .binding = 0,
@@ -16,7 +17,7 @@ namespace HelloTriangleApplication::Geometry
         };
     }
 
-    std::array<vk::VertexInputAttributeDescription, 3> Vertex::attributeDescriptions()
+    std::array<vk::VertexInputAttributeDescription, 3> VertexInfo::attributeDescriptions()
     {
         return {
             vk::VertexInputAttributeDescription {

@@ -1,6 +1,5 @@
 #pragma once
 #include "../utilities/common.h"
-#include "../utilities/vulkan_common.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
@@ -12,9 +11,6 @@ namespace HelloTriangleApplication::Geometry
         vec3 pos;
         vec3 normal;
         vec2 texCoord;
-
-        static vk::VertexInputBindingDescription bindingDescription();
-        static std::array<vk::VertexInputAttributeDescription, 3> attributeDescriptions();
 
         bool operator==(const Vertex& other) const
         {

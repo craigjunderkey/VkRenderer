@@ -56,7 +56,8 @@ namespace HelloTriangleApplication::Resources
     class ResourceExporter
     {
     public:
-        virtual std::filesystem::path exportResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
+        virtual Result<std::filesystem::path, std::string> exportResource(
+            const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
         virtual ~ResourceExporter() = default;
     
     protected:
@@ -72,14 +73,14 @@ namespace HelloTriangleApplication::Resources
     class ResourceCompiler
     {
     public:
-        virtual void compileResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
+        virtual Result<Unit, std::string> compileResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
         virtual ~ResourceCompiler() = default;
     };
 
     class ResourceLinker
     {
     public:
-        virtual void linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
+        virtual Result<Unit, std::string> linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
         virtual ~ResourceLinker() = default;
     };
 

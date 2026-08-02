@@ -3,6 +3,7 @@
 #include "resource_types.h"
 #include "text_data.h"
 #include "image_data.h"
+#include "../geometry/mesh.h"
 
 namespace HelloTriangleApplication::Resources
 {
@@ -11,6 +12,7 @@ namespace HelloTriangleApplication::Resources
         app.resources2.addResourceType(Types::textData());
         app.resources2.addResourceType(Types::jsonData());
         app.resources2.addResourceType(Types::imageData());
+        app.resources2.addResourceType(Types::mesh());
         return Ok();
     }
 
@@ -20,6 +22,7 @@ namespace HelloTriangleApplication::Resources
         registry.loadResources<TextData>("text").unwrap();
         registry.loadResources<nlohmann::json>("json").unwrap();
         registry.loadResources<ImageData>("image").unwrap();
+        registry.loadResources<Geometry::Mesh>("mesh").unwrap();
         return Ok();
     }
 

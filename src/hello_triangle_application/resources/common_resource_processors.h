@@ -14,7 +14,7 @@ namespace HelloTriangleApplication::Resources
         CopyExporter() : type_(nullptr) {}
         CopyExporter(const ResourceType& type) : type_(&type) {}
 
-        std::filesystem::path exportResource(const std::filesystem::path& srcPath, OfflineProcessingData& processingData) override
+        Result<std::filesystem::path, std::string> exportResource(const std::filesystem::path& srcPath, OfflineProcessingData& processingData) override
         {
             std::filesystem::path dstPath = getExportPath(this->type_->resourceDirectory, srcPath);
             std::ifstream src = std::ifstream(srcPath);
@@ -27,16 +27,18 @@ namespace HelloTriangleApplication::Resources
     class NullCompiler : public ResourceCompiler
     {
     public:
-        void compileResource(const std::filesystem::path& path, OfflineProcessingData& processingData) override
+        Result<Unit, std::string> compileResource(const std::filesystem::path& path, OfflineProcessingData& processingData) override
         {
+            return Ok();
         }
     };
 
     class NullLinker : public ResourceLinker
     {
     public:
-        void linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData) override
+        Result<Unit, std::string> linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData) override
         {
+            return Ok();
         }
     };
 

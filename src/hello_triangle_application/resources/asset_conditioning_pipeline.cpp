@@ -77,7 +77,9 @@ namespace HelloTriangleApplication::Resources
             // export each found asset
             for (const std::filesystem::path& path : assetSearchResult.take())
             {
-                std::filesystem::path out = exporter->exportResource(path, processingData);
+                auto exportResult = exporter->exportResource(path, processingData);
+                CHECK_KEEP(exportResult);
+                std::filesystem::path out = exportResult.take();
             }
         }
 
@@ -101,7 +103,7 @@ namespace HelloTriangleApplication::Resources
             for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
             {
                 std::filesystem::path path = file.path();
-                compiler->compileResource(path, processingData);
+                CHECK(compiler->compileResource(path, processingData));
             }
         }
 
@@ -125,7 +127,7 @@ namespace HelloTriangleApplication::Resources
             for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
             {
                 std::filesystem::path path = file.path();
-                linker->linkResource(path, processingData);
+                CHECK(linker->linkResource(path, processingData));
             }
         }
 
