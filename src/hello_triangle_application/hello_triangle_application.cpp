@@ -79,6 +79,7 @@ namespace HelloTriangleApplication
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();
+        handlePostLoadInitialization(*this).unwrap();
         this->resources.loadResources(*this).unwrap();
         this->resources2.registry().unloadResources<ImageData>("image").unwrap();
         createUniformBuffers(*this).unwrap();

@@ -50,4 +50,13 @@ namespace HelloTriangleApplication::Resources
             return Ok();
         }
     };
+
+    class NullPostLoadInitializer : public ResourcePostLoadInitializer
+    {
+    public:
+        Result<Unit, std::string> postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData) override
+        {
+            return Err<std::string>("Post-load initialized a resource with no defined post-load initialization behavior.");
+        }
+    };
 }

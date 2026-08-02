@@ -55,4 +55,12 @@ namespace HelloTriangleApplication::Resources
 
         return Ok();
     }
+
+    Result<Unit, std::string> handlePostLoadInitialization(App& app)
+    {
+        // meshes
+        CHECK(app.resources2.registry().postLoadInitialize<Geometry::Mesh>("mesh"));
+
+        return Ok();
+    }
 }

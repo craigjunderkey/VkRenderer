@@ -58,6 +58,7 @@ namespace HelloTriangleApplication::Resources::Types
     {
         static MeshExporter exporter = MeshExporter();
         static MeshLoader loader = MeshLoader();
+        static MeshInitializer initializer = MeshInitializer();
 
         return ResourceType {
             .resourceName = "mesh",
@@ -68,7 +69,8 @@ namespace HelloTriangleApplication::Resources::Types
             },
             .runtime {
                 .loader = &loader,
-                .unloader = {}
+                .unloader = {},
+                .postLoadInitializer = &initializer
             }
         };
     }

@@ -5,6 +5,8 @@
 
 #define MAX_FILE_EXTENSIONS 4
 
+namespace HelloTriangleApplication { class App; }
+
 namespace HelloTriangleApplication::Resources
 {
     class ResourceExporter;
@@ -12,6 +14,7 @@ namespace HelloTriangleApplication::Resources
     class ResourceLinker;
     class ResourceLoader;
     class ResourceUnloader;
+    class ResourcePostLoadInitializer;
 
     static const std::filesystem::path RES_IMPORT_DIR = "src/assets";
     static const std::filesystem::path RES_EXPORT_DIR = "src/assets_export";
@@ -36,10 +39,12 @@ namespace HelloTriangleApplication::Resources
     {
         ResourceLoader* loader;
         Option<ResourceUnloader*> unloader;
+        Option<ResourcePostLoadInitializer*> postLoadInitializer;
     };
 
     struct RuntimeProcessingData
     {
+        App* app;
     };
 
     struct ResourceType
@@ -87,8 +92,8 @@ namespace HelloTriangleApplication::Resources
     class ResourceLoader
     {
     public:
-        virtual void begin(RuntimeProcessingData& processingData) {}
-        virtual void end(RuntimeProcessingData& processingData) {}
+        virtual Result<Unit, std::string> begin(RuntimeProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, std::string> end(RuntimeProcessingData& processingData) { return Ok(); }
 
         // std::any resource must be a pointer to an instance of the resource type, which loadResource
         // will load data into using the file described by the path
@@ -100,8 +105,24 @@ namespace HelloTriangleApplication::Resources
     class ResourceUnloader
     {
     public:
+        virtual Result<Unit, std::string> begin(RuntimeProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, std::string> end(RuntimeProcessingData& processingData) { return Ok(); }
+
         // std::any resource must be a pointer to an instance of the resource type to unload
         virtual Result<Unit, std::string> unloadResource(std::any resource, RuntimeProcessingData& processingData) = 0;
+        
         virtual ~ResourceUnloader() = default;
+    };
+
+    class ResourcePostLoadInitializer
+    {
+    public:
+        virtual Result<Unit, std::string> begin(RuntimeProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, std::string> end(RuntimeProcessingData& processingData) { return Ok(); }
+
+        // std::any resource must be a pointer to an instance of the resource type to post-load initialize
+        virtual Result<Unit, std::string> postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData) = 0;
+        
+        virtual ~ResourcePostLoadInitializer() = default;
     };
 }

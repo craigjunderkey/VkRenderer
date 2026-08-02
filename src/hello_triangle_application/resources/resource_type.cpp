@@ -7,18 +7,24 @@ namespace HelloTriangleApplication::Resources
 {
     Result<Unit, std::string> ResourceType::isValid()
     {
-        if (resourceName == nullptr) panic("Resource type missing a name.");
-        if (resourceDirectory == nullptr) panic(RESOURCE_NAME_HERE + " missing a directory.");
-        if (inFileExtensions[0] == nullptr) panic(RESOURCE_NAME_HERE + " is missing a first input file extension.");
+        if (resourceName == nullptr)
+            return Err<std::string>("Resource type missing a name.");
+        if (resourceDirectory == nullptr)
+            return Err<std::string>(RESOURCE_NAME_HERE + " missing a directory.");
+        if (inFileExtensions[0] == nullptr)
+            return Err<std::string>(RESOURCE_NAME_HERE + " is missing a first input file extension.");
         if (offline.exporter.has_value() && offline.exporter.value() == nullptr)
-            panic(RESOURCE_NAME_HERE + " has an exporter but it's nullptr.");
+            return Err<std::string>(RESOURCE_NAME_HERE + " has an exporter but it's nullptr.");
         if (offline.compiler.has_value() && offline.compiler.value() == nullptr)
-            panic(RESOURCE_NAME_HERE + " has a compiler but it's nullptr.");
+            return Err<std::string>(RESOURCE_NAME_HERE + " has a compiler but it's nullptr.");
         if (offline.linker.has_value() && offline.linker.value() == nullptr)
-            panic(RESOURCE_NAME_HERE + " has a linker but it's nullptr.");
-        if (runtime.loader == nullptr) panic(RESOURCE_NAME_HERE + " is missing a loader.");
+            return Err<std::string>(RESOURCE_NAME_HERE + " has a linker but it's nullptr.");
+        if (runtime.loader == nullptr)
+            return Err<std::string>(RESOURCE_NAME_HERE + " is missing a loader.");
         if (runtime.unloader.has_value() && runtime.unloader.value() == nullptr)
-            panic(RESOURCE_NAME_HERE + " has an unloader but it's nullptr.");
+            return Err<std::string>(RESOURCE_NAME_HERE + " has an unloader but it's nullptr.");
+        if (runtime.postLoadInitializer.has_value() && runtime.postLoadInitializer.value() == nullptr)
+            return Err<std::string>(RESOURCE_NAME_HERE + " has a post-load initializer but it's nullptr.");
 
         return Ok();
     }

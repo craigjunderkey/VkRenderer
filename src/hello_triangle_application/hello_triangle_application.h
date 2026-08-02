@@ -82,7 +82,7 @@ namespace HelloTriangleApplication
 
         // render loop
         ResourceManager resources;
-        NewResourceManager resources2;
+        NewResourceManager resources2 = NewResourceManager(*this);
         GameLoop loop = GameLoop(*this);
         CameraController camera = CameraController(RenderLoop::Camera(), this->inputs);
         Environment environment = Environment();

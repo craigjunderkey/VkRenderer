@@ -142,7 +142,7 @@ namespace HelloTriangleApplication::RenderLoop
     void GameLoop::submitDraw(App& app, const vk::raii::CommandBuffer& commandBuffer, const RenderObject& obj)
     {
         // bind the geometry
-        const Geometry::Mesh& mesh = app.resources.mesh(obj.mesh);
+        const Geometry::Mesh& mesh = app.resources2.get<Geometry::Mesh>(obj.mesh);
         commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
         commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.data.indices)::value_type>::value);
 

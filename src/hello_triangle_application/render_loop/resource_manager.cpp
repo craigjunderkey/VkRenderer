@@ -18,7 +18,7 @@ namespace HelloTriangleApplication::RenderLoop
         {
             // load texture
             StringId id = pathToStringId(path);
-            auto loadResult = Texture::loadFromImageData(app, app.resources2.registry().get<ImageData>(id));
+            auto loadResult = Texture::loadFromImageData(app, app.resources2.get<ImageData>(id));
             CHECK_KEEP(loadResult);
             Texture texture = loadResult.take();
 
@@ -152,7 +152,7 @@ namespace HelloTriangleApplication::RenderLoop
         CHECK(texLoadResult);
 
         // import meshes
-        auto meshLoadResult = this->loadMeshes(app, std::move(loaded.meshPaths));
+        auto meshLoadResult = this->loadMeshes(app, {}); // TODO: we stopped passing paths, but get rid of this entirely
         CHECK(meshLoadResult);
 
         // import materials

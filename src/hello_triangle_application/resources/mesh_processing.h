@@ -29,4 +29,9 @@ namespace HelloTriangleApplication::Resources
     {
         Result<std::vector<Geometry::Vertex>, std::string> importMesh(const std::filesystem::path& path) override;
     };
+
+    class MeshInitializer : public ResourcePostLoadInitializer
+    {
+        Result<Unit, std::string> postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData) override;
+    };
 }

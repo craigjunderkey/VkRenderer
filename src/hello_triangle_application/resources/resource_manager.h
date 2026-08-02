@@ -4,6 +4,8 @@
 #include "resource_registry.h"
 #include "string_id_map.h"
 
+namespace HelloTriangleApplication { class App; }
+
 namespace HelloTriangleApplication::Resources
 {
     class NewResourceManager
@@ -15,9 +17,12 @@ namespace HelloTriangleApplication::Resources
         ResourceRegistry registry_;
     
     public:
-        NewResourceManager()
+        NewResourceManager(App& app)
             : types_({}), conditioningPipeline_(this->types_), registry_({ this->types_, this->typeMap_ })
         {
+            this->registry_.processingData() = RuntimeProcessingData {
+                .app = &app
+            };
         }
 
         AssetConditioningPipeline& conditioningPipeline() { return this->conditioningPipeline_; }
@@ -25,5 +30,11 @@ namespace HelloTriangleApplication::Resources
 
         void addResourceType(ResourceType type);
         bool exportExists();
+
+        template <typename T>
+        inline T& get(StringId id)
+        {
+            return this->registry_.get<T>(id);
+        }
     };
 }
