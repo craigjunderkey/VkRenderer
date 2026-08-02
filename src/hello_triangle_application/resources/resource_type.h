@@ -42,9 +42,10 @@ namespace HelloTriangleApplication::Resources
         const char* resourceName;
         const char* resourceDirectory;                      // name of the export sub-directory
         const char* inFileExtensions[MAX_FILE_EXTENSIONS];  // file extensions must begin with `.`
-        const char* outFileExtension;
         OfflineResourceProcessors offline;
         RuntimeResourceProcessors runtime;
+
+        Result<Unit, std::string> isValid();
     };
 
     class ResourceExporter

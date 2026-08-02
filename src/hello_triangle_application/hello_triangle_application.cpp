@@ -20,6 +20,7 @@
 #include "geometry/mesh.h"
 #include "render_loop/transform.h"
 #include "resources/prepare_app_resources.h"
+#include "resources/image_data.h"
 
 using namespace HelloTriangleApplication::Utilities;
 using namespace HelloTriangleApplication::Geometry;
@@ -42,6 +43,7 @@ namespace HelloTriangleApplication
         std::cout << "Initializing resources\n";
         initializeResourceManager(*this).unwrap();
         this->resources2.conditioningPipeline().buildAssets().unwrap();
+        loadAllResources(*this).unwrap();
     }
 
     void App::initWindow()
@@ -67,12 +69,12 @@ namespace HelloTriangleApplication
         createImageViews(*this).unwrap();
         createDescriptorSetLayout(*this).unwrap();
         this->resources.prepareResources(*this, "src/assets.json").unwrap();
-        loadAllResources(*this).unwrap();
         createColorTexture(*this).unwrap();
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();
         this->resources.loadResources(*this).unwrap();
+        this->resources2.registry().unloadResources<ImageData>("image").unwrap();
         createUniformBuffers(*this).unwrap();
         createDescriptorPool(*this).unwrap();
         createDescriptorSets(*this).unwrap();

@@ -23,10 +23,6 @@ namespace HelloTriangleApplication::Resources
         AssetConditioningPipeline& conditioningPipeline() { return this->conditioningPipeline_; }
         ResourceRegistry& registry() { return this->registry_; }
 
-        void addResourceType(ResourceType type)
-        {
-            this->typeMap_.add(StringId(type.resourceName), this->types_.size());
-            this->types_.emplace_back(std::move(type));
-        }
+        void addResourceType(ResourceType type);
     };
 }

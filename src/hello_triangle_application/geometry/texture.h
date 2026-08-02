@@ -3,6 +3,7 @@
 #include "../utilities/vulkan_common.h"
 #include "buffer.h"
 #include "../render_loop/sampler_manager.h"
+#include "../resources/image_data.h"
 
 #include <memory>
 
@@ -21,7 +22,7 @@ namespace HelloTriangleApplication::Geometry
         u32 height = 0;
         u32 mipLevels = 1;
 
-        static Result<Texture, std::string> loadFromFile(App& app, std::string path,
+        static Result<Texture, std::string> loadFromImageData(App& app, const HelloTriangleApplication::Resources::ImageData& imageData,
             vk::Format format = vk::Format::eR8G8B8A8Srgb,
             vk::ImageTiling tiling = vk::ImageTiling::eOptimal,
             vk::ImageUsageFlags usage = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,

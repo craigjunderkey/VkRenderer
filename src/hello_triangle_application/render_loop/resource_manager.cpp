@@ -3,8 +3,10 @@
 #include "../geometry/model_loader.h"
 #include "resource_reader.h"
 #include "../geometry/texture.h"
+#include "../resources/image_data.h"
 
 using namespace HelloTriangleApplication::Geometry;
+using namespace HelloTriangleApplication::Resources;
 
 namespace HelloTriangleApplication::RenderLoop
 {
@@ -15,20 +17,19 @@ namespace HelloTriangleApplication::RenderLoop
         for (const auto& path : paths)
         {
             // load texture
-            std::string pathString = path.string();
-            auto loadResult = Texture::loadFromFile(app, pathString);
+            StringId id = pathToStringId(path);
+            auto loadResult = Texture::loadFromImageData(app, app.resources2.registry().get<ImageData>(id));
             CHECK_KEEP(loadResult);
             Texture texture = loadResult.take();
 
             // add it to the map
-            StringId id = pathToStringId(path);
             texture.name = id;
 
             auto pair = std::tuple<StringId, Texture>(std::move(id), std::move(texture));
             auto insertResult = this->textures.insert(std::move(pair));
             
             if (!insertResult.second)
-                return Err<std::string>("Tried to load " + pathString + " multiple times.");
+                return Err<std::string>("Tried to load " + path.string() + " multiple times.");
             else
                 numTexturesLoaded++;
         }

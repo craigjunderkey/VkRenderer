@@ -1,13 +1,13 @@
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 #include "../hello_triangle_application.h"
 #include "texture.h"
 #include "buffer.h"
 #include "../utilities/command_buffer.h"
 #include "vertex_buffer.h"
 #include "../utilities/image_views.h"
+#include "../resources/image_data.h"
 
 using namespace HelloTriangleApplication::Utilities;
+using namespace HelloTriangleApplication::Resources;
 
 namespace HelloTriangleApplication::Geometry
 {
@@ -127,19 +127,12 @@ namespace HelloTriangleApplication::Geometry
         return Ok();
     }
 
-    Result<Texture, std::string> Texture::loadFromFile(App& app, std::string path, vk::Format format,
+    Result<Texture, std::string> Texture::loadFromImageData(App& app, const ImageData& imageData, vk::Format format,
         vk::ImageTiling tiling, vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::ImageAspectFlags aspectFlags,
         bool doMipmapping, vk::SampleCountFlagBits sampleCount)
     {
-        // load image into main memory
-        i32 texWidth, texHeight, texChannels;
-        stbi_uc* pixels = stbi_load(path.data(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-
-        if (!pixels)
-            return Err<std::string>("Failed to load texture " + path + ".");
-        
         // create staging buffer
-        vk::DeviceSize imageSize = texWidth * texHeight * 4;
+        vk::DeviceSize imageSize = imageData.width * imageData.height * 4;
         
         FatBuffer imageBuffer;
         TRY_ASSIGN(
@@ -156,13 +149,11 @@ namespace HelloTriangleApplication::Geometry
         CHECK_KEEP(mapResult);
         void* data = mapResult.take();
 
-        memcpy(data, pixels, imageSize);
+        // transfer image data to staging buffer
+        memcpy(data, imageData.pixels, imageSize);
         imageBuffer.memory.unmapMemory();
 
-        // free copy of image in main memory
-        stbi_image_free(pixels);
-
-        return Texture::loadFromBuffer(app, texWidth, texHeight, imageBuffer, format, tiling,
+        return Texture::loadFromBuffer(app, imageData.width, imageData.height, imageBuffer, format, tiling,
             usage, properties, aspectFlags, doMipmapping, sampleCount);
     }
 

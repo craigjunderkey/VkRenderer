@@ -1,5 +1,6 @@
 #include "resource_types.h"
 #include "resource_loaders.h"
+#include "resource_unloaders.h"
 
 namespace HelloTriangleApplication::Resources::Types
 {
@@ -11,7 +12,6 @@ namespace HelloTriangleApplication::Resources::Types
             .resourceName = "text",
             .resourceDirectory = "text",
             .inFileExtensions = { ".txt" },
-            .outFileExtension = ".txt",
             .offline {
                 .exporter = {},
                 .compiler = {},
@@ -32,7 +32,6 @@ namespace HelloTriangleApplication::Resources::Types
             .resourceName = "json",
             .resourceDirectory = "json",
             .inFileExtensions = { ".json" },
-            .outFileExtension = ".json",
             .offline {
                 .exporter = {},
                 .compiler = {},
@@ -41,6 +40,27 @@ namespace HelloTriangleApplication::Resources::Types
             .runtime {
                 .loader = &loader,
                 .unloader = {}
+            }
+        };
+    }
+
+    ResourceType imageData()
+    {
+        static ImageDataLoader loader = ImageDataLoader();
+        static ImageDataUnloader unloader = ImageDataUnloader();
+
+        return ResourceType {
+            .resourceName = "image",
+            .resourceDirectory = "images",
+            .inFileExtensions = { ".png", ".jpg" },
+            .offline {
+                .exporter = {},
+                .compiler = {},
+                .linker = {}
+            },
+            .runtime {
+                .loader = &loader,
+                .unloader = &unloader
             }
         };
     }
