@@ -5,7 +5,7 @@ namespace HelloTriangleApplication
 {
     namespace Setting
     {
-        enum AntiAliasing
+        enum class AntiAliasing
         {
             None,
             MSAAx2,

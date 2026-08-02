@@ -29,6 +29,12 @@ using namespace HelloTriangleApplication::Resources;
 
 namespace HelloTriangleApplication
 {
+    RuntimeConfig App::RUNTIME_CONFIG {};
+    App::App(RuntimeConfig config)
+    {
+        RUNTIME_CONFIG = config;
+    }
+    
     void App::run()
     {
         initResources();
@@ -42,7 +48,7 @@ namespace HelloTriangleApplication
     {
         std::cout << "Initializing resources\n";
         initializeResourceManager(*this).unwrap();
-        this->resources2.conditioningPipeline().buildAssets().unwrap();
+        handleAssetBuild(*this).unwrap();
         loadAllResources(*this).unwrap();
     }
 

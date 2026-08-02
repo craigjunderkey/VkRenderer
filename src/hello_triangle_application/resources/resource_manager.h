@@ -24,5 +24,6 @@ namespace HelloTriangleApplication::Resources
         ResourceRegistry& registry() { return this->registry_; }
 
         void addResourceType(ResourceType type);
+        bool exportExists();
     };
 }

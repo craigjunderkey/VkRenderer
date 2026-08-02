@@ -2,9 +2,16 @@
 
 using namespace HelloTriangleApplication;
 
+RuntimeConfig getConfig()
+{
+    return RuntimeConfig {
+        .assetBuild = Setting::AssetBuild::ForceBuild
+    };
+}
+
 int main()
 {
-    App app;
+    App app(getConfig());
     app.run();
 
     return EXIT_SUCCESS;

@@ -22,4 +22,34 @@ namespace HelloTriangleApplication::Resources
         registry.loadResources<ImageData>("image").unwrap();
         return Ok();
     }
+
+    Result<Unit, std::string> handleAssetBuild(App& app)
+    {
+        bool shouldBuild;
+
+        switch (App::RUNTIME_CONFIG.assetBuild)
+        {
+            case Setting::AssetBuild::ForceBuild:
+                shouldBuild = true;
+                break;
+            case Setting::AssetBuild::BuildIfNone:
+                shouldBuild = !app.resources2.exportExists();
+                break;
+            case Setting::AssetBuild::NoBuild:
+                shouldBuild = false;
+                break;
+        }
+
+        if (shouldBuild)
+        {
+            std::cout << "Building assets\n";
+            CHECK(app.resources2.conditioningPipeline().buildAssets());
+        }
+        else
+        {
+            std::cout << "Skipping asset build\n";
+        }
+
+        return Ok();
+    }
 }
