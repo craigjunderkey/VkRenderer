@@ -5,6 +5,8 @@
 #include "image_data.h"
 #include "../geometry/mesh.h"
 
+#include <chrono>
+
 namespace HelloTriangleApplication::Resources
 {
     Result<Unit, std::string> initializeResourceManager(App& app)
@@ -16,13 +18,38 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
+    class LogLoader
+    {
+    private:
+        ResourceRegistry& registry_;
+    
+    public:
+        LogLoader(ResourceRegistry& registry) : registry_(registry)
+        {
+            std::cout << "Loading resources\n";
+        }
+
+        template <typename T>
+        Result<Unit, std::string> load(StringId resourceName)
+        {
+            auto start = std::chrono::high_resolution_clock::now();
+            CHECK(this->registry_.loadResources<T>(resourceName));
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+            std::cout << "\t" << resourceName.string() << "\t\t" << this->registry_.getMap<T>().size() << "\t" << ms << std::endl;
+            return Ok();
+        }
+    };
+
     Result<Unit, std::string> loadAllResources(App& app)
     {
-        ResourceRegistry& registry = app.resources2.registry();
-        registry.loadResources<TextData>("text").unwrap();
-        registry.loadResources<nlohmann::json>("json").unwrap();
-        registry.loadResources<ImageData>("image").unwrap();
-        registry.loadResources<Geometry::Mesh>("mesh").unwrap();
+        LogLoader loader(app.resources2.registry());
+
+        loader.load<TextData>("text").unwrap();
+        loader.load<nlohmann::json>("json").unwrap();
+        loader.load<ImageData>("image").unwrap();
+        loader.load<Geometry::Mesh>("mesh").unwrap();
+        
         return Ok();
     }
 
@@ -45,12 +72,15 @@ namespace HelloTriangleApplication::Resources
 
         if (shouldBuild)
         {
-            std::cout << "Building assets\n";
+            auto now = std::chrono::high_resolution_clock::now();
             CHECK(app.resources2.conditioningPipeline().buildAssets());
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - now);
+            std::cout << "Built assets in " << ms << std::endl;
         }
         else
         {
-            std::cout << "Skipping asset build\n";
+            std::cout << "Skipped asset build\n";
         }
 
         return Ok();
@@ -58,9 +88,7 @@ namespace HelloTriangleApplication::Resources
 
     Result<Unit, std::string> handlePostLoadInitialization(App& app)
     {
-        // meshes
         CHECK(app.resources2.registry().postLoadInitialize<Geometry::Mesh>("mesh"));
-
         return Ok();
     }
 }

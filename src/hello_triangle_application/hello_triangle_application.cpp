@@ -46,7 +46,6 @@ namespace HelloTriangleApplication
 
     void App::initResources()
     {
-        std::cout << "Initializing resources\n";
         initializeResourceManager(*this).unwrap();
         handleAssetBuild(*this).unwrap();
         loadAllResources(*this).unwrap();
@@ -54,8 +53,6 @@ namespace HelloTriangleApplication
 
     void App::initWindow()
     {
-        std::cout << "Initializing window\n";
-        
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         this->window.attachGlfwHandle(

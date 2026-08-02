@@ -79,6 +79,11 @@ public:
         this->map_ = std::unordered_map<StringId, T>();
     }
 
+    u32 size()
+    {
+        return this->map_.size();
+    }
+
     // iterators
     auto begin() { return this->map_.begin(); }
     auto end() { return this->map_.end(); }
