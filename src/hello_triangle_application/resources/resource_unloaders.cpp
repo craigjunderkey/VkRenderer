@@ -7,7 +7,7 @@ namespace HelloTriangleApplication::Resources
     {
         ImageData* imageData = std::any_cast<ImageData*>(resource);
         if (!imageData->pixels)
-            return Err<std::string>("Unloading image data but pixels == nullptr.");
+            return Err<std::string>("Unloading image data " + std::string(imageData->name) + " but pixels == nullptr.");
         free(imageData->pixels);
         return Ok();
     }

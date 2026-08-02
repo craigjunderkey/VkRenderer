@@ -9,7 +9,6 @@ namespace HelloTriangleApplication::Resources
     {
         if (resourceName == nullptr) panic("Resource type missing a name.");
         if (resourceDirectory == nullptr) panic(RESOURCE_NAME_HERE + " missing a directory.");
-        if (inFileExtensions == nullptr) panic(RESOURCE_NAME_HERE + " has no array of input file extensions.");
         if (inFileExtensions[0] == nullptr) panic(RESOURCE_NAME_HERE + " is missing a first input file extension.");
         if (offline.exporter.has_value() && offline.exporter.value() == nullptr)
             panic(RESOURCE_NAME_HERE + " has an exporter but it's nullptr.");

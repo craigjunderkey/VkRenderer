@@ -45,6 +45,7 @@ namespace HelloTriangleApplication::Resources
             std::any resource, RuntimeProcessingData& processingData)
     {
         ImageData* imageData = std::any_cast<ImageData*>(resource);
+        imageData->name = pathToName(path);
         imageData->pixels = stbi_load(
             path.c_str(),
             &imageData->width,

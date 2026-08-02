@@ -16,6 +16,11 @@ namespace HelloTriangleApplication::Resources
     static const std::filesystem::path RES_IMPORT_DIR = "src/assets";
     static const std::filesystem::path RES_EXPORT_DIR = "src/assets_export";
     
+    inline StringId pathToName(const std::filesystem::path& path)
+    {
+        return StringId(path.stem().string());
+    }
+    
     struct OfflineResourceProcessors
     {
         Option<ResourceExporter*> exporter;

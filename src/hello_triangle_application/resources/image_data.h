@@ -5,6 +5,7 @@ namespace HelloTriangleApplication::Resources
 {
     struct ImageData
     {
+        StringId name;
         u8* pixels; // ImageData owns the memory to which `pixels` points
         i32 width;
         i32 height;
