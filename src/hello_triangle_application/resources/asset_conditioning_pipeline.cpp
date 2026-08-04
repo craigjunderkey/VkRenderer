@@ -1,5 +1,7 @@
 #include "asset_conditioning_pipeline.h"
 #include "common_resource_processors.h"
+#include "string_id_map.h"
+#include <chrono>
 
 namespace HelloTriangleApplication::Resources
 {
@@ -45,8 +47,18 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> AssetConditioningPipeline::buildAssets()
+    struct AssetBuildProgress
     {
+        std::chrono::milliseconds exportTime;
+        std::chrono::milliseconds compileTime;
+        std::chrono::milliseconds linkTime;
+    };
+
+    Result<Unit, std::string> AssetConditioningPipeline::buildAssets(bool doLogging)
+    {
+        if (doLogging)
+            std::cout << "Building assets\n";
+        
         this->prepareExportDirectory();
 
         CopyExporter defaultExporter;
@@ -55,9 +67,18 @@ namespace HelloTriangleApplication::Resources
 
         OfflineProcessingData processingData;
 
+        // start tracking each resource
+        StringIdMap<AssetBuildProgress> buildProgress;
+        for (const ResourceType& type : this->types_)
+        {
+            buildProgress.add(type.resourceName, {});
+        }
+
         // 1. export
         for (const ResourceType& type : this->types_)
         {
+            auto startTime = std::chrono::high_resolution_clock::now();
+
             // get all paths for this resource type
             auto assetSearchResult = this->findAssets(type);
             CHECK_KEEP(assetSearchResult);
@@ -81,11 +102,17 @@ namespace HelloTriangleApplication::Resources
                 CHECK(exporter->exportResource(path, processingData));
             }
             CHECK(exporter->end(processingData));
+
+            // store export time
+            auto now = std::chrono::high_resolution_clock::now();
+            buildProgress.get(type.resourceName).exportTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime);
         }
 
         // 2. compile
         for (const ResourceType& type : this->types_)
         {
+            auto startTime = std::chrono::high_resolution_clock::now();
+
             // prepare compiler pointer
             ResourceCompiler* compiler;
             if (type.offline.compiler)
@@ -107,11 +134,17 @@ namespace HelloTriangleApplication::Resources
                 CHECK(compiler->compileResource(path, processingData));
             }
             CHECK(compiler->end(processingData));
+
+            // store compile time
+            auto now = std::chrono::high_resolution_clock::now();
+            buildProgress.get(type.resourceName).compileTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime);
         }
 
         // 3. link
         for (const ResourceType& type : this->types_)
         {
+            auto startTime = std::chrono::high_resolution_clock::now();
+            
             // prepare linker pointer
             ResourceLinker* linker;
             if (type.offline.linker)
@@ -133,6 +166,24 @@ namespace HelloTriangleApplication::Resources
                 CHECK(linker->linkResource(path, processingData));
             }
             CHECK(linker->end(processingData));
+
+            // store link time
+            auto now = std::chrono::high_resolution_clock::now();
+            buildProgress.get(type.resourceName).linkTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime);
+        }
+
+        // log build duration
+        if (doLogging)
+        {
+            std::cout << "\ttype\texport\tcompile\tlink\ttotal\n";
+            for (const ResourceType& type : this->types_)
+            {
+                const auto& stats = buildProgress.get(type.resourceName);
+                std::chrono::milliseconds resTotal = stats.exportTime + stats.compileTime + stats.linkTime;
+                std::cout << "\t" << type.resourceName << "\t" << stats.exportTime
+                    << "\t" << stats.compileTime << "\t" << stats.linkTime
+                    << "\t" << resTotal << "\n";
+            }
         }
 
         return Ok();

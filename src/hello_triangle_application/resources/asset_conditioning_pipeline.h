@@ -13,6 +13,6 @@ namespace HelloTriangleApplication::Resources
         AssetConditioningPipeline(const std::vector<ResourceType>& types) : types_(types) {}
         Result<std::vector<std::filesystem::path>, std::string> findAssets(const ResourceType& resourceType);
         Result<Unit, std::string> prepareExportDirectory();
-        Result<Unit, std::string> buildAssets();
+        Result<Unit, std::string> buildAssets(bool doLogging);
     };
 }

@@ -57,30 +57,27 @@ namespace HelloTriangleApplication::Resources
     {
         bool shouldBuild;
 
-        switch (App::RUNTIME_CONFIG.assetBuild)
+        switch (App::RUNTIME_CONFIG.assetBuild.buildOption)
         {
-            case Setting::AssetBuild::ForceBuild:
+            case Setting::BuildOption::ForceBuild:
                 shouldBuild = true;
                 break;
-            case Setting::AssetBuild::BuildIfNone:
+            case Setting::BuildOption::BuildIfNone:
                 shouldBuild = !app.resources2.exportExists();
                 break;
-            case Setting::AssetBuild::NoBuild:
+            case Setting::BuildOption::NoBuild:
                 shouldBuild = false;
                 break;
         }
 
         if (shouldBuild)
         {
-            auto now = std::chrono::high_resolution_clock::now();
-            CHECK(app.resources2.conditioningPipeline().buildAssets());
-            auto stop = std::chrono::high_resolution_clock::now();
-            auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - now);
-            std::cout << "Built assets in " << ms << std::endl;
+            CHECK(app.resources2.conditioningPipeline().buildAssets(App::RUNTIME_CONFIG.assetBuild.doBuildLogging));
         }
         else
         {
-            std::cout << "Skipped asset build\n";
+            if (App::RUNTIME_CONFIG.assetBuild.doBuildLogging)
+                std::cout << "Skipped asset build\n";
         }
 
         return Ok();

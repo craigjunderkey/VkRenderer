@@ -17,13 +17,7 @@ namespace HelloTriangleApplication::Resources
         ResourceRegistry registry_;
     
     public:
-        NewResourceManager(App& app)
-            : types_({}), conditioningPipeline_(this->types_), registry_({ this->types_, this->typeMap_ })
-        {
-            this->registry_.processingData() = RuntimeProcessingData {
-                .app = &app
-            };
-        }
+        NewResourceManager(App& app);
 
         AssetConditioningPipeline& conditioningPipeline() { return this->conditioningPipeline_; }
         ResourceRegistry& registry() { return this->registry_; }

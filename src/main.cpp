@@ -5,7 +5,10 @@ using namespace HelloTriangleApplication;
 RuntimeConfig getConfig()
 {
     return RuntimeConfig {
-        .assetBuild = Setting::AssetBuild::ForceBuild
+        .assetBuild = {
+            .buildOption = Setting::BuildOption::ForceBuild,
+            .doBuildLogging = true
+        }
     };
 }
 

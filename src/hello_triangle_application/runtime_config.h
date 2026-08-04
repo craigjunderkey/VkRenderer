@@ -5,16 +5,23 @@ namespace HelloTriangleApplication
 {
     namespace Setting
     {
-        enum class AssetBuild
+        enum class BuildOption
         {
             ForceBuild,
             BuildIfNone,
             NoBuild
+        };
+
+        struct AssetBuild
+        {
+            BuildOption buildOption;
+            bool doBuildLogging;
         };
     }
 
     struct RuntimeConfig
     {
         Setting::AssetBuild assetBuild;
+        bool logAssetBuild;
     };
 }
