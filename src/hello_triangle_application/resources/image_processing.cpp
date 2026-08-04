@@ -48,7 +48,7 @@ namespace HelloTriangleApplication::Resources
     }
 
     // NOTE: this exporter is unused since CopyExporter produces quicker load (and build) times
-    Result<std::filesystem::path, std::string> ImageDataExporter::exportResource(
+    Result<Unit, std::string> ImageDataExporter::exportResource(
         const std::filesystem::path& path, OfflineProcessingData& processingData)
     {
         // load image
@@ -68,6 +68,6 @@ namespace HelloTriangleApplication::Resources
             image.width * image.numChannels
         );
 
-        return std::move(dstPath);
+        return Ok();
     }
 }

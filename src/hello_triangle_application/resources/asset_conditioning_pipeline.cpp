@@ -75,12 +75,12 @@ namespace HelloTriangleApplication::Resources
             }
 
             // export each found asset
+            CHECK(exporter->begin(processingData));
             for (const std::filesystem::path& path : assetSearchResult.take())
             {
-                auto exportResult = exporter->exportResource(path, processingData);
-                CHECK_KEEP(exportResult);
-                std::filesystem::path out = exportResult.take();
+                CHECK(exporter->exportResource(path, processingData));
             }
+            CHECK(exporter->end(processingData));
         }
 
         // 2. compile
@@ -99,12 +99,14 @@ namespace HelloTriangleApplication::Resources
             }
 
             // compile each exported asset
+            CHECK(compiler->begin(processingData));
             std::filesystem::path dir = RES_EXPORT_DIR / type.resourceDirectory;
             for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
             {
                 std::filesystem::path path = file.path();
                 CHECK(compiler->compileResource(path, processingData));
             }
+            CHECK(compiler->end(processingData));
         }
 
         // 3. link
@@ -123,12 +125,14 @@ namespace HelloTriangleApplication::Resources
             }
 
             // link each compiled asset
+            CHECK(linker->begin(processingData));
             std::filesystem::path dir = RES_EXPORT_DIR / type.resourceDirectory;
             for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
             {
                 std::filesystem::path path = file.path();
                 CHECK(linker->linkResource(path, processingData));
             }
+            CHECK(linker->end(processingData));
         }
 
         return Ok();

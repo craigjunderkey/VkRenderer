@@ -14,7 +14,7 @@ using HelloTriangleApplication::Geometry::MeshData;
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<std::filesystem::path, std::string> MeshExporter::exportResource(
+    Result<Unit, std::string> MeshExporter::exportResource(
         const std::filesystem::path& path, OfflineProcessingData& processingData)
     {
         MeshImporter* importer;
@@ -61,7 +61,7 @@ namespace HelloTriangleApplication::Resources
         out.write(reinterpret_cast<const char*>(vertices.data()), sizeof(Vertex) * vertices.size());
         out.write(reinterpret_cast<const char*>(indices.data()), sizeof(u32) * indices.size());
 
-        return std::move(outPath);
+        return Ok();
     }
 
     Result<Unit, std::string> MeshLoader::loadResource(const std::filesystem::path& path,

@@ -7,7 +7,7 @@ namespace HelloTriangleApplication::Resources
     class MeshExporter : public ResourceExporter
     {
     public:
-        Result<std::filesystem::path, std::string> exportResource(
+        Result<Unit, std::string> exportResource(
             const std::filesystem::path& path, OfflineProcessingData& processingData) override;
     };
 

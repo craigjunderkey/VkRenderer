@@ -14,13 +14,13 @@ namespace HelloTriangleApplication::Resources
         CopyExporter() : type_(nullptr) {}
         CopyExporter(const ResourceType& type) : type_(&type) {}
 
-        Result<std::filesystem::path, std::string> exportResource(const std::filesystem::path& srcPath, OfflineProcessingData& processingData) override
+        Result<Unit, std::string> exportResource(const std::filesystem::path& srcPath, OfflineProcessingData& processingData) override
         {
             std::filesystem::path dstPath = getExportPath(this->type_->resourceDirectory, srcPath);
             std::ifstream src = std::ifstream(srcPath);
             std::ofstream dst = std::ofstream(dstPath);
             dst << src.rdbuf();
-            return std::move(dstPath);
+            return Ok();
         }
     };
 
