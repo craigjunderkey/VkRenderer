@@ -1,6 +1,9 @@
 #pragma once
 #include <array>
-#include "../../utility/types.h"
+#include <cstdint>
+
+using u8 = std::uint8_t;
+using u32 = std::uint32_t;
 
 /*
     Reference:

@@ -20,7 +20,7 @@ void JsonHelper::setProperty(const char* key, vec3& property)
 void JsonHelper::setProperty(const char* key, StringId& property)
 {
     auto& value = this->data_[key];
-    property = StringId(value);
+    property = StringId((nlohmann::json::string_t)value);
 }
 
 void JsonHelper::setProperty(const char* key, bool& property)
