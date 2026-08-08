@@ -60,7 +60,7 @@ namespace HelloTriangleApplication::RenderLoop
                 numMaterialsLoaded++;
         }
 
-        this->matManager_.writeMaterialData(app, this->textures, this->materials);
+        this->matManager_.writeMaterialData(app, this->textures, app.resources2.registry().getMap<Material>());
 
         std::cout << "Loaded materials (" << numMaterialsLoaded << "/" << data.size() << ")\n";
 
@@ -127,7 +127,7 @@ namespace HelloTriangleApplication::RenderLoop
         TRY_ASSIGN(
             this->matManager_,
             MaterialManager::create(
-                app, loaded.matData.size(), loaded.texPaths.size(), this->samplerManager_.numSamplers()
+                app, app.resources2.registry().getMap<Material>().size(), loaded.texPaths.size(), this->samplerManager_.numSamplers()
             )
         );
 
@@ -156,7 +156,7 @@ namespace HelloTriangleApplication::RenderLoop
         CHECK(meshLoadResult);
 
         // import materials
-        auto matLoadResult = this->loadMaterials(app, std::move(loaded.matData));
+        auto matLoadResult = this->loadMaterials(app, {}); // TODO: we stopped passing mat data, but get rid of this entirely
         CHECK(matLoadResult);
 
         return Ok();

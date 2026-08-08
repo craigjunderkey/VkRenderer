@@ -1,6 +1,7 @@
 #pragma once
 #include <nlohmann/json.hpp>
 #include "../utilities/common.h"
+#include <filesystem>
 
 class JsonHelper
 {
@@ -26,4 +27,6 @@ public:
         }
         return false;
     }
+
+    static nlohmann::json load(const std::filesystem::path& path);
 };

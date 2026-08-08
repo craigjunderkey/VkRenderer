@@ -2,6 +2,7 @@
 #include "resource_loaders.h"
 #include "mesh_processing.h"
 #include "image_processing.h"
+#include "material_processing.h"
 
 namespace HelloTriangleApplication::Resources::Types
 {
@@ -64,6 +65,27 @@ namespace HelloTriangleApplication::Resources::Types
             .resourceName = "mesh",
             .resourceDirectory = "meshes",
             .inFileExtensions = { ".obj" },
+            .offline {
+                .exporter = &exporter
+            },
+            .runtime {
+                .loader = &loader,
+                .unloader = {},
+                .postLoadInitializer = &initializer
+            }
+        };
+    }
+
+    ResourceType material()
+    {
+        static MaterialExporter exporter = MaterialExporter();
+        static MaterialLoader loader = MaterialLoader();
+        static MaterialInitializer initializer = MaterialInitializer();
+
+        return ResourceType {
+            .resourceName = "material",
+            .resourceDirectory = "materials",
+            .inFileExtensions = { ".mats" },
             .offline {
                 .exporter = &exporter
             },

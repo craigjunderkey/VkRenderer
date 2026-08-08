@@ -1,4 +1,6 @@
 #include "json_helper.h"
+#include <iostream>
+#include <fstream>
 
 void JsonHelper::setProperty(const char* key, f32& property)
 {
@@ -26,4 +28,10 @@ void JsonHelper::setProperty(const char* key, StringId& property)
 void JsonHelper::setProperty(const char* key, bool& property)
 {
     property = static_cast<bool>(this->data_[key]);
+}
+
+nlohmann::json JsonHelper::load(const std::filesystem::path& path)
+{
+    std::ifstream file(path);
+    return nlohmann::json::parse(file);
 }

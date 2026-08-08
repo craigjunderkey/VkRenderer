@@ -8,6 +8,7 @@
 #include <nlohmann/json.hpp>
 #include "image_data.h"
 #include "../geometry/mesh.h"
+#include "../render_loop/material.h"
 
 #define REGISTER_RESOURCE_TYPE(type, resourceName) \
 private:                                        \
@@ -44,6 +45,7 @@ namespace HelloTriangleApplication::Resources
         REGISTER_RESOURCE_TYPE(nlohmann::json, json)
         REGISTER_RESOURCE_TYPE(ImageData, image)
         REGISTER_RESOURCE_TYPE(Geometry::Mesh, mesh)
+        REGISTER_RESOURCE_TYPE(RenderLoop::Material, material)
 
         template <typename T>
         Result<Unit, std::string> loadResources(StringId resourceName)

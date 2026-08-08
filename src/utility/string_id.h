@@ -100,6 +100,9 @@ public:
             return std::to_string(this->id);
         #endif
     }
+
+    auto operator<=>(const StringId& other) const = default;
+    
 };
 
 namespace std

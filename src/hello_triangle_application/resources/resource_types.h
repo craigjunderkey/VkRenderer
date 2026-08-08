@@ -7,4 +7,5 @@ namespace HelloTriangleApplication::Resources::Types
     ResourceType jsonData();
     ResourceType imageData();
     ResourceType mesh();
+    ResourceType material();
 }

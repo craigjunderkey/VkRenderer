@@ -2,6 +2,7 @@
 #include "../utilities/common.h"
 #include "../utilities/vulkan_common.h"
 #include "../geometry/buffer.h"
+#include "../resources/string_id_map.h"
 
 #include <unordered_map>
 
@@ -32,13 +33,13 @@ namespace HelloTriangleApplication::RenderLoop
         vk::raii::DescriptorPool pool_ = nullptr;
         vk::raii::DescriptorSet set_ = nullptr;
         Geometry::MappedBuffer buffer_ = {};
-        std::unordered_map<StringId, u32> matIdMap_;
+        StringIdMap<u32> matIdMap_;
 
     public:
         static Result<MaterialManager, std::string> create(App& app, u32 numMaterials, u32 numTextures, u32 numSamplers);
         
         Result<Unit, std::string> writeMaterialData(App& app,
-            const std::unordered_map<StringId, Geometry::Texture>& textures, const std::unordered_map<StringId, Material>& materials);
+            const std::unordered_map<StringId, Geometry::Texture>& textures, const StringIdMap<Material>& materials);
         
         u32 getMaterialId(const Material& material) const;
         u32 getMaterialId(StringId name) const;

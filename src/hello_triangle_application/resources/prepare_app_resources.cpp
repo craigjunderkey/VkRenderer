@@ -4,6 +4,7 @@
 #include "text_data.h"
 #include "image_data.h"
 #include "../geometry/mesh.h"
+#include "../render_loop/material.h"
 
 #include <chrono>
 
@@ -15,6 +16,7 @@ namespace HelloTriangleApplication::Resources
         app.resources2.addResourceType(Types::jsonData());
         app.resources2.addResourceType(Types::imageData());
         app.resources2.addResourceType(Types::mesh());
+        app.resources2.addResourceType(Types::material());
         return Ok();
     }
 
@@ -49,6 +51,7 @@ namespace HelloTriangleApplication::Resources
         loader.load<nlohmann::json>("json").unwrap();
         loader.load<ImageData>("image").unwrap();
         loader.load<Geometry::Mesh>("mesh").unwrap();
+        loader.load<RenderLoop::Material>("material").unwrap();
         
         return Ok();
     }
@@ -86,6 +89,7 @@ namespace HelloTriangleApplication::Resources
     Result<Unit, std::string> handlePostLoadInitialization(App& app)
     {
         CHECK(app.resources2.registry().postLoadInitialize<Geometry::Mesh>("mesh"));
+        CHECK(app.resources2.registry().postLoadInitialize<RenderLoop::Material>("material"));
         return Ok();
     }
 }

@@ -1,7 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "material_manager.h"
 #include "../geometry/texture.h"
-#include <unordered_set>
+#include <algorithm>
 
 using namespace HelloTriangleApplication::Geometry;
 
@@ -9,16 +9,12 @@ namespace HelloTriangleApplication::RenderLoop
 {
     u32 MaterialManager::getMaterialId(const Material& material) const
     {
-        auto result = this->matIdMap_.find(material.name);
-        assert(result != this->matIdMap_.end());
-        return result->second;
+        return this->matIdMap_.get(material.name);
     }
     
     u32 MaterialManager::getMaterialId(StringId name) const
     {
-        auto result = this->matIdMap_.find(name);
-        assert(result != this->matIdMap_.end());
-        return result->second;
+        return this->matIdMap_.get(name);
     }
 
     Result<i32, std::string> getTextureId(std::unordered_map<StringId, u32>& texIdMap, StringId name)
@@ -108,15 +104,17 @@ namespace HelloTriangleApplication::RenderLoop
     }
 
     Result<Unit, std::string> MaterialManager::writeMaterialData(App& app,
-            const std::unordered_map<StringId, Geometry::Texture>& textures, const std::unordered_map<StringId, Material>& materials)
+            const std::unordered_map<StringId, Geometry::Texture>& textures, const StringIdMap<Material>& materials)
     {
         // make vectors
+        std::vector<StringId> matIdVec = materials.makeIdVec();
+        std::sort(matIdVec.begin(), matIdVec.end());
+        std::vector<const Material*> matVec = materials.makePtrVec(matIdVec);
         std::vector<const Texture*> texVec = mapValuesAsConstPtrs(textures);
-        std::vector<const Material*> matVec = mapValuesAsConstPtrs(materials);
 
         // make maps
         std::unordered_map<StringId, u32> texIdMap = idMapFromKeys(textures);
-        std::unordered_map<StringId, u32> matIdMap = idMapFromKeys(materials);
+        StringIdMap<u32> matIdMap = materials.makeIndexMap(matIdVec);
 
         // construct array of MaterialUniformData
         std::vector<MaterialUniformData> matData {};
