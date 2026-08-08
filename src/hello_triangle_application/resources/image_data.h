@@ -10,5 +10,10 @@ namespace HelloTriangleApplication::Resources
         i32 width;
         i32 height;
         i32 numChannels;
+
+        constexpr u32 size() const
+        {
+            return width * height * 4;
+        }
     };
 }

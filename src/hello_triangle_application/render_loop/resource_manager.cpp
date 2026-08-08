@@ -18,7 +18,9 @@ namespace HelloTriangleApplication::RenderLoop
         {
             // load texture
             StringId id = pathToStringId(path);
-            auto loadResult = Texture::loadFromImageData(app, app.resources2.get<ImageData>(id));
+            TextureDescription desc = TextureDescription::defaultTexture(); // TODO: remove this
+            desc.image = id;
+            auto loadResult = Texture::loadFromDescription(app, std::move(desc));
             CHECK_KEEP(loadResult);
             Texture texture = loadResult.take();
 

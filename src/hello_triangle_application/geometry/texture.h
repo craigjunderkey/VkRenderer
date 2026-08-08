@@ -4,6 +4,7 @@
 #include "buffer.h"
 #include "../render_loop/sampler_manager.h"
 #include "../resources/image_data.h"
+#include "../resources/texture_description.h"
 
 #include <memory>
 
@@ -21,6 +22,7 @@ namespace HelloTriangleApplication::Geometry
         u32 width = 0;
         u32 height = 0;
         u32 mipLevels = 1;
+        u32 numLayers = 1;
 
         static Result<Texture, std::string> loadFromImageData(App& app, const HelloTriangleApplication::Resources::ImageData& imageData,
             vk::Format format = vk::Format::eR8G8B8A8Srgb,
@@ -42,6 +44,8 @@ namespace HelloTriangleApplication::Geometry
             vk::ImageAspectFlags aspectFlags = vk::ImageAspectFlagBits::eColor,
             bool doMipmapping = true, vk::SampleCountFlagBits sampleCount = vk::SampleCountFlagBits::e1
         );
+
+        static Result<Texture, std::string> loadFromDescription(App& app, Resources::TextureDescription desc);
         
         static vk::SamplerCreateInfo defaultSamplerInfo(App& app);
 

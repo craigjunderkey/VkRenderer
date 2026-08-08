@@ -36,7 +36,7 @@ namespace HelloTriangleApplication::Geometry
         return samplerInfo;
     }
 
-    Result<Unit, std::string> generateMipmaps(App& app, vk::raii::CommandBuffer& commandBuffer, vk::raii::Image& image, u32 texWidth, u32 texHeight, u32 mipLevels, vk::Format format)
+    Result<Unit, std::string> generateMipmaps(App& app, vk::raii::CommandBuffer& commandBuffer, vk::raii::Image& image, u32 texWidth, u32 texHeight, u32 mipLevels, u32 numLayers, vk::Format format)
     {
         // check whether the image format supports blitting
         vk::FormatProperties formatProperties = app.physicalDevice.getFormatProperties(format);
@@ -54,7 +54,7 @@ namespace HelloTriangleApplication::Geometry
             .subresourceRange {
                 .aspectMask = vk::ImageAspectFlagBits::eColor,
                 .levelCount = 1,
-                .layerCount = 1,
+                .layerCount = numLayers,
             }
         };
 
@@ -78,7 +78,7 @@ namespace HelloTriangleApplication::Geometry
                 .srcSubresource = vk::ImageSubresourceLayers {
                     .aspectMask = vk::ImageAspectFlagBits::eColor,
                     .mipLevel = i - 1,
-                    .layerCount = 1
+                    .layerCount = numLayers
                 },
                 .srcOffsets = std::array<vk::Offset3D, 2>({
                     {},
@@ -87,7 +87,7 @@ namespace HelloTriangleApplication::Geometry
                 .dstSubresource = vk::ImageSubresourceLayers {
                     .aspectMask = vk::ImageAspectFlagBits::eColor,
                     .mipLevel = i,
-                    .layerCount = 1
+                    .layerCount = numLayers
                 },
                 .dstOffsets = std::array<vk::Offset3D, 2>({
                     {},
@@ -183,7 +183,7 @@ namespace HelloTriangleApplication::Geometry
         
         if (doMipmapping)
         {
-            CHECK(generateMipmaps(app, copyCommand, texture.image, width, height, texture.mipLevels, format));
+            CHECK(generateMipmaps(app, copyCommand, texture.image, width, height, texture.mipLevels, 1, format));
         }
         else
         {
@@ -246,6 +246,135 @@ namespace HelloTriangleApplication::Geometry
             texture.view,
             createImageView(app, texture.image, format, aspectFlags, texture.mipLevels)
         );
+
+        return std::move(texture);
+    }
+
+    Result<Texture, std::string> Texture::loadFromDescription(App& app, Resources::TextureDescription desc)
+    {
+        const ImageData& imageData = app.resources2.get<ImageData>(desc.image);
+
+        // create staging buffer
+        auto bufferResult = FatBuffer::create(
+            app, imageData.size(), vk::BufferUsageFlagBits::eTransferSrc,
+            vk::MemoryPropertyFlagBits::eHostCoherent | vk::MemoryPropertyFlagBits::eHostVisible
+        );
+        CHECK_KEEP(bufferResult);
+        FatBuffer stagingBuffer = bufferResult.take();
+
+        // transfer image data to staging buffer
+        auto memoryMapResult = castVkResult(stagingBuffer.memory.mapMemory(0, imageData.size()));
+        CHECK_KEEP(memoryMapResult);
+        void* bufferData = memoryMapResult.take();
+        memcpy(bufferData, imageData.pixels, imageData.size());
+        stagingBuffer.memory.unmapMemory();
+
+        // get mip levels and samples
+        u32 mipLevels = 1;
+        if (desc.doMipmapping)
+            mipLevels = Texture::computeMipLevels(imageData.width, imageData.height);
+
+        vk::SampleCountFlagBits numSamples = vk::SampleCountFlagBits::e1;
+        if (desc.doMultisampling)
+            numSamples = app.msaaSamples;
+        
+        // create texture object
+        Texture texture {
+            .format = desc.format,
+            .width = static_cast<u32>(imageData.width),
+            .height = static_cast<u32>(imageData.height),
+            .mipLevels = mipLevels,
+            .numLayers = desc.numLayers
+        };
+        
+        // create GPU image
+        vk::ImageCreateInfo imageCreateInfo {
+            .imageType = desc.imageType,
+            .format = desc.format,
+            .extent = { texture.width, texture.height, 1 },
+            .mipLevels = mipLevels,
+            .arrayLayers = desc.numLayers,
+            .samples = numSamples,
+            .tiling = desc.tiling,
+            .usage = desc.usage,
+            .sharingMode = vk::SharingMode::eExclusive,
+            .initialLayout = vk::ImageLayout::eUndefined
+        };
+
+        auto imageCreateResult = castVkResult(app.device.createImage(imageCreateInfo));
+        CHECK_KEEP(imageCreateResult);
+        texture.image = imageCreateResult.take();
+
+        // allocate and bind image memory
+        vk::MemoryRequirements memRequirements = texture.image.getMemoryRequirements();
+        vk::MemoryAllocateInfo allocInfo {
+            .allocationSize = memRequirements.size,
+            .memoryTypeIndex = findMemoryType(app, memRequirements.memoryTypeBits, desc.properties)
+        };
+        auto allocResult = castVkResult(app.device.allocateMemory(allocInfo));
+        CHECK_KEEP(allocResult);
+        texture.memory = allocResult.take();
+        texture.image.bindMemory(texture.memory, 0);
+
+        // create image view
+        vk::ImageViewCreateInfo viewCreateInfo {
+            .image = *texture.image,
+            .viewType = desc.viewType,
+            .format = desc.format,
+            .subresourceRange = {
+                .aspectMask = desc.aspectFlags,
+                .baseMipLevel = 0,
+                .levelCount = mipLevels,
+                .baseArrayLayer = 0,
+                .layerCount = desc.numLayers
+            }
+        };
+        auto viewCreateResult = castVkResult(app.device.createImageView(viewCreateInfo));
+        CHECK_KEEP(viewCreateResult);
+        texture.view = viewCreateResult.take();
+
+        // prepare command buffer for copying
+        auto commandBeginResult = beginSingleTimeCommands(app, app.graphicsQueue);
+        CHECK_KEEP(commandBeginResult);
+        vk::raii::CommandBuffer copyCommand = commandBeginResult.take();
+
+        CHECK(transitionImageLayout(
+            copyCommand, *texture.image, vk::ImageLayout::eUndefined,
+            vk::ImageLayout::eTransferDstOptimal, mipLevels, desc.numLayers, desc.aspectFlags
+        ));
+
+        // copy buffer to image
+        vk::BufferImageCopy copyRegion {
+            .bufferOffset = 0,
+            .bufferRowLength = 0,
+            .bufferImageHeight = 0,
+            .imageSubresource = {
+                .aspectMask = desc.aspectFlags,
+                .mipLevel = 0,
+                .baseArrayLayer = 0,
+                .layerCount = texture.numLayers
+            },
+            .imageOffset = { 0, 0, 0 },
+            .imageExtent = { texture.width, texture.height, 1 }
+        };
+        copyCommand.copyBufferToImage(**stagingBuffer, *texture.image, vk::ImageLayout::eTransferDstOptimal, copyRegion);
+
+        // do mipmapping or transfer image to shader-read optimal
+        if (desc.doMipmapping)
+        {
+            CHECK(generateMipmaps(
+                app, copyCommand, texture.image, texture.width, texture.height, texture.mipLevels, texture.numLayers, texture.format
+            ));
+        }
+        else
+        {
+            CHECK(transitionImageLayout(
+                copyCommand, *texture.image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal,
+                texture.mipLevels, texture.numLayers, desc.aspectFlags
+            ));
+        }
+
+        endSingleTimeCommands(std::move(copyCommand), app.graphicsQueue);
 
         return std::move(texture);
     }

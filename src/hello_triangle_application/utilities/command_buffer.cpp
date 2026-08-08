@@ -324,8 +324,8 @@ namespace HelloTriangleApplication::Utilities
         queue.queue.waitIdle();
     }
 
-    Result<Unit, std::string> transitionImageLayout(vk::raii::CommandBuffer& commandBuffer, const vk::Image& image,
-        vk::ImageLayout oldLayout, vk::ImageLayout newLayout, u32 mipLevels, u32 srcFamily, u32 dstFamily)
+    Result<Unit, std::string> transitionImageLayout(vk::raii::CommandBuffer& commandBuffer, const vk::Image& image, vk::ImageLayout oldLayout,
+        vk::ImageLayout newLayout, u32 mipLevels, u32 numLayers, vk::ImageAspectFlags imageAspectFlags, u32 srcFamily, u32 dstFamily)
     {
         vk::ImageMemoryBarrier barrier {
             .oldLayout = oldLayout,
@@ -336,7 +336,7 @@ namespace HelloTriangleApplication::Utilities
             .subresourceRange = {
                 .aspectMask = vk::ImageAspectFlagBits::eColor,
                 .levelCount = mipLevels,
-                .layerCount = 1
+                .layerCount = numLayers
             }
         };
 
