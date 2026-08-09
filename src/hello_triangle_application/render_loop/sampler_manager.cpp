@@ -4,7 +4,7 @@
 
 namespace HelloTriangleApplication::RenderLoop
 {
-    Result<Unit, std::string> SamplerManager::loadSamplers(App& app)
+    Result<Unit, std::string> SamplerManager::makeSamplers(App& app)
     {
         // make repeat sampler
         {

@@ -187,7 +187,7 @@ namespace HelloTriangleApplication::Utilities
         commandBuffer.bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics, *app.pipeline.layout, 0,
             {
-                *app.resources.materialManager().descriptorSet(),
+                *app.gpuMaterials.descriptorSet(),
                 *app.descriptorSets[app.frameIndex]
             },
             nullptr
@@ -203,7 +203,7 @@ namespace HelloTriangleApplication::Utilities
     void drawPointLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
     {
         // bind debug point light mesh
-        const Geometry::Mesh& mesh = app.resources2.get<Geometry::Mesh>("light_ball");
+        const Geometry::Mesh& mesh = app.resources.get<Geometry::Mesh>("light_ball");
         bindMesh(commandBuffer, mesh);
         
         // draw each point light
@@ -226,7 +226,7 @@ namespace HelloTriangleApplication::Utilities
     void drawSpotLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
     {
         // bind debug spot light mesh
-        const Geometry::Mesh& mesh = app.resources2.get<Geometry::Mesh>("light_cone");
+        const Geometry::Mesh& mesh = app.resources.get<Geometry::Mesh>("light_cone");
         bindMesh(commandBuffer, mesh);
 
         // draw each spot light

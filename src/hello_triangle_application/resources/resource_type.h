@@ -2,10 +2,9 @@
 #include "../utilities/common.h"
 #include <filesystem>
 #include <any>
+#include "processing_data.h"
 
 #define MAX_FILE_EXTENSIONS 4
-
-namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::Resources
 {
@@ -17,8 +16,6 @@ namespace HelloTriangleApplication::Resources
     class ResourceUnloader;
     class ResourcePostLoadInitializer;
     class RuntimeResourceTasks;
-
-    class TextureDescriptionManager;
 
     static const std::filesystem::path RES_IMPORT_DIR = "src/assets";
     static const std::filesystem::path RES_EXPORT_DIR = "src/assets_export";
@@ -36,23 +33,12 @@ namespace HelloTriangleApplication::Resources
         Option<OfflineResourceTasks*> tasks;
     };
 
-    struct OfflineProcessingData
-    {
-        TextureDescriptionManager* texDescs;
-    };
-
     struct RuntimeResourceProcessors
     {
         ResourceLoader* loader;
         Option<ResourceUnloader*> unloader;
         Option<ResourcePostLoadInitializer*> postLoadInitializer;
         Option<RuntimeResourceTasks*> tasks;
-    };
-
-    struct RuntimeProcessingData
-    {
-        App* app;
-        TextureDescriptionManager* texDescs;
     };
 
     struct ResourceType

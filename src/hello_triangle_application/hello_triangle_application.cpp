@@ -48,7 +48,7 @@ namespace HelloTriangleApplication
     {
         initializeResourceManager(*this).unwrap();
         handleAssetBuild(*this).unwrap();
-        this->resources2.registry().startup().unwrap();
+        this->resources.registry().startup().unwrap();
         loadAllResources(*this).unwrap();
     }
 
@@ -72,14 +72,13 @@ namespace HelloTriangleApplication
         createSwapChain(*this).unwrap();
         createImageViews(*this).unwrap();
         createDescriptorSetLayout(*this).unwrap();
-        this->resources.prepareResources(*this, "src/assets.json").unwrap();
+        handlePrePipelineInitialization(*this).unwrap();
         createColorTexture(*this).unwrap();
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();
         handlePostLoadInitialization(*this).unwrap();
-        this->resources.loadResources(*this).unwrap();
-        this->resources2.registry().unloadResources<ImageData>("image").unwrap();
+        this->resources.registry().unloadResources<ImageData>("image").unwrap();
         createUniformBuffers(*this).unwrap();
         createDescriptorPool(*this).unwrap();
         createDescriptorSets(*this).unwrap();
@@ -128,7 +127,7 @@ namespace HelloTriangleApplication
     {
         std::cout << "Cleaning up\n";
 
-        this->resources2.registry().shutdown().unwrap();
+        this->resources.registry().shutdown().unwrap();
         glfwTerminate();
     }
 }

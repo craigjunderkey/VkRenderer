@@ -1,3 +1,4 @@
+#include "../hello_triangle_application.h"
 #include "material_processing.h"
 #include "../render_loop/json_helper.h"
 #include "../render_loop/material.h"
@@ -69,6 +70,15 @@ namespace HelloTriangleApplication::Resources
 
     Result<Unit, std::string> MaterialInitializer::begin(RuntimeProcessingData& processingData)
     {
+        // write material data
+        App& app = *processingData.app;
+        auto matWriteResult = app.gpuMaterials.writeMaterialData(
+            app,
+            app.resources.registry().getMap<Texture>(),
+            app.resources.registry().getMap<Material>()
+        );
+        CHECK(matWriteResult);
+
         return Ok();
     }
 

@@ -252,7 +252,7 @@ namespace HelloTriangleApplication::Geometry
 
     Result<Texture, std::string> Texture::loadFromDescription(App& app, Resources::TextureDescription desc)
     {
-        const ImageData& imageData = app.resources2.get<ImageData>(desc.image);
+        const ImageData& imageData = app.resources.get<ImageData>(desc.image);
 
         // create staging buffer
         auto bufferResult = FatBuffer::create(

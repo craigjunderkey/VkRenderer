@@ -24,7 +24,7 @@ namespace HelloTriangleApplication::RenderLoop
         vec3 specColor  alignas(16);
     };
     
-    class MaterialManager
+    class GpuMaterialManager
     {
     private:
         vk::raii::DescriptorSetLayout layout_ = nullptr;
@@ -34,7 +34,7 @@ namespace HelloTriangleApplication::RenderLoop
         StringIdMap<u32> matIdMap_;
 
     public:
-        static Result<MaterialManager, std::string> create(App& app, u32 numMaterials, u32 numTextures, u32 numSamplers);
+        static Result<GpuMaterialManager, std::string> create(App& app, u32 numMaterials, u32 numTextures, u32 numSamplers);
         
         Result<Unit, std::string> writeMaterialData(App& app,
             const StringIdMap<Geometry::Texture>& textures, const StringIdMap<Material>& materials);

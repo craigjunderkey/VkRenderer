@@ -12,12 +12,12 @@ namespace HelloTriangleApplication::Resources
 {
     Result<Unit, std::string> initializeResourceManager(App& app)
     {
-        app.resources2.addResourceType(Types::textData());
-        app.resources2.addResourceType(Types::jsonData());
-        app.resources2.addResourceType(Types::imageData());
-        app.resources2.addResourceType(Types::mesh());
-        app.resources2.addResourceType(Types::material());
-        app.resources2.addResourceType(Types::texture());
+        app.resources.addResourceType(Types::textData());
+        app.resources.addResourceType(Types::jsonData());
+        app.resources.addResourceType(Types::imageData());
+        app.resources.addResourceType(Types::mesh());
+        app.resources.addResourceType(Types::material());
+        app.resources.addResourceType(Types::texture());
         return Ok();
     }
 
@@ -46,7 +46,7 @@ namespace HelloTriangleApplication::Resources
 
     Result<Unit, std::string> loadAllResources(App& app)
     {
-        LogLoader loader(app.resources2.registry());
+        LogLoader loader(app.resources.registry());
 
         loader.load<TextData>("text").unwrap();
         loader.load<nlohmann::json>("json").unwrap();
@@ -68,7 +68,7 @@ namespace HelloTriangleApplication::Resources
                 shouldBuild = true;
                 break;
             case Setting::BuildOption::BuildIfNone:
-                shouldBuild = !app.resources2.exportExists();
+                shouldBuild = !app.resources.exportExists();
                 break;
             case Setting::BuildOption::NoBuild:
                 shouldBuild = false;
@@ -77,7 +77,7 @@ namespace HelloTriangleApplication::Resources
 
         if (shouldBuild)
         {
-            CHECK(app.resources2.conditioningPipeline().buildAssets(App::RUNTIME_CONFIG.assetBuild.doBuildLogging));
+            CHECK(app.resources.conditioningPipeline().buildAssets(App::RUNTIME_CONFIG.assetBuild.doBuildLogging));
         }
         else
         {
@@ -90,9 +90,27 @@ namespace HelloTriangleApplication::Resources
 
     Result<Unit, std::string> handlePostLoadInitialization(App& app)
     {
-        CHECK(app.resources2.registry().postLoadInitialize<Geometry::Mesh>("mesh"));
-        CHECK(app.resources2.registry().postLoadInitialize<RenderLoop::Material>("material"));
-        CHECK(app.resources2.registry().postLoadInitialize<Geometry::Texture>("texture"));
+        CHECK(app.resources.registry().postLoadInitialize<Geometry::Mesh>("mesh"));
+        CHECK(app.resources.registry().postLoadInitialize<Geometry::Texture>("texture"));
+        CHECK(app.resources.registry().postLoadInitialize<RenderLoop::Material>("material"));
+        return Ok();
+    }
+
+    Result<Unit, std::string> handlePrePipelineInitialization(App& app)
+    {
+        // make samplers
+        CHECK(app.samplers.makeSamplers(app));
+        
+        // make GPU material manager
+        auto gpuMatResult = GpuMaterialManager::create(
+            app,
+            app.resources.registry().getMap<RenderLoop::Material>().size(),
+            app.resources.registry().getMap<Texture>().size(),
+            app.samplers.numSamplers()
+        );
+        CHECK_KEEP(gpuMatResult);
+        app.gpuMaterials = gpuMatResult.take();
+
         return Ok();
     }
 }

@@ -1,5 +1,5 @@
 #include "../hello_triangle_application.h"
-#include "material_manager.h"
+#include "gpu_material_manager.h"
 #include "../geometry/texture.h"
 #include <algorithm>
 
@@ -7,12 +7,12 @@ using namespace HelloTriangleApplication::Geometry;
 
 namespace HelloTriangleApplication::RenderLoop
 {
-    u32 MaterialManager::getMaterialId(const Material& material) const
+    u32 GpuMaterialManager::getMaterialId(const Material& material) const
     {
         return this->matIdMap_.get(material.name);
     }
     
-    u32 MaterialManager::getMaterialId(StringId name) const
+    u32 GpuMaterialManager::getMaterialId(StringId name) const
     {
         return this->matIdMap_.get(name);
     }
@@ -37,9 +37,9 @@ namespace HelloTriangleApplication::RenderLoop
         }
     }
 
-    Result<MaterialManager, std::string> MaterialManager::create(App& app, u32 numMaterials, u32 numTextures, u32 numSamplers)
+    Result<GpuMaterialManager, std::string> GpuMaterialManager::create(App& app, u32 numMaterials, u32 numTextures, u32 numSamplers)
     {
-        MaterialManager mats {};
+        GpuMaterialManager mats {};
 
         // create descriptor pool
         std::array<vk::DescriptorPoolSize, 3> poolSizes {
@@ -103,7 +103,7 @@ namespace HelloTriangleApplication::RenderLoop
         return std::move(mats);
     }
 
-    Result<Unit, std::string> MaterialManager::writeMaterialData(App& app,
+    Result<Unit, std::string> GpuMaterialManager::writeMaterialData(App& app,
             const StringIdMap<Texture>& textures, const StringIdMap<Material>& materials)
     {
         // make vectors
@@ -177,11 +177,11 @@ namespace HelloTriangleApplication::RenderLoop
         }
 
         std::vector<vk::DescriptorImageInfo> samplerImageInfo {};
-        samplerImageInfo.reserve(app.resources.samplerManager().numSamplers());
-        for (u32 i = 0; i < app.resources.samplerManager().numSamplers(); i++)
+        samplerImageInfo.reserve(app.samplers.numSamplers());
+        for (u32 i = 0; i < app.samplers.numSamplers(); i++)
         {
             samplerImageInfo.push_back(vk::DescriptorImageInfo {
-                .sampler = *app.resources.samplerManager().sampler(i),
+                .sampler = *app.samplers.sampler(i),
                 .imageView = nullptr,
                 .imageLayout = vk::ImageLayout::eUndefined
             });

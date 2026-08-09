@@ -4,7 +4,7 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    NewResourceManager::NewResourceManager(App& app) :
+    ResourceManager::ResourceManager(App& app) :
         types_({}),
         conditioningPipeline_(this->types_),
         registry_({ this->types_, this->typeMap_ })
@@ -14,14 +14,14 @@ namespace HelloTriangleApplication::Resources
         };
     }
 
-    void NewResourceManager::addResourceType(ResourceType type)
+    void ResourceManager::addResourceType(ResourceType type)
     {
         type.isValid().unwrap();
         this->typeMap_.add(StringId(type.resourceName), this->types_.size());
         this->types_.emplace_back(std::move(type));
     }
 
-    bool NewResourceManager::exportExists()
+    bool ResourceManager::exportExists()
     {
         if (!std::filesystem::exists(RES_EXPORT_DIR))
             return false;

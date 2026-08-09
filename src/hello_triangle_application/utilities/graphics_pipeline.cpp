@@ -34,7 +34,7 @@ namespace HelloTriangleApplication::Utilities
         // pipeline layout
         PipelineLayoutBuilder layoutBuilder;
         layoutBuilder.descriptorSetLayouts = {
-            *app.resources.materialManager().descriptorSetLayout(),
+            *app.gpuMaterials.descriptorSetLayout(),
             *app.descriptorSetLayout
         };
         layoutBuilder.pushConstantRanges = {

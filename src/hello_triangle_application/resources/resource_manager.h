@@ -8,7 +8,7 @@ namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::Resources
 {
-    class NewResourceManager
+    class ResourceManager
     {
     private:
         std::vector<ResourceType> types_;
@@ -17,7 +17,7 @@ namespace HelloTriangleApplication::Resources
         ResourceRegistry registry_;
     
     public:
-        NewResourceManager(App& app);
+        ResourceManager(App& app);
 
         AssetConditioningPipeline& conditioningPipeline() { return this->conditioningPipeline_; }
         ResourceRegistry& registry() { return this->registry_; }
