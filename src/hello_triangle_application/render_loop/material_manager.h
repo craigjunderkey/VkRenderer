@@ -4,8 +4,6 @@
 #include "../geometry/buffer.h"
 #include "../resources/string_id_map.h"
 
-#include <unordered_map>
-
 namespace HelloTriangleApplication { class App; }
 namespace HelloTriangleApplication::Geometry { struct Texture; }
 
@@ -39,7 +37,7 @@ namespace HelloTriangleApplication::RenderLoop
         static Result<MaterialManager, std::string> create(App& app, u32 numMaterials, u32 numTextures, u32 numSamplers);
         
         Result<Unit, std::string> writeMaterialData(App& app,
-            const std::unordered_map<StringId, Geometry::Texture>& textures, const StringIdMap<Material>& materials);
+            const StringIdMap<Geometry::Texture>& textures, const StringIdMap<Material>& materials);
         
         u32 getMaterialId(const Material& material) const;
         u32 getMaterialId(StringId name) const;

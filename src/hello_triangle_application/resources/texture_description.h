@@ -1,6 +1,7 @@
 #pragma once
 #include "../utilities/common.h"
 #include "../utilities/vulkan_common.h"
+#include "string_id_map.h"
 
 namespace HelloTriangleApplication::Resources
 {
@@ -32,6 +33,29 @@ namespace HelloTriangleApplication::Resources
                 .aspectFlags = vk::ImageAspectFlagBits::eColor,
                 .numLayers = 1
             };
+        }
+    };
+
+    class TextureDescriptionManager
+    {
+    private:
+        StringIdMap<TextureDescription> descs_;
+    
+    public:
+        const StringIdMap<TextureDescription>& descs() const { return this->descs_; }
+    
+        TextureDescription& getOrAdd(StringId texture)
+        {
+            Option<TextureDescription*> desc = this->descs_.tryGet(texture);
+            if (desc)
+            {
+                return *desc.value();
+            }
+            else
+            {
+                this->descs_.add(texture, TextureDescription::defaultTexture());
+                return this->descs_.get(texture);
+            }
         }
     };
 }

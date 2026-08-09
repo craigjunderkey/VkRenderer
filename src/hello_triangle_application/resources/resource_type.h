@@ -12,9 +12,13 @@ namespace HelloTriangleApplication::Resources
     class ResourceExporter;
     class ResourceCompiler;
     class ResourceLinker;
+    class OfflineResourceTasks;
     class ResourceLoader;
     class ResourceUnloader;
     class ResourcePostLoadInitializer;
+    class RuntimeResourceTasks;
+
+    class TextureDescriptionManager;
 
     static const std::filesystem::path RES_IMPORT_DIR = "src/assets";
     static const std::filesystem::path RES_EXPORT_DIR = "src/assets_export";
@@ -29,10 +33,12 @@ namespace HelloTriangleApplication::Resources
         Option<ResourceExporter*> exporter;
         Option<ResourceCompiler*> compiler;
         Option<ResourceLinker*> linker;
+        Option<OfflineResourceTasks*> tasks;
     };
 
     struct OfflineProcessingData
     {
+        TextureDescriptionManager* texDescs;
     };
 
     struct RuntimeResourceProcessors
@@ -40,11 +46,13 @@ namespace HelloTriangleApplication::Resources
         ResourceLoader* loader;
         Option<ResourceUnloader*> unloader;
         Option<ResourcePostLoadInitializer*> postLoadInitializer;
+        Option<RuntimeResourceTasks*> tasks;
     };
 
     struct RuntimeProcessingData
     {
         App* app;
+        TextureDescriptionManager* texDescs;
     };
 
     struct ResourceType
@@ -101,6 +109,15 @@ namespace HelloTriangleApplication::Resources
         virtual ~ResourceLinker() = default;
     };
 
+    class OfflineResourceTasks
+    {
+    public:
+        virtual Result<Unit, std::string> onBuildStarted(OfflineProcessingData& processingData) = 0;
+        virtual Result<Unit, std::string> onBuildFinished(OfflineProcessingData& processingData) = 0;
+
+        virtual ~OfflineResourceTasks() = default;
+    };
+
     class ResourceLoader
     {
     public:
@@ -136,5 +153,14 @@ namespace HelloTriangleApplication::Resources
         virtual Result<Unit, std::string> postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData) = 0;
         
         virtual ~ResourcePostLoadInitializer() = default;
+    };
+
+    class RuntimeResourceTasks
+    {
+    public:
+        virtual Result<Unit, std::string> onStartup(RuntimeProcessingData& processingData) = 0;
+        virtual Result<Unit, std::string> onShutdown(RuntimeProcessingData& processingData) = 0;
+
+        virtual ~RuntimeResourceTasks() = default;
     };
 }

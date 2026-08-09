@@ -41,7 +41,7 @@ public:
         }
         else
         {
-            return Option<T*>(&searchResult->second);
+            return Option<const T*>(&searchResult->second);
         }
     }
     

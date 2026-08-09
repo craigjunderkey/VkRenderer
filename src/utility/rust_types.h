@@ -60,7 +60,7 @@ public:
     operator bool() const { return this->val_.has_value(); }
     operator std::expected<T, E>() { return std::move(this->val_); } // will this cause problems?
 
-    T&& unwrap() requires (not std::copy_constructible<T>)
+    T&& unwrap()
     {
         if (!this->val_)
             panic(std::format("{}", this->val_.error()));
@@ -68,28 +68,12 @@ public:
         return std::move(this->val_).value();
     }
 
-    T unwrap() requires std::copy_constructible<T>
-    {
-        if (!this->val_)
-            panic(std::format("{}", this->val_.error()));
-
-        return this->val_.value();
-    }
-
-    T&& expect(const char* message) requires (not std::copy_constructible<T>)
+    T&& expect(const char* message)
     {
         if (!this->val_)
             panic(std::format("{}", this->val_.error()));
         
         return std::move(this->val_).value();
-    }
-
-    T expect(const char* message) requires std::copy_constructible<T>
-    {
-        if (!this->val_)
-            panic(std::format("{}", this->val_.error()));
-        
-        return this->val_.value();
     }
 
     T&& take()

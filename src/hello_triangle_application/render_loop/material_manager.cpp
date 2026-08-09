@@ -17,7 +17,7 @@ namespace HelloTriangleApplication::RenderLoop
         return this->matIdMap_.get(name);
     }
 
-    Result<i32, std::string> getTextureId(std::unordered_map<StringId, u32>& texIdMap, StringId name)
+    Result<i32, std::string> getTextureId(const StringIdMap<u32>& texIdMap, StringId name)
     {
         if (name.isNull())
         {
@@ -25,10 +25,10 @@ namespace HelloTriangleApplication::RenderLoop
         }
         else
         {
-            auto result = texIdMap.find(name);
-            if (result != texIdMap.end())
+            auto result = texIdMap.tryGet(name);
+            if (result)
             {
-                return result->second;
+                return *result.value();
             }
             else
             {
@@ -104,16 +104,19 @@ namespace HelloTriangleApplication::RenderLoop
     }
 
     Result<Unit, std::string> MaterialManager::writeMaterialData(App& app,
-            const std::unordered_map<StringId, Geometry::Texture>& textures, const StringIdMap<Material>& materials)
+            const StringIdMap<Texture>& textures, const StringIdMap<Material>& materials)
     {
         // make vectors
         std::vector<StringId> matIdVec = materials.makeIdVec();
         std::sort(matIdVec.begin(), matIdVec.end());
         std::vector<const Material*> matVec = materials.makePtrVec(matIdVec);
-        std::vector<const Texture*> texVec = mapValuesAsConstPtrs(textures);
+
+        std::vector<StringId> texIdVec = textures.makeIdVec();
+        std::sort(texIdVec.begin(), texIdVec.end());
+        std::vector<const Texture*> texVec = textures.makePtrVec(texIdVec);
 
         // make maps
-        std::unordered_map<StringId, u32> texIdMap = idMapFromKeys(textures);
+        StringIdMap<u32> texIdMap = textures.makeIndexMap(texIdVec);
         StringIdMap<u32> matIdMap = materials.makeIndexMap(matIdVec);
 
         // construct array of MaterialUniformData

@@ -9,6 +9,7 @@
 #include "image_data.h"
 #include "../geometry/mesh.h"
 #include "../render_loop/material.h"
+#include "../geometry/texture.h"
 
 #define REGISTER_RESOURCE_TYPE(type, resourceName) \
 private:                                        \
@@ -28,12 +29,52 @@ namespace HelloTriangleApplication::Resources
         const std::vector<ResourceType>& types_;
         const StringIdMap<u32>& typeMap_;
         RuntimeProcessingData processingData_;
+        bool hasShutdown_ = false;
 
     public:
         ResourceRegistry(const std::vector<ResourceType>& types, const StringIdMap<u32>& typeMap)
             : types_(types), typeMap_(typeMap), processingData_({}) {}
         
         RuntimeProcessingData& processingData() { return this->processingData_; }
+
+        Result<Unit, std::string> startup()
+        {
+            NullRuntimeTasks defaultTasks;
+            for (const ResourceType& type : this->types_)
+            {
+                RuntimeResourceTasks* tasks;
+                if (type.runtime.tasks)
+                    tasks = type.runtime.tasks.value();
+                else
+                    tasks = &defaultTasks;
+                CHECK(tasks->onStartup(this->processingData_));
+            }
+            return Ok();
+        }
+
+        Result<Unit, std::string> shutdown()
+        {
+            if (this->hasShutdown_)
+                panic("Called shutdown on ResourceRegistry but it's already been shut down.");
+            NullRuntimeTasks defaultTasks;
+            for (const ResourceType& type : this->types_)
+            {
+                RuntimeResourceTasks* tasks;
+                if (type.runtime.tasks)
+                    tasks = type.runtime.tasks.value();
+                else
+                    tasks = &defaultTasks;
+                CHECK(tasks->onShutdown(this->processingData_));
+            }
+            this->hasShutdown_ = true;
+            return Ok();
+        }
+
+        // ~ResourceRegistry()
+        // {
+        //     if (!this->hasShutdown_)
+        //         panic("Destroyed ResourceRegistry without having first called shutdown.");
+        // }
 
         // make a map for each resource type and associate it with a C++ type
         template <typename T>
@@ -46,6 +87,7 @@ namespace HelloTriangleApplication::Resources
         REGISTER_RESOURCE_TYPE(ImageData, image)
         REGISTER_RESOURCE_TYPE(Geometry::Mesh, mesh)
         REGISTER_RESOURCE_TYPE(RenderLoop::Material, material)
+        REGISTER_RESOURCE_TYPE(Geometry::Texture, texture)
 
         template <typename T>
         Result<Unit, std::string> loadResources(StringId resourceName)

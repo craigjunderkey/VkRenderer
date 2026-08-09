@@ -64,6 +64,7 @@ namespace HelloTriangleApplication::Resources
         CopyExporter defaultExporter;
         NullCompiler defaultCompiler;
         NullLinker defaultLinker;
+        NullOfflineTasks defaultTasks;
 
         OfflineProcessingData processingData;
 
@@ -72,6 +73,17 @@ namespace HelloTriangleApplication::Resources
         for (const ResourceType& type : this->types_)
         {
             buildProgress.add(type.resourceName, {});
+        }
+
+        // 0. run build-start tasks
+        for (const ResourceType& type : this->types_)
+        {
+            OfflineResourceTasks* tasks;
+            if (type.offline.tasks)
+                tasks = type.offline.tasks.value();
+            else
+                tasks = &defaultTasks;
+            CHECK(tasks->onBuildStarted(processingData));
         }
 
         // 1. export
@@ -170,6 +182,17 @@ namespace HelloTriangleApplication::Resources
             // store link time
             auto now = std::chrono::high_resolution_clock::now();
             buildProgress.get(type.resourceName).linkTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime);
+        }
+
+        // 4. run build-finish tasks
+        for (const ResourceType& type : this->types_)
+        {
+            OfflineResourceTasks* tasks;
+            if (type.offline.tasks)
+                tasks = type.offline.tasks.value();
+            else
+                tasks = &defaultTasks;
+            CHECK(tasks->onBuildFinished(processingData));
         }
 
         // log build duration

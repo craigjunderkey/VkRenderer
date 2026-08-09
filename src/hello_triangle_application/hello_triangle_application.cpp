@@ -48,6 +48,7 @@ namespace HelloTriangleApplication
     {
         initializeResourceManager(*this).unwrap();
         handleAssetBuild(*this).unwrap();
+        this->resources2.registry().startup().unwrap();
         loadAllResources(*this).unwrap();
     }
 
@@ -127,6 +128,7 @@ namespace HelloTriangleApplication
     {
         std::cout << "Cleaning up\n";
 
+        this->resources2.registry().shutdown().unwrap();
         glfwTerminate();
     }
 }

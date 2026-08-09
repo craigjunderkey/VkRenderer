@@ -19,12 +19,16 @@ namespace HelloTriangleApplication::Resources
             return Err<std::string>(RESOURCE_NAME_HERE + " has a compiler but it's nullptr.");
         if (offline.linker.has_value() && offline.linker.value() == nullptr)
             return Err<std::string>(RESOURCE_NAME_HERE + " has a linker but it's nullptr.");
+        if (offline.tasks.has_value() && offline.tasks.value() == nullptr)
+            return Err<std::string>(RESOURCE_NAME_HERE + " has offline tasks but it's nullptr.");
         if (runtime.loader == nullptr)
             return Err<std::string>(RESOURCE_NAME_HERE + " is missing a loader.");
         if (runtime.unloader.has_value() && runtime.unloader.value() == nullptr)
             return Err<std::string>(RESOURCE_NAME_HERE + " has an unloader but it's nullptr.");
         if (runtime.postLoadInitializer.has_value() && runtime.postLoadInitializer.value() == nullptr)
             return Err<std::string>(RESOURCE_NAME_HERE + " has a post-load initializer but it's nullptr.");
+        if (runtime.tasks.has_value() && runtime.tasks.value() == nullptr)
+            return Err<std::string>(RESOURCE_NAME_HERE + " has runtime tasks but it's nullptr.");
 
         return Ok();
     }

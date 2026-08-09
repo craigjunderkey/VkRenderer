@@ -17,6 +17,7 @@ namespace HelloTriangleApplication::Resources
         app.resources2.addResourceType(Types::imageData());
         app.resources2.addResourceType(Types::mesh());
         app.resources2.addResourceType(Types::material());
+        app.resources2.addResourceType(Types::texture());
         return Ok();
     }
 
@@ -52,7 +53,8 @@ namespace HelloTriangleApplication::Resources
         loader.load<ImageData>("image").unwrap();
         loader.load<Geometry::Mesh>("mesh").unwrap();
         loader.load<RenderLoop::Material>("material").unwrap();
-        
+        loader.load<Geometry::Texture>("texture").unwrap();
+
         return Ok();
     }
 
@@ -90,6 +92,7 @@ namespace HelloTriangleApplication::Resources
     {
         CHECK(app.resources2.registry().postLoadInitialize<Geometry::Mesh>("mesh"));
         CHECK(app.resources2.registry().postLoadInitialize<RenderLoop::Material>("material"));
+        CHECK(app.resources2.registry().postLoadInitialize<Geometry::Texture>("texture"));
         return Ok();
     }
 }

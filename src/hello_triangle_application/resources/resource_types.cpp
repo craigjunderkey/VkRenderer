@@ -3,6 +3,7 @@
 #include "mesh_processing.h"
 #include "image_processing.h"
 #include "material_processing.h"
+#include "texture_processing.h"
 
 namespace HelloTriangleApplication::Resources::Types
 {
@@ -93,6 +94,34 @@ namespace HelloTriangleApplication::Resources::Types
                 .loader = &loader,
                 .unloader = {},
                 .postLoadInitializer = &initializer
+            }
+        };
+    }
+
+    ResourceType texture()
+    {
+        static TextureExporter exporter = TextureExporter();
+        static TextureLinker linker = TextureLinker();
+        static OfflineTextureTasks offlineTasks = OfflineTextureTasks();
+        static TextureLoader loader = TextureLoader();
+        static TextureInitializer initializer = TextureInitializer();
+        static RuntimeTextureTasks runtimeTasks = RuntimeTextureTasks();
+
+        return ResourceType {
+            .resourceName = "texture",
+            .resourceDirectory = "textures",
+            .inFileExtensions = { ".png", ".jpg" },
+            .offline {
+                .exporter = &exporter,
+                .compiler = {},
+                .linker = &linker,
+                .tasks = &offlineTasks
+            },
+            .runtime {
+                .loader = &loader,
+                .unloader = {},
+                .postLoadInitializer = &initializer,
+                .tasks = &runtimeTasks
             }
         };
     }

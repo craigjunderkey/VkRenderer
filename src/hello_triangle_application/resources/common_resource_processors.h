@@ -42,6 +42,19 @@ namespace HelloTriangleApplication::Resources
         }
     };
 
+    class NullOfflineTasks : public OfflineResourceTasks
+    {
+    public:
+        Result<Unit, std::string> onBuildStarted(OfflineProcessingData& processingData) override
+        {
+            return Ok();
+        }
+        Result<Unit, std::string> onBuildFinished(OfflineProcessingData& processingData) override
+        {
+            return Ok();
+        }
+    };
+
     class NullUnloader : public ResourceUnloader
     {
     public:
@@ -57,6 +70,19 @@ namespace HelloTriangleApplication::Resources
         Result<Unit, std::string> postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData) override
         {
             return Err<std::string>("Post-load initialized a resource with no defined post-load initialization behavior.");
+        }
+    };
+
+    class NullRuntimeTasks : public RuntimeResourceTasks
+    {
+    public:
+        Result<Unit, std::string> onStartup(RuntimeProcessingData& processingData) override
+        {
+            return Ok();
+        }
+        Result<Unit, std::string> onShutdown(RuntimeProcessingData& processingData) override
+        {
+            return Ok();
         }
     };
 }
