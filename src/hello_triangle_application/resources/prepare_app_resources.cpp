@@ -95,6 +95,9 @@ namespace HelloTriangleApplication::Resources
         CHECK(app.resources.registry().postLoadInitialize<Geometry::Mesh>("mesh"));
         CHECK(app.resources.registry().postLoadInitialize<Geometry::Texture>("texture"));
         CHECK(app.resources.registry().postLoadInitialize<RenderLoop::Material>("material"));
+        
+        CHECK(app.resources.registry().unloadResources<ImageData>("image"));
+
         return Ok();
     }
 

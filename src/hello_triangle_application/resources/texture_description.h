@@ -2,6 +2,7 @@
 #include "../utilities/common.h"
 #include "../utilities/vulkan_common.h"
 #include "string_id_map.h"
+#include "image_data.h"
 
 namespace HelloTriangleApplication::Resources
 {
@@ -17,23 +18,17 @@ namespace HelloTriangleApplication::Resources
         vk::ImageUsageFlags usage;
         vk::MemoryPropertyFlags properties;
         vk::ImageAspectFlags aspectFlags;
+
+        // `numLayers` <= the number of images supplied
         u32 numLayers;
 
-        static TextureDescription defaultTexture()
-        {
-            return TextureDescription
-            {
-                .imageType = vk::ImageType::e2D,
-                .viewType = vk::ImageViewType::e2D,
-                .doMipmapping = true,
-                .doMultisampling = false,
-                .format = vk::Format::eR8G8B8A8Srgb,
-                .tiling = vk::ImageTiling::eOptimal,
-                .usage = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
-                .aspectFlags = vk::ImageAspectFlagBits::eColor,
-                .numLayers = 1
-            };
-        }
+        // all images in `additionalImages` must have the same dimensions as `image`
+        // if `image` is null, then `additionalImages` must be empty
+        std::vector<StringId> additionalImages = {}; 
+
+        Result<Unit, std::string> check(const StringIdMap<ImageData>& images);
+        
+        static TextureDescription defaultTexture();
     };
 
     class TextureDescriptionManager

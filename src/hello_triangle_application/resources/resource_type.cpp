@@ -5,7 +5,7 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> ResourceType::isValid()
+    Result<Unit, std::string> ResourceType::check()
     {
         if (resourceName == nullptr)
             return Err<std::string>("Resource type missing a name.");

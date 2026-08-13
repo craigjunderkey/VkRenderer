@@ -16,7 +16,7 @@ namespace HelloTriangleApplication::Resources
 
     void ResourceManager::addResourceType(ResourceType type)
     {
-        type.isValid().unwrap();
+        type.check().unwrap();
         this->typeMap_.add(StringId(type.resourceName), this->types_.size());
         this->types_.emplace_back(std::move(type));
     }

@@ -78,7 +78,6 @@ namespace HelloTriangleApplication
         createGraphicsPipeline(*this).unwrap();
         createCommandPools(*this).unwrap();
         handlePostLoadInitialization(*this).unwrap();
-        this->resources.registry().unloadResources<ImageData>("image").unwrap();
         createUniformBuffers(*this).unwrap();
         createDescriptorPool(*this).unwrap();
         createDescriptorSets(*this).unwrap();

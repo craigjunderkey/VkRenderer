@@ -252,6 +252,7 @@ namespace HelloTriangleApplication::Geometry
 
     Result<Texture, std::string> Texture::loadFromDescription(App& app, Resources::TextureDescription desc)
     {
+        CHECK(desc.check(app.resources.registry().getMap<ImageData>()));
         const ImageData& imageData = app.resources.get<ImageData>(desc.image);
 
         // create staging buffer

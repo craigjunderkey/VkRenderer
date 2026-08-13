@@ -1,18 +1,35 @@
 #include "texture_processing.h"
 #include "texture_description.h"
 #include "../geometry/texture.h"
-#include <iostream>
-#include <fstream>
+#include "io_helper.h"
 
 namespace HelloTriangleApplication::Resources
 {
+    void writeTexDesc(std::ofstream& out, const TextureDescription& desc)
+    {
+        // write everything up until the `additionalImages` vector
+        out.write(reinterpret_cast<const char*>(&desc), offsetof(TextureDescription, additionalImages));
+
+        // write `additionalImages` vector
+        writeVec<StringId>(out, desc.additionalImages);
+    }
+
+    void readTexDesc(std::ifstream& in, TextureDescription& desc)
+    {
+        // read everything up until the `additionalImages` vector
+        in.read(reinterpret_cast<char*>(&desc), offsetof(TextureDescription, additionalImages));
+
+        // read `additionalImages` vector
+        readVec<StringId>(in, desc.additionalImages);
+    }
+    
     Result<Unit, std::string> TextureExporter::exportResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
     {
         StringId name = pathToName(path);
         TextureDescription& desc = processingData.texDescs->getOrAdd(name);
         desc.image = name;
         auto out = std::ofstream(getExportPath("textures", path, ".texdesc"));
-        out.write(reinterpret_cast<const char*>(&desc), sizeof(TextureDescription));
+        writeTexDesc(out, desc);
         return Ok();
     }
 
@@ -20,7 +37,7 @@ namespace HelloTriangleApplication::Resources
     {
         TextureDescription& desc = processingData.texDescs->getOrAdd(pathToName(path));
         auto file = std::ofstream(path, std::ios::binary);
-        file.write(reinterpret_cast<const char*>(&desc), sizeof(TextureDescription));
+        writeTexDesc(file, desc);
         return Ok();
     }
 
@@ -35,7 +52,7 @@ namespace HelloTriangleApplication::Resources
         // load texture description
         TextureDescription& desc = processingData.texDescs->getOrAdd(name);
         auto in = std::ifstream(path);
-        in.read(reinterpret_cast<char*>(&desc), sizeof(TextureDescription));
+        readTexDesc(in, desc);
         in.ignore();
         if (!in.eof())
             return Err<std::string>("Read all texture info in " + path.string() + " but didn't reach end-of-file.\n");
@@ -45,7 +62,7 @@ namespace HelloTriangleApplication::Resources
 
     Result<Unit, std::string> TextureInitializer::postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData)
     {
-        Geometry::Texture* tex = std::any_cast<Geometry::Texture*>(resource);
+        Geometry::Texture* tex = std::any_cast<Geometry::Texture*>(resource); 
         auto loadResult = Geometry::Texture::loadFromDescription(*processingData.app, processingData.texDescs->descs().get(tex->name));
         CHECK_KEEP(loadResult);
         *tex = loadResult.take();

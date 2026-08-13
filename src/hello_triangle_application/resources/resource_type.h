@@ -49,7 +49,7 @@ namespace HelloTriangleApplication::Resources
         OfflineResourceProcessors offline;
         RuntimeResourceProcessors runtime;
 
-        Result<Unit, std::string> isValid();
+        Result<Unit, std::string> check();
     };
 
     class ResourceExporter
