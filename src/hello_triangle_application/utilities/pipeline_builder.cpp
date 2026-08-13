@@ -1,5 +1,6 @@
 #include "../hello_triangle_application.h"
 #include "pipeline_builder.h"
+#include "shader_module.h"
 
 namespace HelloTriangleApplication::Utilities
 {
@@ -92,6 +93,7 @@ namespace HelloTriangleApplication::Utilities
             }
         );
     }
+
 
     Result<FatPipeline, std::string> PipelineBuilder::build(App& app) const
     {

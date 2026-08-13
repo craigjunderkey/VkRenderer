@@ -10,6 +10,7 @@
 #include "../geometry/mesh.h"
 #include "../render_loop/material.h"
 #include "../geometry/texture.h"
+#include "shader.h"
 
 #define REGISTER_RESOURCE_TYPE(type, resourceName) \
 private:                                        \
@@ -88,6 +89,7 @@ namespace HelloTriangleApplication::Resources
         REGISTER_RESOURCE_TYPE(Geometry::Mesh, mesh)
         REGISTER_RESOURCE_TYPE(RenderLoop::Material, material)
         REGISTER_RESOURCE_TYPE(Geometry::Texture, texture)
+        REGISTER_RESOURCE_TYPE(Shader, shader)
 
         template <typename T>
         Result<Unit, std::string> loadResources(StringId resourceName)

@@ -4,6 +4,7 @@
 #include "image_processing.h"
 #include "material_processing.h"
 #include "texture_processing.h"
+#include "shader_processing.h"
 
 namespace HelloTriangleApplication::Resources::Types
 {
@@ -122,6 +123,27 @@ namespace HelloTriangleApplication::Resources::Types
                 .unloader = {},
                 .postLoadInitializer = &initializer,
                 .tasks = &runtimeTasks
+            }
+        };
+    }
+    
+    ResourceType shader()
+    {
+        static ShaderExporter exporter = ShaderExporter();
+        static ShaderLinker linker = ShaderLinker();
+        static ShaderLoader loader = ShaderLoader();
+
+        return ResourceType {
+            .resourceName = "shader",
+            .resourceDirectory = "shaders",
+            .inFileExtensions = { ".slang" },
+            .offline {
+                .exporter = &exporter,
+                .compiler = {},
+                .linker = &linker
+            },
+            .runtime {
+                .loader = &loader
             }
         };
     }

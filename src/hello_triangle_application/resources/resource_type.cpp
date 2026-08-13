@@ -33,9 +33,14 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
     
+    std::filesystem::path getResDir(const char* resourceDirectory)
+    {
+        return std::move(RES_EXPORT_DIR / resourceDirectory);
+    }
+    
     std::filesystem::path ResourceExporter::getExportDirectory(const char* resourceDirectory)
     {
-        return RES_EXPORT_DIR / resourceDirectory;
+        return std::move(getResDir(resourceDirectory));
     }
 
     std::filesystem::path ResourceExporter::getExportPath(const char* resourceDirectory,
@@ -54,5 +59,15 @@ namespace HelloTriangleApplication::Resources
         
         // generate export path
         return RES_EXPORT_DIR / resourceDirectory / name;
+    }
+
+    std::filesystem::path ResourceCompiler::getResourceDirectory(const char* resourceDirectory)
+    {
+        return std::move(getResDir(resourceDirectory));
+    }
+
+    std::filesystem::path ResourceLinker::getResourceDirectory(const char* resourceDirectory)
+    {
+        return std::move(getResDir(resourceDirectory));
     }
 }

@@ -18,6 +18,7 @@ namespace HelloTriangleApplication::Resources
         app.resources.addResourceType(Types::mesh());
         app.resources.addResourceType(Types::material());
         app.resources.addResourceType(Types::texture());
+        app.resources.addResourceType(Types::shader());
         return Ok();
     }
 
@@ -54,6 +55,7 @@ namespace HelloTriangleApplication::Resources
         loader.load<Geometry::Mesh>("mesh").unwrap();
         loader.load<RenderLoop::Material>("material").unwrap();
         loader.load<Geometry::Texture>("texture").unwrap();
+        loader.load<Shader>("shader").unwrap();
 
         return Ok();
     }

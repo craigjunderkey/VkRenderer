@@ -52,6 +52,12 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
+    Result<Unit, std::string> TextureInitializer::end(RuntimeProcessingData& processingData)
+    {
+        processingData.texDescs->descs().clear();
+        return Ok();
+    }
+
     Result<Unit, std::string> OfflineTextureTasks::onBuildStarted(OfflineProcessingData& processingData)
     {
         processingData.texDescs = new TextureDescriptionManager();

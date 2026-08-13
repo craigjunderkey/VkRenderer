@@ -82,6 +82,9 @@ namespace HelloTriangleApplication::Resources
         virtual Result<Unit, std::string> compileResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
 
         virtual ~ResourceCompiler() = default;
+    
+    protected:
+        std::filesystem::path getResourceDirectory(const char* resourceDirectory);
     };
 
     class ResourceLinker
@@ -93,6 +96,9 @@ namespace HelloTriangleApplication::Resources
         virtual Result<Unit, std::string> linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
         
         virtual ~ResourceLinker() = default;
+    
+    protected:
+        std::filesystem::path getResourceDirectory(const char* resourceDirectory);
     };
 
     class OfflineResourceTasks

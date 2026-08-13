@@ -25,6 +25,7 @@ namespace HelloTriangleApplication::Resources
     {
     public:
         Result<Unit, std::string> postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData) override;
+        Result<Unit, std::string> end(RuntimeProcessingData& processingData) override;
     };
 
     class OfflineTextureTasks : public OfflineResourceTasks

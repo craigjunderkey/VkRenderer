@@ -5,10 +5,13 @@
 #include "push_constants.h"
 #include "shader_module.h"
 #include "../render_loop/light.h"
+#include "../resources/shader.h"
 
 using HelloTriangleApplication::App;
 using HelloTriangleApplication::Geometry::Vertex;
 using HelloTriangleApplication::Geometry::VertexInfo;
+using HelloTriangleApplication::Resources::Shader;
+using HelloTriangleApplication::Resources::ShaderStage;
 
 namespace HelloTriangleApplication::Utilities
 {
@@ -17,12 +20,21 @@ namespace HelloTriangleApplication::Utilities
         pipelineBuilder.setDefaults(app);
         
         // make programmable stages
-        auto shaderLoadResult = loadShaderModule(app, "shaders/shader.spv");
-        CHECK_KEEP(shaderLoadResult);
-        vk::raii::ShaderModule shaderModule = shaderLoadResult.take();
+        Shader& shader = app.resources.get<Shader>("shader");
+        auto moduleResult = createShaderModule(app, shader);
+        CHECK_KEEP(moduleResult);
+        vk::raii::ShaderModule shaderModule = moduleResult.take();
         
-        pipelineBuilder.addShaderStage(vk::ShaderStageFlagBits::eVertex, shaderModule);
-        pipelineBuilder.addShaderStage(vk::ShaderStageFlagBits::eFragment, shaderModule);
+        pipelineBuilder.addShaderStage(
+            vk::ShaderStageFlagBits::eVertex,
+            shaderModule,
+            shader.getEntryPoint(ShaderStage::Vertex).functionName.data()
+        );
+        pipelineBuilder.addShaderStage(
+            vk::ShaderStageFlagBits::eFragment, 
+            shaderModule,
+            shader.getEntryPoint(ShaderStage::Fragment).functionName.data()
+        );
 
         // vertex input
         pipelineBuilder.vertBindingDescriptions = { VertexInfo::bindingDescription() };
@@ -60,13 +72,22 @@ namespace HelloTriangleApplication::Utilities
     Result<Unit, std::string> createLightDebugPipeline(App& app, PipelineBuilder& pipelineBuilder)
     {
         // make programmable stages
-        auto shaderLoadResult = loadShaderModule(app, "shaders/light_debug.spv");
-        CHECK_KEEP(shaderLoadResult);
-        vk::raii::ShaderModule shaderModule = shaderLoadResult.take();
+        Shader& shader = app.resources.get<Shader>("light_debug");
+        auto moduleResult = createShaderModule(app, shader);
+        CHECK_KEEP(moduleResult);
+        vk::raii::ShaderModule shaderModule = moduleResult.take();
 
         pipelineBuilder.shaderStages.clear();
-        pipelineBuilder.addShaderStage(vk::ShaderStageFlagBits::eVertex, shaderModule);
-        pipelineBuilder.addShaderStage(vk::ShaderStageFlagBits::eFragment, shaderModule);
+        pipelineBuilder.addShaderStage(
+            vk::ShaderStageFlagBits::eVertex,
+            shaderModule,
+            shader.getEntryPoint(ShaderStage::Vertex).functionName.data()
+        );
+        pipelineBuilder.addShaderStage(
+            vk::ShaderStageFlagBits::eFragment,
+            shaderModule,
+            shader.getEntryPoint(ShaderStage::Fragment).functionName.data()
+        );
 
         // pipeline layout
         PipelineLayoutBuilder layoutBuilder;

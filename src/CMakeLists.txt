@@ -10,7 +10,16 @@ include("../CMake/VulkanSetup.cmake")
 # include json library
 find_package(nlohmann_json REQUIRED)
 set(JSON_INCLUDEDIR ${nlohmann_json_INCLUDE_DIRS})
-target_include_directories (${TEMPLATE_NAME} PRIVATE ${JSON_INCLUDEDIR})
+target_include_directories(${TEMPLATE_NAME} PRIVATE ${JSON_INCLUDEDIR})
+
+# include slang compilation API
+set(${CMAKE_CURRENT_LIST_DIR} "${CMAKE_CURRENT_LIST_DIR}/..")
+include(../CMake/slang/slangConfig.cmake)
+find_package(slang REQUIRED)
+include(../CMake/slang/slangTargets.cmake)
+target_link_libraries(${TEMPLATE_NAME} slang::slang)
+set(SLANG_INCLUDEDIR "$ENV{VULKAN_SDK}/include/slang")
+target_include_directories(${TEMPLATE_NAME} PRIVATE ${SLANG_INCLUDEDIR})
 
 # compile shaders
 set(SHADER_SLANG_SOURCES "shader" "light_debug")

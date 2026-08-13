@@ -43,6 +43,7 @@ namespace HelloTriangleApplication::Resources
     
     public:
         const StringIdMap<TextureDescription>& descs() const { return this->descs_; }
+        StringIdMap<TextureDescription>& descs() { return this->descs_; }
     
         TextureDescription& getOrAdd(StringId texture)
         {
