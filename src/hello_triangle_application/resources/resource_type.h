@@ -17,8 +17,8 @@ namespace HelloTriangleApplication::Resources
     class ResourcePostLoadInitializer;
     class RuntimeResourceTasks;
 
-    static const std::filesystem::path RES_IMPORT_DIR = "src/assets";
-    static const std::filesystem::path RES_EXPORT_DIR = "src/assets_export";
+    static const std::filesystem::path RES_IMPORT_DIR = "assets";
+    static const std::filesystem::path RES_EXPORT_DIR = "assets_export";
     
     inline StringId pathToName(const std::filesystem::path& path)
     {

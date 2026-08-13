@@ -20,10 +20,3 @@ include(../CMake/slang/slangTargets.cmake)
 target_link_libraries(${TEMPLATE_NAME} slang::slang)
 set(SLANG_INCLUDEDIR "$ENV{VULKAN_SDK}/include/slang")
 target_include_directories(${TEMPLATE_NAME} PRIVATE ${SLANG_INCLUDEDIR})
-
-# compile shaders
-set(SHADER_SLANG_SOURCES "shader" "light_debug")
-set(IN_SHADERS_DIR ${CMAKE_CURRENT_LIST_DIR}/shaders)
-set(OUT_SHADERS_DIR ${CMAKE_CURRENT_LIST_DIR}/../shaders) # this sucks
-add_slang_shader_target(SHADER_TARGETS SOURCES ${SHADER_SLANG_SOURCES})
-add_dependencies(${TEMPLATE_NAME} ${SHADER_TARGETS})
