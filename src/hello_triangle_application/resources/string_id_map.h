@@ -74,17 +74,17 @@ public:
         addResult.unwrap();
     }
 
-    void clear()
+    inline void clear()
     {
-        this->map_ = std::unordered_map<StringId, T>();
+        this->map_.clear();
     }
 
-    void reserve(u32 size)
+    inline void reserve(u32 size)
     {
         this->map_.reserve(size);
     }
 
-    u32 size() const
+    inline u32 size() const
     {
         return this->map_.size();
     }

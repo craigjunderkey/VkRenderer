@@ -57,6 +57,21 @@ namespace HelloTriangleApplication::Resources
         std::chrono::milliseconds linkTime;
     };
 
+    void updateResourceCount(const ResourceType& type, OfflineProcessingData& data)
+    {
+        // get number of resources of this type
+        u32 numResources = 0;
+        std::filesystem::path resDir = RES_EXPORT_DIR / type.resourceDirectory;
+        for (const std::filesystem::directory_entry& file : std::filesystem::recursive_directory_iterator(resDir))
+        {
+            if (!file.is_directory())
+                numResources++;
+        }
+
+        // update the table
+        data.resourceCounts.add(type.resourceName, numResources);
+    }
+
     Result<Unit, std::string> AssetConditioningPipeline::buildAssets(bool doLogging)
     {
         if (doLogging)
@@ -118,12 +133,16 @@ namespace HelloTriangleApplication::Resources
             }
             CHECK(exporter->end(processingData));
 
+            // update count
+            updateResourceCount(type, processingData);
+
             // store export time
             auto now = std::chrono::high_resolution_clock::now();
             buildProgress.get(type.resourceName).exportTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime);
         }
 
         // 2. compile
+        processingData.resourceCounts.clear();
         for (const ResourceType& type : this->types_)
         {
             auto startTime = std::chrono::high_resolution_clock::now();
@@ -152,12 +171,16 @@ namespace HelloTriangleApplication::Resources
             }
             CHECK(compiler->end(processingData));
 
+            // update count
+            updateResourceCount(type, processingData);
+
             // store compile time
             auto now = std::chrono::high_resolution_clock::now();
             buildProgress.get(type.resourceName).compileTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime);
         }
 
         // 3. link
+        processingData.resourceCounts.clear();
         for (const ResourceType& type : this->types_)
         {
             auto startTime = std::chrono::high_resolution_clock::now();
@@ -185,6 +208,9 @@ namespace HelloTriangleApplication::Resources
                 }
             }
             CHECK(linker->end(processingData));
+
+            // update count
+            updateResourceCount(type, processingData);
 
             // store link time
             auto now = std::chrono::high_resolution_clock::now();

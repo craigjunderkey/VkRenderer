@@ -1,18 +1,12 @@
 #pragma once
 #include "../utilities/common.h"
 #include "../utilities/vulkan_common.h"
+#include "sampler_name.h"
 
 namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::RenderLoop
 {
-    enum SamplerName
-    {
-        Repeat,
-        MirroredRepeat,
-        None
-    };
-
     class SamplerManager
     {
     private:

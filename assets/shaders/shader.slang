@@ -188,9 +188,9 @@ struct VSOutput
 
 struct OnCreate
 {
-    Material materials[UNKNOWN_SIZE];
-    Texture2D textures[UNKNOWN_SIZE];
-    SamplerState samplers[UNKNOWN_SIZE];
+    Material materials[NUM_MATERIALS];
+    Texture2D textures[NUM_TEXTURES];
+    SamplerState samplers[NUM_SAMPLERS];
 };
 
 struct PerFrame

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include "shader.h"
+#include "../render_loop/sampler_name.h"
 
 #include <slang.h>
 
@@ -40,7 +41,7 @@ namespace HelloTriangleApplication::Resources
         SlangResult globalResult = slang::createGlobalSession(this->globalSession_.writeRef());
         CHECK(castSlangResult(globalResult));
 
-        // configure session
+        // configure target
         std::array<slang::CompilerOptionEntry, 3> compilerOptions {
             slang::CompilerOptionEntry {
                 .name = slang::CompilerOptionName::EmitSpirvDirectly,
@@ -62,7 +63,27 @@ namespace HelloTriangleApplication::Resources
             .compilerOptionEntries = compilerOptions.data(),
             .compilerOptionEntryCount = compilerOptions.size()
         };
+
+        // configure macros
+        auto texCountStr = std::to_string(processingData.resourceCounts.get("texture"));
+        auto matCountStr = std::to_string(processingData.resourceCounts.get("material"));
+        auto samplerCountStr = std::to_string(RenderLoop::SamplerName::None);
+        std::array<slang::PreprocessorMacroDesc, 3> macros {
+            slang::PreprocessorMacroDesc {
+                .name = "NUM_TEXTURES",
+                .value = texCountStr.data()
+            },
+            slang::PreprocessorMacroDesc {
+                .name = "NUM_MATERIALS",
+                .value = matCountStr.data()
+            },
+            slang::PreprocessorMacroDesc {
+                .name = "NUM_SAMPLERS",
+                .value = samplerCountStr.data()
+            }
+        };
         
+        // configure session
         std::filesystem::path searchPath = getResourceDirectory("shaders") / "src";
         const char* searchPathCStr = searchPath.c_str();
         slang::SessionDesc desc {
@@ -76,8 +97,8 @@ namespace HelloTriangleApplication::Resources
             
             .searchPaths = &searchPathCStr,
             .searchPathCount = 1,
-            .preprocessorMacros = nullptr, // TODO: set macros
-            .preprocessorMacroCount = 0
+            .preprocessorMacros = macros.data(),
+            .preprocessorMacroCount = macros.size()
         };
 
         // create session
