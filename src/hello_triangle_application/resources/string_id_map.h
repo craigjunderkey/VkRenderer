@@ -9,6 +9,11 @@ private:
     std::unordered_map<StringId, T> map_ = std::unordered_map<StringId, T>();
 
 public:
+    StringId name = "unnamed";
+
+    StringIdMap() = default;
+    StringIdMap(StringId name) : name(name) {}
+
     Option<T*> tryGet(StringId id)
     {
         auto searchResult = this->map_.find(id);
@@ -27,7 +32,7 @@ public:
         auto searchResult = this->map_.find(id);
         if (searchResult == this->map_.end())
         {
-            panic("Couldn't find " + std::string(id) + ".");
+            panic("Couldn't find " + std::string(id) + " in " + std::string(this->name) + ".");
         }
         return searchResult->second;
     }
@@ -50,7 +55,7 @@ public:
         auto searchResult = this->map_.find(id);
         if (searchResult == this->map_.end())
         {
-            panic("Couldn't find " + std::string(id) + ".");
+            panic("Couldn't find " + std::string(id) + " in " + std::string(this->name) + ".");
         }
         return searchResult->second;
     }
@@ -60,7 +65,7 @@ public:
         auto insertResult = this->map_.insert({id, std::move(item)});
         if (!insertResult.second)
         {
-            return Err<std::string>("Tried to add " + std::string(id) + " multiple times.");
+            return Err<std::string>("Tried to add " + std::string(id) + " in " + std::string(this->name) + " multiple times.");
         }
         else
         {

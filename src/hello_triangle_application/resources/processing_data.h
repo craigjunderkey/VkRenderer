@@ -23,7 +23,7 @@ namespace HelloTriangleApplication::Resources
             - owned by `AssetConditioningPipeline`
             - writing: only by owner
         */
-        StringIdMap<u32> resourceCounts;
+        StringIdMap<u32> resourceCounts { "resource_counts" };
     };
     
     struct RuntimeProcessingData

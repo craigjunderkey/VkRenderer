@@ -4,19 +4,25 @@
 #include "string_id_map.h"
 #include "image_data.h"
 
+namespace HelloTriangleApplication { class App; }
+
 namespace HelloTriangleApplication::Resources
 {
     struct TextureDescription
     {
         StringId image = StringId::NONE;
+
+        // if `image` is null, then `dimensions` must be set
+        Option<vk::Extent3D> dimensions = {};
+        
         vk::ImageType imageType;
         vk::ImageViewType viewType;
         bool doMipmapping;
         bool doMultisampling;
         vk::Format format;
         vk::ImageTiling tiling;
-        vk::ImageUsageFlags usage;
-        vk::MemoryPropertyFlags properties;
+        vk::ImageUsageFlags usageFlags;
+        vk::MemoryPropertyFlags memoryProperties;
         vk::ImageAspectFlags aspectFlags;
 
         // `numLayers` <= the number of images supplied
@@ -26,15 +32,18 @@ namespace HelloTriangleApplication::Resources
         // if `image` is null, then `additionalImages` must be empty
         std::vector<StringId> additionalImages = {}; 
 
-        Result<Unit, std::string> check(const StringIdMap<ImageData>& images);
+        Result<Unit, std::string> check(const StringIdMap<ImageData>& images) const;
         
         static TextureDescription defaultTexture();
+
+        // leaves only the following unset: `format`, `usageFlags`, and `aspectFlags`
+        static TextureDescription screenTexture(vk::Extent2D screenDimensions);
     };
 
     class TextureDescriptionManager
     {
     private:
-        StringIdMap<TextureDescription> descs_;
+        StringIdMap<TextureDescription> descs_ { "texture_descriptions" };
     
     public:
         const StringIdMap<TextureDescription>& descs() const { return this->descs_; }

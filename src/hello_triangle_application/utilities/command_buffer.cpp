@@ -23,7 +23,9 @@ namespace HelloTriangleApplication::Utilities
         vk::AccessFlags2 dstAccessMask,
         vk::PipelineStageFlags2 srcStageMask,
         vk::PipelineStageFlags2 dstStageMask,
-        vk::ImageAspectFlags imageAspectFlags
+        vk::ImageAspectFlags imageAspectFlags,
+        u32 mipLevels,
+        u32 numLayers
     )
     {
         vk::ImageMemoryBarrier2 barrier {
@@ -39,9 +41,9 @@ namespace HelloTriangleApplication::Utilities
             .subresourceRange = {
                 .aspectMask = imageAspectFlags,
                 .baseMipLevel = 0,
-                .levelCount = 1,
+                .levelCount = mipLevels,
                 .baseArrayLayer = 0,
-                .layerCount = 1
+                .layerCount = numLayers
             }
         };
 
@@ -87,31 +89,34 @@ namespace HelloTriangleApplication::Utilities
             vk::AccessFlagBits2::eColorAttachmentWrite,
             vk::PipelineStageFlagBits2::eColorAttachmentOutput,
             vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-            vk::ImageAspectFlagBits::eColor
+            vk::ImageAspectFlagBits::eColor,
+            1, 1
         );
 
         // then transition multisampled color attachment image to optimal layout
         stageTransitionImageLayout(
-            app,
-            app.colorTexture.image,
-            app.graphicsQueue.commandBuffers[app.frameIndex],
+            app, *app.colorTexture.image, app.graphicsQueue.commandBuffers[app.frameIndex],
             vk::ImageLayout::eUndefined,
             vk::ImageLayout::eColorAttachmentOptimal,
             {},
             vk::AccessFlagBits2::eColorAttachmentWrite,
             vk::PipelineStageFlagBits2::eColorAttachmentOutput,
             vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-            vk::ImageAspectFlagBits::eColor
+            vk::ImageAspectFlagBits::eColor,
+            app.colorTexture.mipLevels,
+            app.colorTexture.numLayers
         );
 
         // then transition depth image to optimal layout
         stageTransitionImageLayout(
-            app, app.depthTexture.image, app.graphicsQueue.commandBuffers[app.frameIndex],
+            app, *app.depthTexture.image, app.graphicsQueue.commandBuffers[app.frameIndex],
             vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthAttachmentOptimal,
             vk::AccessFlagBits2::eDepthStencilAttachmentWrite, vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
             vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
             vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
-            vk::ImageAspectFlagBits::eDepth
+            vk::ImageAspectFlagBits::eDepth,
+            app.depthTexture.mipLevels,
+            app.depthTexture.numLayers
         );
 
         // set up the color attachment
@@ -286,7 +291,8 @@ namespace HelloTriangleApplication::Utilities
             {},
             vk::PipelineStageFlagBits2::eColorAttachmentOutput,
             vk::PipelineStageFlagBits2::eBottomOfPipe,
-            vk::ImageAspectFlagBits::eColor
+            vk::ImageAspectFlagBits::eColor,
+            1, 1
         );
 
         commandBuffer.end();
@@ -327,6 +333,9 @@ namespace HelloTriangleApplication::Utilities
     Result<Unit, std::string> transitionImageLayout(vk::raii::CommandBuffer& commandBuffer, const vk::Image& image, vk::ImageLayout oldLayout,
         vk::ImageLayout newLayout, u32 mipLevels, u32 numLayers, vk::ImageAspectFlags imageAspectFlags, u32 srcFamily, u32 dstFamily)
     {
+        if (oldLayout == newLayout)
+            return Ok();
+        
         vk::ImageMemoryBarrier barrier {
             .oldLayout = oldLayout,
             .newLayout = newLayout,

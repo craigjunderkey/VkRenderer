@@ -2,6 +2,8 @@
 #include "depth_resources.h"
 #include "texture.h"
 
+using HelloTriangleApplication::Resources::TextureDescription;
+
 namespace HelloTriangleApplication::Geometry
 {
     Result<vk::Format, std::string> findSupportedFormat(App& app, const std::vector<vk::Format>& candidates,
@@ -20,6 +22,7 @@ namespace HelloTriangleApplication::Geometry
     
     Result<Unit, std::string> createDepthTexture(App& app)
     {
+        // get format
         auto depthFormatResult = findSupportedFormat(
             app, 
             {vk::Format::eD32Sfloat, vk::Format::eD32SfloatS8Uint, vk::Format::eD24UnormS8Uint},
@@ -29,21 +32,31 @@ namespace HelloTriangleApplication::Geometry
 
         vk::Format depthFormat = depthFormatResult.take();
 
-        TRY_ASSIGN(
-            app.depthTexture,
-            Texture::create(
-                app,
-                app.swapChainExtent.width,
-                app.swapChainExtent.height,
-                depthFormat,
-                vk::ImageTiling::eOptimal,
-                vk::ImageUsageFlagBits::eDepthStencilAttachment,
-                vk::MemoryPropertyFlagBits::eDeviceLocal,
-                vk::ImageAspectFlagBits::eDepth,
-                false,
-                app.msaaSamples
-            )
-        );
+        // create texture
+        TextureDescription desc = TextureDescription::screenTexture(app.swapChainExtent);
+        desc.format = depthFormat;
+        desc.usageFlags = vk::ImageUsageFlagBits::eDepthStencilAttachment;
+        desc.aspectFlags = vk::ImageAspectFlagBits::eDepth;
+
+        auto texResult = Texture::fromDescription(app, desc);
+        CHECK_KEEP(texResult);
+        app.depthTexture = texResult.take();
+
+        // TRY_ASSIGN(
+        //     app.depthTexture,
+        //     Texture::create(
+        //         app,
+        //         app.swapChainExtent.width,
+        //         app.swapChainExtent.height,
+        //         depthFormat,
+        //         vk::ImageTiling::eOptimal,
+        //         vk::ImageUsageFlagBits::eDepthStencilAttachment,
+        //         vk::MemoryPropertyFlagBits::eDeviceLocal,
+        //         vk::ImageAspectFlagBits::eDepth,
+        //         false,
+        //         app.msaaSamples
+        //     )
+        // );
 
         return Ok();
     }

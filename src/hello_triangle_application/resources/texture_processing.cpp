@@ -63,7 +63,7 @@ namespace HelloTriangleApplication::Resources
     Result<Unit, std::string> TextureInitializer::postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData)
     {
         Geometry::Texture* tex = std::any_cast<Geometry::Texture*>(resource); 
-        auto loadResult = Geometry::Texture::loadFromDescription(*processingData.app, processingData.texDescs->descs().get(tex->name));
+        auto loadResult = Geometry::Texture::fromDescription(*processingData.app, processingData.texDescs->descs().get(tex->name));
         CHECK_KEEP(loadResult);
         *tex = loadResult.take();
         return Ok();

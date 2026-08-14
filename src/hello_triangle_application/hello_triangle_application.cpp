@@ -72,16 +72,16 @@ namespace HelloTriangleApplication
         createSwapChain(*this).unwrap();
         createImageViews(*this).unwrap();
         createDescriptorSetLayout(*this).unwrap();
+        createCommandPools(*this).unwrap();
+        createCommandBuffers(*this).unwrap();
         handlePrePipelineInitialization(*this).unwrap();
         createColorTexture(*this).unwrap();
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
-        createCommandPools(*this).unwrap();
         handlePostLoadInitialization(*this).unwrap();
         createUniformBuffers(*this).unwrap();
         createDescriptorPool(*this).unwrap();
         createDescriptorSets(*this).unwrap();
-        createCommandBuffers(*this).unwrap();
         createSyncObjects(*this).unwrap();
         createProjectionTransform(*this);
     }

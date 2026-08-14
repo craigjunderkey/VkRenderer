@@ -2,20 +2,27 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> TextureDescription::check(const StringIdMap<ImageData>& images)
+    Result<Unit, std::string> TextureDescription::check(const StringIdMap<ImageData>& images) const
     {
+        // check `dimensions`
+        if (this->image.isNull() && !this->dimensions)
+            return Err<std::string>("If `image` is null, then `dimensions` must be set.");
+        
         // check `additionalImages`
         if (this->image.isNull() && !this->additionalImages.empty())
             return Err<std::string>("If `image` is null, then `additionalImages` must be empty.");
         
-        const ImageData& imageData = images.get(this->image);
-        for (StringId layer : this->additionalImages)
+        if (!this->image.isNull())
         {
-            const ImageData& layerData = images.get(layer);
-            bool matchesDimensions = imageData.width == layerData.width
-                && imageData.height == layerData.height;
-            if (!matchesDimensions)
-                return Err<std::string>("All images in `additionalImages` must have the same dimensions as `image`.");
+            const ImageData& imageData = images.get(this->image);
+            for (StringId layer : this->additionalImages)
+            {
+                const ImageData& layerData = images.get(layer);
+                bool matchesDimensions = imageData.width == layerData.width
+                    && imageData.height == layerData.height;
+                if (!matchesDimensions)
+                    return Err<std::string>("All images in `additionalImages` must have the same dimensions as `image`.");
+            }
         }
 
         // check `numLayers`
@@ -31,17 +38,36 @@ namespace HelloTriangleApplication::Resources
 
     TextureDescription TextureDescription::defaultTexture()
     {
-        return TextureDescription
-        {
+        return TextureDescription {
+            .dimensions = {},
             .imageType = vk::ImageType::e2D,
             .viewType = vk::ImageViewType::e2D,
             .doMipmapping = true,
             .doMultisampling = false,
             .format = vk::Format::eR8G8B8A8Srgb,
             .tiling = vk::ImageTiling::eOptimal,
-            .usage = vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
+            .usageFlags = vk::ImageUsageFlagBits::eTransferSrc
+                | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
+            .memoryProperties = vk::MemoryPropertyFlagBits::eDeviceLocal,
             .aspectFlags = vk::ImageAspectFlagBits::eColor,
-            .numLayers = 1
+            .numLayers = 1,
+            .additionalImages = {}
+        };
+    }
+
+    TextureDescription TextureDescription::screenTexture(vk::Extent2D screen)
+    {
+        return TextureDescription {
+            .image = StringId::NONE,
+            .dimensions = vk::Extent3D { screen.width, screen.height, 1 },
+            .imageType = vk::ImageType::e2D,
+            .viewType = vk::ImageViewType::e2D,
+            .doMipmapping = false,
+            .doMultisampling = true,
+            .tiling = vk::ImageTiling::eOptimal,
+            .memoryProperties = vk::MemoryPropertyFlagBits::eDeviceLocal,
+            .numLayers = 1,
+            .additionalImages = {}
         };
     }
 }

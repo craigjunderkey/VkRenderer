@@ -12,15 +12,15 @@
 #include "../geometry/texture.h"
 #include "shader.h"
 
-#define REGISTER_RESOURCE_TYPE(type, resourceName) \
-private:                                        \
-    StringIdMap< type > resourceName##_;        \
-public:                                         \
-    template <>                                 \
-    StringIdMap< type >& getMap< type >()       \
-    {                                           \
-        return resourceName##_;                 \
-    }                                           \
+#define REGISTER_RESOURCE_TYPE(type, resourceName)                                          \
+private:                                                                                    \
+    StringIdMap< type > resourceName##_ { TO_STRING_LITERAL(resourceName##_resource_map) }; \
+public:                                                                                     \
+    template <>                                                                             \
+    StringIdMap< type >& getMap< type >()                                                   \
+    {                                                                                       \
+        return resourceName##_;                                                             \
+    }                                                                                       \
 
 namespace HelloTriangleApplication::Resources
 {

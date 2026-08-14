@@ -69,10 +69,13 @@ public:
 
     static const std::string& getString(StringId id)
     {
+        static constexpr std::string NONE_STRING = "NULL";
+        if (id.isNull()) return NONE_STRING;
+
         auto searchResult = strings_.find(id);
         if (searchResult == strings_.end())
         {
-            std::cerr << "Tried to find string for " << id << " but it wasn't interned.\n";
+            std::cerr << "Tried to find string for " << id.id << " but it wasn't interned.\n";
             std::exit(EXIT_FAILURE);
         }
         return searchResult->second;

@@ -12,7 +12,7 @@ namespace HelloTriangleApplication::Resources
     {
     private:
         std::vector<ResourceType> types_;
-        StringIdMap<u32> typeMap_;
+        StringIdMap<u32> typeMap_ { "resource_type_to_index_map" };
         AssetConditioningPipeline conditioningPipeline_;
         ResourceRegistry registry_;
     

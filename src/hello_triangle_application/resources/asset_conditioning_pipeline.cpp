@@ -87,7 +87,7 @@ namespace HelloTriangleApplication::Resources
         OfflineProcessingData processingData;
 
         // start tracking each resource
-        StringIdMap<AssetBuildProgress> buildProgress;
+        StringIdMap<AssetBuildProgress> buildProgress { "asset_build_progress" };
         for (const ResourceType& type : this->types_)
         {
             buildProgress.add(type.resourceName, {});
