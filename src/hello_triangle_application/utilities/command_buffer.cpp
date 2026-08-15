@@ -271,10 +271,24 @@ namespace HelloTriangleApplication::Utilities
         drawSpotLights(app, commandBuffer);
     }
 
+    void drawSkybox(App& app, const vk::raii::CommandBuffer& commandBuffer)
+    {
+        // change to skybox pipeline
+        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **app.pipelines.get("skybox"));
+
+        // draw cube
+        const Geometry::Mesh& cube = app.resources.get<Geometry::Mesh>("skybox");
+        bindMesh(commandBuffer, cube);
+        commandBuffer.drawIndexed(cube.data.numIndices, 1, 0, 0, 0);
+    }
+
     void endRender(App& app, u32 imageIndex)
     {
         const vk::raii::CommandBuffer& commandBuffer = app.graphicsQueue.commandBuffers[app.frameIndex];
 
+        // draw the skybox
+        drawSkybox(app, commandBuffer);
+        
         // draw all the lights
         drawLights(app, commandBuffer);
 

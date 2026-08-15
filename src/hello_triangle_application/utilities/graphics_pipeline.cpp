@@ -71,6 +71,14 @@ namespace HelloTriangleApplication::Utilities
         pipelineBuilder.shaderStages.clear();
         pipelineBuilder.addShaderStages(shaderModule, shader.entryPoints);
 
+        // set depth test to <=
+        pipelineBuilder.depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+
+        // build pipeline
+        auto pipelineBuildResult = pipelineBuilder.build(app);
+        CHECK_KEEP(pipelineBuildResult);
+        app.pipelines.add("skybox", pipelineBuildResult.take());
+
         return Ok();
     }
 
@@ -84,6 +92,9 @@ namespace HelloTriangleApplication::Utilities
 
         pipelineBuilder.shaderStages.clear();
         pipelineBuilder.addShaderStages(shaderModule, shader.entryPoints);
+
+        // set depth test to <
+        pipelineBuilder.depthStencilState.depthCompareOp = vk::CompareOp::eLess;
 
         // pipeline layout
         PipelineLayoutBuilder layoutBuilder;
@@ -112,6 +123,7 @@ namespace HelloTriangleApplication::Utilities
     {
         PipelineBuilder pipelineBuilder;
         CHECK(createScenePipeline(app, pipelineBuilder));
+        CHECK(createSkyboxPipeline(app, pipelineBuilder));
         CHECK(createLightDebugPipeline(app, pipelineBuilder));
         return Ok();
     }
