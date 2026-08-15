@@ -171,7 +171,8 @@ namespace HelloTriangleApplication::Utilities
 
         // begin rendering
         commandBuffer.beginRendering(renderingInfo);
-        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **app.pipeline);
+        FatPipeline& scenePipeline = app.pipelines.get("scene");
+        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **scenePipeline);
 
         // viewport and scissor are dynamic, so we must set them here
         commandBuffer.setViewport(0, vk::Viewport {
@@ -190,7 +191,7 @@ namespace HelloTriangleApplication::Utilities
 
         // bind our descriptor sets
         commandBuffer.bindDescriptorSets(
-            vk::PipelineBindPoint::eGraphics, *app.pipeline.layout, 0,
+            vk::PipelineBindPoint::eGraphics, *scenePipeline.layout, 0,
             {
                 *app.gpuMaterials.descriptorSet(),
                 *app.descriptorSets[app.frameIndex]
@@ -220,7 +221,7 @@ namespace HelloTriangleApplication::Utilities
                 .color = vec4(light.components.diffuse, 1.0f),
             };
             commandBuffer.pushConstants(
-                *app.debugLightPipeline.layout,
+                *app.pipelines.get("debug_light").layout,
                 vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
                 0, sizeof(DebugLightPushConstants), &pushConstants
             );
@@ -252,7 +253,7 @@ namespace HelloTriangleApplication::Utilities
                 .color = vec4(light.components.diffuse, 1.0f)
             };
             commandBuffer.pushConstants(
-                *app.debugLightPipeline.layout,
+                *app.pipelines.get("debug_light").layout,
                 vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
                 0, sizeof(DebugLightPushConstants), &pushConstants
             );
@@ -263,7 +264,7 @@ namespace HelloTriangleApplication::Utilities
     void drawLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
     {
         // change to debug light pipeline
-        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **app.debugLightPipeline);
+        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **app.pipelines.get("debug_light"));
         
         // draw each light
         drawPointLights(app, commandBuffer);

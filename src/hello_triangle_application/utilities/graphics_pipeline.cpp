@@ -20,7 +20,7 @@ namespace HelloTriangleApplication::Utilities
         pipelineBuilder.setDefaults(app);
         
         // make programmable stages
-        Shader& shader = app.resources.get<Shader>("shader");
+        Shader& shader = app.resources.get<Shader>("scene");
         auto moduleResult = createShaderModule(app, shader);
         CHECK_KEEP(moduleResult);
         vk::raii::ShaderModule shaderModule = moduleResult.take();
@@ -64,7 +64,7 @@ namespace HelloTriangleApplication::Utilities
         // build pipeline
         auto pipelineBuildResult = pipelineBuilder.build(app);
         CHECK_KEEP(pipelineBuildResult);
-        app.pipeline = pipelineBuildResult.take();
+        app.pipelines.add("scene", pipelineBuildResult.take());
 
         return Ok();
     }
@@ -107,7 +107,7 @@ namespace HelloTriangleApplication::Utilities
         // build pipeline
         auto pipelineBuildResult = pipelineBuilder.build(app);
         CHECK_KEEP(pipelineBuildResult);
-        app.debugLightPipeline = pipelineBuildResult.take();
+        app.pipelines.add("debug_light", pipelineBuildResult.take());
         
         return Ok();
     }

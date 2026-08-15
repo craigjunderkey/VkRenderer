@@ -1,14 +1,19 @@
 #include "../hello_triangle_application.h"
 #include "descriptor_pool.h"
 #include "uniform_buffer.h"
+#include "../render_loop/cubemap.h"
 
 namespace HelloTriangleApplication::Geometry
 {
     Result<Unit, std::string> createDescriptorPool(App& app)
     {
-        std::array<vk::DescriptorPoolSize, 1> poolSizes {
+        std::array<vk::DescriptorPoolSize, 2> poolSizes {
             vk::DescriptorPoolSize {
                 .type = vk::DescriptorType::eUniformBuffer,
+                .descriptorCount = MAX_FRAMES_IN_FLIGHT
+            },
+            vk::DescriptorPoolSize {
+                .type = vk::DescriptorType::eSampledImage,
                 .descriptorCount = MAX_FRAMES_IN_FLIGHT
             }
         };
@@ -51,7 +56,13 @@ namespace HelloTriangleApplication::Geometry
                 .range = vk::WholeSize
             };
 
-            std::array<vk::WriteDescriptorSet, 1> descriptorWrites {
+            vk::DescriptorImageInfo imageInfo {
+                .sampler = nullptr,
+                .imageView = *app.resources.get<RenderLoop::Cubemap>("skybox").texArray.view,
+                .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+            };
+
+            std::array<vk::WriteDescriptorSet, 2> descriptorWrites {
                 vk::WriteDescriptorSet {
                     .dstSet = *app.descriptorSets[i],
                     .dstBinding = 0,
@@ -59,6 +70,14 @@ namespace HelloTriangleApplication::Geometry
                     .descriptorCount = 1,
                     .descriptorType = vk::DescriptorType::eUniformBuffer,
                     .pBufferInfo = &bufferInfo
+                },
+                vk::WriteDescriptorSet {
+                    .dstSet = *app.descriptorSets[i],
+                    .dstBinding = 1,
+                    .dstArrayElement = 0,
+                    .descriptorCount = 1,
+                    .descriptorType = vk::DescriptorType::eSampledImage,
+                    .pImageInfo = &imageInfo
                 }
             };
 

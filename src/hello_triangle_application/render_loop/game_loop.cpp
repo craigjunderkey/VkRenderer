@@ -154,7 +154,7 @@ namespace HelloTriangleApplication::RenderLoop
             .normal = glm::transpose(glm::inverse(app.view * model))
         };
         commandBuffer.pushConstants(
-            *app.pipeline.layout,
+            *app.pipelines.get("scene").layout,
             vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
             0, sizeof(PushConstants), &pushConstants
         );
