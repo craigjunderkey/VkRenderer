@@ -15,7 +15,7 @@ using HelloTriangleApplication::Resources::ShaderStage;
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createDefaultPipeline(App& app, PipelineBuilder& pipelineBuilder)
+    Result<Unit, std::string> createScenePipeline(App& app, PipelineBuilder& pipelineBuilder)
     {
         pipelineBuilder.setDefaults(app);
         
@@ -25,16 +25,7 @@ namespace HelloTriangleApplication::Utilities
         CHECK_KEEP(moduleResult);
         vk::raii::ShaderModule shaderModule = moduleResult.take();
         
-        pipelineBuilder.addShaderStage(
-            vk::ShaderStageFlagBits::eVertex,
-            shaderModule,
-            shader.getEntryPoint(ShaderStage::Vertex).functionName.data()
-        );
-        pipelineBuilder.addShaderStage(
-            vk::ShaderStageFlagBits::eFragment, 
-            shaderModule,
-            shader.getEntryPoint(ShaderStage::Fragment).functionName.data()
-        );
+        pipelineBuilder.addShaderStages(shaderModule, shader.entryPoints);
 
         // vertex input
         pipelineBuilder.vertBindingDescriptions = { VertexInfo::bindingDescription() };
@@ -69,6 +60,20 @@ namespace HelloTriangleApplication::Utilities
         return Ok();
     }
 
+    Result<Unit, std::string> createSkyboxPipeline(App& app, PipelineBuilder& pipelineBuilder)
+    {
+        // make programmable stages
+        Shader& shader = app.resources.get<Shader>("skybox");
+        auto moduleResult = createShaderModule(app, shader);
+        CHECK_KEEP(moduleResult);
+        vk::raii::ShaderModule shaderModule = moduleResult.take();
+
+        pipelineBuilder.shaderStages.clear();
+        pipelineBuilder.addShaderStages(shaderModule, shader.entryPoints);
+
+        return Ok();
+    }
+
     Result<Unit, std::string> createLightDebugPipeline(App& app, PipelineBuilder& pipelineBuilder)
     {
         // make programmable stages
@@ -78,16 +83,7 @@ namespace HelloTriangleApplication::Utilities
         vk::raii::ShaderModule shaderModule = moduleResult.take();
 
         pipelineBuilder.shaderStages.clear();
-        pipelineBuilder.addShaderStage(
-            vk::ShaderStageFlagBits::eVertex,
-            shaderModule,
-            shader.getEntryPoint(ShaderStage::Vertex).functionName.data()
-        );
-        pipelineBuilder.addShaderStage(
-            vk::ShaderStageFlagBits::eFragment,
-            shaderModule,
-            shader.getEntryPoint(ShaderStage::Fragment).functionName.data()
-        );
+        pipelineBuilder.addShaderStages(shaderModule, shader.entryPoints);
 
         // pipeline layout
         PipelineLayoutBuilder layoutBuilder;
@@ -115,7 +111,7 @@ namespace HelloTriangleApplication::Utilities
     Result<Unit, std::string> createGraphicsPipeline(App& app)
     {
         PipelineBuilder pipelineBuilder;
-        CHECK(createDefaultPipeline(app, pipelineBuilder));
+        CHECK(createScenePipeline(app, pipelineBuilder));
         CHECK(createLightDebugPipeline(app, pipelineBuilder));
         return Ok();
     }

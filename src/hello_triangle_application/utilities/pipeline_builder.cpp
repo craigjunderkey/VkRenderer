@@ -2,6 +2,8 @@
 #include "pipeline_builder.h"
 #include "shader_module.h"
 
+using HelloTriangleApplication::Resources::ShaderStage;
+
 namespace HelloTriangleApplication::Utilities
 {
     void PipelineBuilder::setDefaults(App& app)
@@ -92,6 +94,48 @@ namespace HelloTriangleApplication::Utilities
                 .pName = name
             }
         );
+    }
+
+    void PipelineBuilder::addShaderStages(vk::ShaderModule shader, const std::vector<Resources::ShaderEntryPoint>& entryPoints)
+    {
+        for (const Resources::ShaderEntryPoint& entryPoint : entryPoints)
+        {
+            // get stage bit
+            vk::ShaderStageFlagBits stage;
+            switch (entryPoint.stage)
+            {
+                case ShaderStage::Vertex:
+                    stage = vk::ShaderStageFlagBits::eVertex;
+                    break;
+                case ShaderStage::Fragment:
+                    stage = vk::ShaderStageFlagBits::eFragment;
+                    break;
+                case ShaderStage::Compute:
+                    stage = vk::ShaderStageFlagBits::eCompute;
+                    break;
+                case ShaderStage::Geometry:
+                    stage = vk::ShaderStageFlagBits::eGeometry;
+                    break;
+                case ShaderStage::Hull:
+                    stage = vk::ShaderStageFlagBits::eTessellationControl;
+                    break;
+                case ShaderStage::Domain:
+                    stage = vk::ShaderStageFlagBits::eTessellationEvaluation;
+                    break;
+                case ShaderStage::RayGeneration:
+                    stage = vk::ShaderStageFlagBits::eRaygenKHR;
+                    break;
+            }
+
+            // add shader stage
+            this->shaderStages.emplace_back(
+                vk::PipelineShaderStageCreateInfo {
+                    .stage = stage,
+                    .module = shader,
+                    .pName = entryPoint.functionName.data()
+                }
+            );
+        }
     }
 
 

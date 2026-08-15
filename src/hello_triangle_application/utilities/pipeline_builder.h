@@ -1,6 +1,7 @@
 #pragma once
 #include "common.h"
 #include "vulkan_common.h"
+#include "../resources/shader.h"
 
 namespace HelloTriangleApplication { class App; }
 
@@ -49,6 +50,7 @@ namespace HelloTriangleApplication::Utilities
         void setDefaults(App& app);
         
         void addShaderStage(vk::ShaderStageFlagBits stage, vk::ShaderModule shader, Option<const char*> entryPoint = {});
+        void addShaderStages(vk::ShaderModule shader, const std::vector<Resources::ShaderEntryPoint>& entryPoints);
         Result<FatPipeline, std::string> build(App& app) const;
     };
 
