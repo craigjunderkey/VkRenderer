@@ -10,7 +10,7 @@ namespace HelloTriangleApplication::RenderLoop
     class SamplerManager
     {
     private:
-        std::array<vk::raii::Sampler, SamplerName::None> samplers_ { nullptr, nullptr };
+        std::array<vk::raii::Sampler, SamplerName::None> samplers_ { nullptr, nullptr, nullptr };
     
     public:
         Result<Unit, std::string> makeSamplers(App& app);

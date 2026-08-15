@@ -34,6 +34,20 @@ namespace HelloTriangleApplication::RenderLoop
             this->samplers_[SamplerName::MirroredRepeat] = samplerResult.take();
         }
 
+        // make clamped sampler
+        {
+            vk::SamplerCreateInfo samplerInfo = Texture::defaultSamplerInfo(app);
+            samplerInfo.addressModeU = vk::SamplerAddressMode::eClampToEdge;
+            samplerInfo.addressModeV = vk::SamplerAddressMode::eClampToEdge;
+            samplerInfo.addressModeW = vk::SamplerAddressMode::eClampToEdge;
+
+            auto samplerResult = castVkResult(app.device.createSampler(samplerInfo));
+            if (!samplerResult)
+                return Err<std::string>("Failed to create clamped sampler.");
+            
+            this->samplers_[SamplerName::Clamped] = samplerResult.take();
+        }
+
         return Ok();
     }
 

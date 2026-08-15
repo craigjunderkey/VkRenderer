@@ -6,6 +6,7 @@ namespace HelloTriangleApplication::RenderLoop
     {
         Repeat,
         MirroredRepeat,
+        Clamped,
         None
     };
 }

@@ -1,6 +1,13 @@
 #include "prelude.slang"
 #include "default_incoming_data.slang"
 
+/*
+TODO: do something more intelligent
+    e.g., set macros when compiling which reference SamplerName
+find skybox textures at https://www.humus.name/index.php?page=Textures
+*/
+#define SKYBOX_SAMPLER_INDEX 2
+
 struct VSOutput
 {
     float4 vertPos : SV_POSITION;
@@ -23,5 +30,5 @@ VSOutput vertMain(VSInput vertIn)
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_Target
 {
-    return frame.skybox.Sample(onCreate.samplers[0], vertIn.texCoords);
+    return frame.skybox.Sample(onCreate.samplers[SKYBOX_SAMPLER_INDEX], vertIn.texCoords);
 }
