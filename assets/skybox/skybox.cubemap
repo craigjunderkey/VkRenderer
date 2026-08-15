@@ -1,0 +1,8 @@
+{
+    "+x": "sb_right",
+    "-x": "sb_left",
+    "+y": "sb_top",
+    "-y": "sb_bottom",
+    "+z": "sb_front",
+    "-z": "sb_back"
+}

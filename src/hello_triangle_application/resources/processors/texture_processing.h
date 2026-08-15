@@ -1,5 +1,5 @@
 #pragma once
-#include "resource_type.h"
+#include "../resource_type.h"
 
 namespace HelloTriangleApplication::Resources
 {

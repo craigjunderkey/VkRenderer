@@ -6,7 +6,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
-#include "image_data.h"
+#include "../image_data.h"
 
 namespace HelloTriangleApplication::Resources
 {

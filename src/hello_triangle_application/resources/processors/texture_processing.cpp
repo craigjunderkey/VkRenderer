@@ -1,7 +1,7 @@
 #include "texture_processing.h"
-#include "texture_description.h"
-#include "../geometry/texture.h"
-#include "io_helper.h"
+#include "../texture_description.h"
+#include "../../geometry/texture.h"
+#include "../io_helper.h"
 
 namespace HelloTriangleApplication::Resources
 {

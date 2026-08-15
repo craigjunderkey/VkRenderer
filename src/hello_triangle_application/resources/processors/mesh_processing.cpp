@@ -1,5 +1,5 @@
 #include "mesh_processing.h"
-#include "../geometry/mesh.h"
+#include "../../geometry/mesh.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>

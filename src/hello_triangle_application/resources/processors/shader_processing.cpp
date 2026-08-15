@@ -1,8 +1,8 @@
 #include "shader_processing.h"
 #include <iostream>
 #include <fstream>
-#include "shader.h"
-#include "../render_loop/sampler_name.h"
+#include "../shader.h"
+#include "../../render_loop/sampler_name.h"
 
 #include <slang.h>
 

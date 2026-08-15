@@ -1,10 +1,11 @@
 #include "resource_types.h"
-#include "resource_loaders.h"
-#include "mesh_processing.h"
-#include "image_processing.h"
-#include "material_processing.h"
-#include "texture_processing.h"
-#include "shader_processing.h"
+#include "processors/resource_loaders.h"
+#include "processors/mesh_processing.h"
+#include "processors/image_processing.h"
+#include "processors/material_processing.h"
+#include "processors/texture_processing.h"
+#include "processors/shader_processing.h"
+#include "processors/cubemap_processing.h"
 
 namespace HelloTriangleApplication::Resources::Types
 {
@@ -144,6 +145,26 @@ namespace HelloTriangleApplication::Resources::Types
             },
             .runtime {
                 .loader = &loader
+            }
+        };
+    }
+
+    ResourceType cubemap()
+    {
+        static CubemapExporter exporter = CubemapExporter();
+        static CubemapLoader loader = CubemapLoader();
+        static CubemapInitializer initializer = CubemapInitializer();
+
+        return ResourceType {
+            .resourceName = "cubemap",
+            .resourceDirectory = "cubemaps",
+            .inFileExtensions = { ".cubemap" },
+            .offline {
+                .exporter = &exporter
+            },
+            .runtime {
+                .loader = &loader,
+                .postLoadInitializer = &initializer
             }
         };
     }

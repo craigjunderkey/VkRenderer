@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "text_data.h"
+#include "../text_data.h"
 #include <nlohmann/json.hpp>
 
 namespace HelloTriangleApplication::Resources

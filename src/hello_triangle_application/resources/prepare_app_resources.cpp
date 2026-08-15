@@ -5,6 +5,7 @@
 #include "image_data.h"
 #include "../geometry/mesh.h"
 #include "../render_loop/material.h"
+#include "../render_loop/cubemap.h"
 
 #include <chrono>
 
@@ -19,6 +20,7 @@ namespace HelloTriangleApplication::Resources
         app.resources.addResourceType(Types::material());
         app.resources.addResourceType(Types::texture());
         app.resources.addResourceType(Types::shader());
+        app.resources.addResourceType(Types::cubemap());
         return Ok();
     }
 
@@ -56,6 +58,7 @@ namespace HelloTriangleApplication::Resources
         loader.load<RenderLoop::Material>("material").unwrap();
         loader.load<Geometry::Texture>("texture").unwrap();
         loader.load<Shader>("shader").unwrap();
+        loader.load<RenderLoop::Cubemap>("cubemap").unwrap();
 
         return Ok();
     }
@@ -95,6 +98,7 @@ namespace HelloTriangleApplication::Resources
         CHECK(app.resources.registry().postLoadInitialize<Geometry::Mesh>("mesh"));
         CHECK(app.resources.registry().postLoadInitialize<Geometry::Texture>("texture"));
         CHECK(app.resources.registry().postLoadInitialize<RenderLoop::Material>("material"));
+        CHECK(app.resources.registry().postLoadInitialize<RenderLoop::Cubemap>("cubemap"));
         
         CHECK(app.resources.registry().unloadResources<ImageData>("image"));
 

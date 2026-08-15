@@ -1,5 +1,5 @@
 #include "asset_conditioning_pipeline.h"
-#include "common_resource_processors.h"
+#include "processors/common_resource_processors.h"
 #include "string_id_map.h"
 #include <chrono>
 

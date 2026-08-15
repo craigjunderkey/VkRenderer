@@ -1,6 +1,6 @@
 #pragma once
-#include "resource_type.h"
-#include "../geometry/vertex.h"
+#include "../resource_type.h"
+#include "../../geometry/vertex.h"
 
 namespace HelloTriangleApplication::Resources
 {

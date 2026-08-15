@@ -10,4 +10,5 @@ namespace HelloTriangleApplication::Resources::Types
     ResourceType material();
     ResourceType texture();
     ResourceType shader();
+    ResourceType cubemap();
 }

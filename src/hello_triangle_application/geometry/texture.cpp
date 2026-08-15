@@ -131,21 +131,36 @@ namespace HelloTriangleApplication::Geometry
         return Ok();
     }
 
-    Result<FatBuffer, std::string> makeBufferForImageCopy(App& app, const ImageData& image)
+    Result<FatBuffer, std::string> makeImageCopyBuffer(App& app, const TextureDescription& desc)
     {
+        u32 numImages = 1 + desc.additionalImages.size();
+        vk::DeviceSize imageSize = app.resources.get<ImageData>(desc.image).size();
+
         // create staging buffer
         auto bufferResult = FatBuffer::create(
-            app, image.size(), vk::BufferUsageFlagBits::eTransferSrc,
+            app, imageSize * numImages, vk::BufferUsageFlagBits::eTransferSrc,
             vk::MemoryPropertyFlagBits::eHostCoherent | vk::MemoryPropertyFlagBits::eHostVisible
         );
         CHECK_KEEP(bufferResult);
         FatBuffer stagingBuffer = bufferResult.take();
 
         // transfer image data to staging buffer
-        auto memoryMapResult = castVkResult(stagingBuffer.memory.mapMemory(0, image.size()));
+        auto memoryMapResult = castVkResult(stagingBuffer.memory.mapMemory(0, imageSize * numImages));
         CHECK_KEEP(memoryMapResult);
         void* bufferData = memoryMapResult.take();
-        memcpy(bufferData, image.pixels, image.size());
+        for (u32 i = 0; i < numImages; i++)
+        {
+            // get image
+            StringId image;
+            if (i == 0)
+                image = desc.image;
+            else
+                image = desc.additionalImages[i - 1];
+            
+            // copy image data
+            const ImageData& imageData = app.resources.get<ImageData>(image);
+            memcpy(static_cast<u8*>(bufferData) + i * imageSize, imageData.pixels, imageSize);
+        }
         stagingBuffer.memory.unmapMemory();
 
         return std::move(stagingBuffer);
@@ -219,6 +234,7 @@ namespace HelloTriangleApplication::Geometry
         
         // create GPU image
         vk::ImageCreateInfo imageCreateInfo {
+            .flags = desc.createFlags,
             .imageType = desc.imageType,
             .format = desc.format,
             .extent = layerDims,
@@ -273,7 +289,7 @@ namespace HelloTriangleApplication::Geometry
         Option<FatBuffer> copyBuffer;
         if (desc.image)
         {
-            auto bufferResult = makeBufferForImageCopy(app, app.resources.get<ImageData>(desc.image));
+            auto bufferResult = makeImageCopyBuffer(app, desc);
             CHECK_KEEP(bufferResult);
             copyBuffer = bufferResult.take();
             addBufferToImageCopyCommand(app, cmdBuffer, copyBuffer.value(), desc, texture);

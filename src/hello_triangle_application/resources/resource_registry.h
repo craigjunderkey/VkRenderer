@@ -2,7 +2,7 @@
 #include "../utilities/common.h"
 #include "resource_type.h"
 #include "string_id_map.h"
-#include "common_resource_processors.h"
+#include "processors/common_resource_processors.h"
 
 #include "text_data.h"
 #include <nlohmann/json.hpp>
@@ -11,6 +11,7 @@
 #include "../render_loop/material.h"
 #include "../geometry/texture.h"
 #include "shader.h"
+#include "../render_loop/cubemap.h"
 
 #define REGISTER_RESOURCE_TYPE(type, resourceName)                                          \
 private:                                                                                    \
@@ -90,6 +91,7 @@ namespace HelloTriangleApplication::Resources
         REGISTER_RESOURCE_TYPE(RenderLoop::Material, material)
         REGISTER_RESOURCE_TYPE(Geometry::Texture, texture)
         REGISTER_RESOURCE_TYPE(Shader, shader)
+        REGISTER_RESOURCE_TYPE(RenderLoop::Cubemap, cubemap)
 
         template <typename T>
         Result<Unit, std::string> loadResources(StringId resourceName)

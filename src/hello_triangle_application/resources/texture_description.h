@@ -22,6 +22,7 @@ namespace HelloTriangleApplication::Resources
         vk::Format format;
         vk::ImageTiling tiling;
         vk::ImageUsageFlags usageFlags;
+        vk::ImageCreateFlags createFlags;
         vk::MemoryPropertyFlags memoryProperties;
         vk::ImageAspectFlags aspectFlags;
 

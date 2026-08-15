@@ -1,7 +1,7 @@
-#include "../hello_triangle_application.h"
+#include "../../hello_triangle_application.h"
 #include "material_processing.h"
-#include "../render_loop/json_helper.h"
-#include "../render_loop/material.h"
+#include "../json_helper.h"
+#include "../../render_loop/material.h"
 #include <iostream>
 #include <fstream>
 

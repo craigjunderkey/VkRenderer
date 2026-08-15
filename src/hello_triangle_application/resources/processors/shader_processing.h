@@ -1,6 +1,6 @@
 #pragma once
-#include "../utilities/common.h"
-#include "resource_type.h"
+#include "../../utilities/common.h"
+#include "../resource_type.h"
 #include <slang-com-ptr.h>
 
 namespace slang { class IGlobalSession; class ISession; }
