@@ -70,4 +70,42 @@ namespace HelloTriangleApplication::Resources
             .additionalImages = {}
         };
     }
+
+    TextureDescription& TextureDescriptionManager::getOrAdd(StringId texture)
+    {
+        Option<TextureDescription*> desc = this->descs_.tryGet(texture);
+        if (desc)
+        {
+            return *desc.value();
+        }
+        else
+        {
+            this->descs_.add(texture, TextureDescription::defaultTexture());
+            return this->descs_.get(texture);
+        }
+    }
+
+    Result<Unit, std::string> TextureDescriptionManager::drop(StringId texture)
+    {
+        auto removeDescResult = this->descs_.tryRemove(texture);
+        auto removePathResult = this->paths_.tryRemove(texture);
+        if (!removeDescResult)
+            return Err<std::string>("Tried to drop " + std::string(texture) + " from TextureDescriptionsManager, but couldn't find it.");
+        
+        if (removePathResult)
+        {
+            std::filesystem::path path = std::move(removePathResult).value();
+            std::filesystem::remove(path);
+        }
+
+        return Ok();
+    }
+
+    Result<Unit, std::string> TextureDescriptionManager::attachPath(StringId texture, std::filesystem::path path)
+    {
+        if (!this->descs_.tryGet(texture))
+            return Err<std::string>("Tried to attach path to " + std::string(texture) + " but it's not in the description map.");
+        CHECK(this->paths_.tryAdd(texture, std::move(path)));
+        return Ok();
+    }
 }

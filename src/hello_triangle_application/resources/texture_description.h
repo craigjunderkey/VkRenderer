@@ -3,6 +3,7 @@
 #include "../utilities/vulkan_common.h"
 #include "string_id_map.h"
 #include "image_data.h"
+#include <filesystem>
 
 namespace HelloTriangleApplication { class App; }
 
@@ -41,27 +42,20 @@ namespace HelloTriangleApplication::Resources
         static TextureDescription screenTexture(vk::Extent2D screenDimensions);
     };
 
+    class TextureExporter;
+    
     class TextureDescriptionManager
-    {
+    {   
     private:
         StringIdMap<TextureDescription> descs_ { "texture_descriptions" };
+        StringIdMap<std::filesystem::path> paths_ { "texture_description_path_map" };
     
     public:
         const StringIdMap<TextureDescription>& descs() const { return this->descs_; }
         StringIdMap<TextureDescription>& descs() { return this->descs_; }
     
-        TextureDescription& getOrAdd(StringId texture)
-        {
-            Option<TextureDescription*> desc = this->descs_.tryGet(texture);
-            if (desc)
-            {
-                return *desc.value();
-            }
-            else
-            {
-                this->descs_.add(texture, TextureDescription::defaultTexture());
-                return this->descs_.get(texture);
-            }
-        }
+        TextureDescription& getOrAdd(StringId texture);
+        Result<Unit, std::string> drop(StringId texture);
+        Result<Unit, std::string> attachPath(StringId texture, std::filesystem::path path);
     };
 }

@@ -79,6 +79,30 @@ public:
         addResult.unwrap();
     }
 
+    Option<T> tryRemove(StringId id)
+    {
+        auto extractResult = this->map_.extract(id);
+        if (extractResult.empty())
+        {
+            return {};
+        }
+        else
+        {
+            return std::move(extractResult.mapped());
+        }
+    }
+
+    T remove(StringId id)
+    {
+        auto removeResult = this->tryRemove(id);
+        if (!removeResult)
+        {
+            panic("Couldn't find " + std::string(id) + " in " + std::string(this->name) + ".");
+        }
+        
+        return std::move(removeResult).value();
+    }
+
     inline void clear()
     {
         this->map_.clear();

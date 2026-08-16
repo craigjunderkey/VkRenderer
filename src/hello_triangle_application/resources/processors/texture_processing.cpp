@@ -28,8 +28,12 @@ namespace HelloTriangleApplication::Resources
         StringId name = pathToName(path);
         TextureDescription& desc = processingData.texDescs->getOrAdd(name);
         desc.image = name;
-        auto out = std::ofstream(getExportPath("textures", path, ".texdesc"));
+
+        std::filesystem::path outPath = getExportPath("textures", path, ".texdesc");
+        auto out = std::ofstream(outPath);
+        processingData.texDescs->attachPath(name, std::move(outPath));
         writeTexDesc(out, desc);
+        
         return Ok();
     }
 

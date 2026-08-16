@@ -35,6 +35,12 @@ namespace HelloTriangleApplication::Resources
         std::ofstream out(getExportPath("cubemaps", path));
         out.write(reinterpret_cast<const char*>(sides.data()), sizeof(StringId) * sides.size());
 
+        // drop sides texture descriptions so they aren't processed as textures
+        for (StringId side : sides)
+        {
+            CHECK(processingData.texDescs->drop(side));
+        }
+
         return Ok();
     }
 
