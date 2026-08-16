@@ -99,7 +99,6 @@ public:
         {
             panic("Couldn't find " + std::string(id) + " in " + std::string(this->name) + ".");
         }
-        
         return std::move(removeResult).value();
     }
 

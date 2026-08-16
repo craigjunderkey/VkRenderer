@@ -17,4 +17,17 @@ namespace HelloTriangleApplication::RenderLoop
         f32 shininess = 16.0f;
         bool isUnlit = false;
     };
+
+    struct MaterialUniformData
+    {
+        i32 diffMap     alignas(4);
+        i32 specMap     alignas(4);
+        u32 samplerId   alignas(4);
+        f32 shininess   alignas(4);
+        bool isUnlit    alignas(4);
+        vec2 texOffset  alignas(8);
+        vec2 texScale   alignas(8);
+        vec3 diffColor  alignas(16);
+        vec3 specColor  alignas(16);
+    };
 }

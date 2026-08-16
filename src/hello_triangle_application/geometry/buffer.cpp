@@ -103,4 +103,10 @@ namespace HelloTriangleApplication::Geometry
         
         return fatBufferResult.take().makeMapped();
     }
+
+    FatBuffer&& MappedBuffer::unmap()
+    {
+        this->data = nullptr;
+        return std::move(this->buffer);
+    }
 }

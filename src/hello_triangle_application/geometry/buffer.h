@@ -19,6 +19,7 @@ namespace HelloTriangleApplication::Geometry
         std::unique_ptr<std::vector<u32>> families = nullptr;
 
         vk::raii::Buffer& operator*() { return this->buffer; }
+        const vk::raii::Buffer& operator*() const { return this->buffer; }
 
         static Result<FatBuffer, std::string> create(
             App& app,
@@ -37,6 +38,7 @@ namespace HelloTriangleApplication::Geometry
         void* data = nullptr;
 
         FatBuffer& operator*() { return this->buffer; }
+        FatBuffer&& unmap();
 
         static Result<MappedBuffer, std::string> fromFatBufferResult(Result<FatBuffer, std::string>&& fatBufferResult);
     };

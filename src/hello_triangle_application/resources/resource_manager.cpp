@@ -7,7 +7,8 @@ namespace HelloTriangleApplication::Resources
     ResourceManager::ResourceManager(App& app) :
         types_({}),
         conditioningPipeline_(this->types_),
-        registry_({ this->types_, this->typeMap_ })
+        registry_({ this->types_, this->typeMap_ }),
+        bindless_(app)
     {
         this->registry_.processingData() = RuntimeProcessingData {
             .app = &app
