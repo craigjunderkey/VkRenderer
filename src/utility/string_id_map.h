@@ -1,6 +1,7 @@
 #pragma once
-#include "../utilities/common.h"
+#include "types.h"
 #include <unordered_map>
+#include <vector>
 
 template <typename T>
 class StringIdMap

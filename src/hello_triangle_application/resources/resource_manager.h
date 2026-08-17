@@ -3,7 +3,7 @@
 #include "asset_conditioning_pipeline.h"
 #include "resource_registry.h"
 #include "bindless_manager.h"
-#include "string_id_map.h"
+#include "../../utility/string_id_map.h"
 
 namespace HelloTriangleApplication { class App; }
 

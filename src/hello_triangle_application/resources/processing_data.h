@@ -1,6 +1,6 @@
 #pragma once
 #include "../utilities/common.h"
-#include "string_id_map.h"
+#include "../../utility/string_id_map.h"
 
 namespace HelloTriangleApplication { class App; }
 

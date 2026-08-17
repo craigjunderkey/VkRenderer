@@ -1,6 +1,6 @@
 #include "asset_conditioning_pipeline.h"
 #include "processors/common_resource_processors.h"
-#include "string_id_map.h"
+#include "../../utility/string_id_map.h"
 #include <chrono>
 
 namespace HelloTriangleApplication::Resources

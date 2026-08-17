@@ -1,7 +1,7 @@
 #pragma once
 #include "../utilities/common.h"
 #include "resource_type.h"
-#include "string_id_map.h"
+#include "../../utility/string_id_map.h"
 #include "processors/common_resource_processors.h"
 
 #include "text_data.h"
