@@ -149,7 +149,7 @@ namespace HelloTriangleApplication::RenderLoop
         // upload per-object data
         mat4 model = obj.transform.global();
         PushConstants pushConstants {
-            .matId = app.gpuMaterials.getMaterialId(obj.material),
+            .matId = app.resources.bindless().getIndex("material", obj.material).unwrap(),
             .model = model,
             .normal = glm::transpose(glm::inverse(app.view * model))
         };

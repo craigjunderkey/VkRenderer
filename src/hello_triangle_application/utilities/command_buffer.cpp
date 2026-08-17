@@ -193,7 +193,7 @@ namespace HelloTriangleApplication::Utilities
         commandBuffer.bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics, *scenePipeline.layout, 0,
             {
-                *app.gpuMaterials.descriptorSet(),
+                *app.resources.bindless().getDescriptorSet(),
                 *app.descriptorSets[app.frameIndex]
             },
             nullptr

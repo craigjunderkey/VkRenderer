@@ -70,14 +70,37 @@ namespace HelloTriangleApplication::Resources
 
     Result<Unit, std::string> MaterialInitializer::begin(RuntimeProcessingData& processingData)
     {
-        // write material data
         App& app = *processingData.app;
-        auto matWriteResult = app.gpuMaterials.writeMaterialData(
-            app,
-            app.resources.registry().getMap<Texture>(),
-            app.resources.registry().getMap<Material>()
-        );
-        CHECK(matWriteResult);
+        BindlessManager& bindless = app.resources.bindless();
+        
+        // get ptr vec
+        std::vector<StringId> matIdVec = app.resources.registry().getMap<RenderLoop::Material>().makeIdVec();
+        std::sort(matIdVec.begin(), matIdVec.end());
+        std::vector<const RenderLoop::Material*> matVec = app.resources.registry().getMap<RenderLoop::Material>().makePtrVec(matIdVec);
+
+        // create material uniform data
+        std::vector<RenderLoop::MaterialUniformData> matData;
+        u32 numMaterials = bindless.getBindlessResource("material").virtualCount;
+        matData.reserve(numMaterials);
+        for (u32 i = 0; i < numMaterials; i++)
+        {
+            const RenderLoop::Material* mat = matVec[i];
+            matData.push_back(RenderLoop::MaterialUniformData {
+                .diffMap = app.resources.bindless().getNullableIndex("texture", mat->diffuseTexture).unwrap(),
+                .specMap = app.resources.bindless().getNullableIndex("texture", mat->specularTexture).unwrap(),
+                .samplerId = static_cast<u32>(mat->sampler),
+                .shininess = mat->shininess,
+                .isUnlit = mat->isUnlit,
+                .texOffset = mat->texOffset,
+                .texScale = mat->texScale,
+                .diffColor = mat->diffuseColor,
+                .specColor = mat->specularColor
+            });
+        }
+
+        // buffer the material uniform data
+        Geometry::MappedBuffer& matBuffer = bindless.getBuffer("materials");
+        memcpy(matBuffer.data, matData.data(), matBuffer.buffer.size);
 
         return Ok();
     }

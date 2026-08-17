@@ -157,16 +157,6 @@ namespace HelloTriangleApplication::Resources
         // make samplers
         CHECK(app.samplers.makeSamplers(app));
         
-        // make GPU material manager
-        auto gpuMatResult = GpuMaterialManager::create(
-            app,
-            app.resources.registry().getMap<RenderLoop::Material>().size(),
-            app.resources.registry().getMap<Texture>().size(),
-            app.samplers.numSamplers()
-        );
-        CHECK_KEEP(gpuMatResult);
-        app.gpuMaterials = gpuMatResult.take();
-
         // add material buffer
         auto matBufferResult = MappedBuffer::fromFatBufferResult(
             FatBuffer::create(
@@ -186,42 +176,13 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> loadBindlessResources(App& app)
+    Result<Unit, std::string> loadAndSubmitBindlessResources(App& app)
     {
         BindlessManager& bindless = app.resources.bindless();
 
         // material
         {
-            // get ptr vec
-            std::vector<StringId> matIdVec = app.resources.registry().getMap<RenderLoop::Material>().makeIdVec();
-            std::sort(matIdVec.begin(), matIdVec.end());
-            std::vector<const RenderLoop::Material*> matVec = app.resources.registry().getMap<RenderLoop::Material>().makePtrVec(matIdVec);
-
-            // create material uniform data
-            std::vector<RenderLoop::MaterialUniformData> matData;
-            u32 numMaterials = bindless.getBindlessResource("material").virtualCount;
-            matData.reserve(numMaterials);
-            for (u32 i = 0; i < numMaterials; i++)
-            {
-                const RenderLoop::Material* mat = matVec[i];
-                matData.push_back(RenderLoop::MaterialUniformData {
-                    .diffMap = app.resources.bindless().getNullableIndex("texture", mat->diffuseTexture).unwrap(),
-                    .specMap = app.resources.bindless().getNullableIndex("texture", mat->specularTexture).unwrap(),
-                    .samplerId = static_cast<u32>(mat->sampler),
-                    .shininess = mat->shininess,
-                    .isUnlit = mat->isUnlit,
-                    .texOffset = mat->texOffset,
-                    .texScale = mat->texScale,
-                    .diffColor = mat->diffuseColor,
-                    .specColor = mat->specularColor
-                });
-            }
-
-            // buffer the material uniform data
-            Geometry::MappedBuffer& matBuffer = bindless.getBuffer("materials");
-            memcpy(matBuffer.data, matData.data(), matBuffer.buffer.size);
-
-            CHECK(bindless.load("material", { &matBuffer.buffer }));
+            CHECK(bindless.load("material", { &bindless.getBuffer("materials").buffer }));
         }
 
         // texture

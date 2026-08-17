@@ -80,7 +80,7 @@ namespace HelloTriangleApplication
         createDepthTexture(*this).unwrap();
         createGraphicsPipeline(*this).unwrap();
         handlePostLoadInitialization(*this).unwrap();
-        loadBindlessResources(*this).unwrap();
+        loadAndSubmitBindlessResources(*this).unwrap();
         createUniformBuffers(*this).unwrap();
         createDescriptorPool(*this).unwrap();
         createDescriptorSets(*this).unwrap();

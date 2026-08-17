@@ -19,7 +19,6 @@
 #include "render_loop/game_loop.h"
 #include "render_loop/camera_controller.h"
 #include "render_loop/light.h"
-#include "render_loop/gpu_material_manager.h"
 #include "render_loop/sampler_manager.h"
 #include "resources/resource_manager.h"
 
@@ -30,7 +29,6 @@ using HelloTriangleApplication::Geometry::MappedBuffer;
 using HelloTriangleApplication::Geometry::Texture;
 using HelloTriangleApplication::RenderLoop::GameLoop;
 using HelloTriangleApplication::RenderLoop::CameraController;
-using HelloTriangleApplication::RenderLoop::GpuMaterialManager;
 using HelloTriangleApplication::RenderLoop::SamplerManager;
 using HelloTriangleApplication::Input::InputManager;
 using HelloTriangleApplication::Resources::ResourceManager;
@@ -84,7 +82,6 @@ namespace HelloTriangleApplication
         // render loop
         ResourceManager resources = ResourceManager(*this);
         SamplerManager samplers = SamplerManager();
-        GpuMaterialManager gpuMaterials = GpuMaterialManager();
         GameLoop loop = GameLoop(*this);
         CameraController camera = CameraController(RenderLoop::Camera(), this->inputs);
         Environment environment = Environment();

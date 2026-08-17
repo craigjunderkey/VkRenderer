@@ -11,5 +11,5 @@ namespace HelloTriangleApplication::Resources
     Result<Unit, std::string> handleAssetBuild(App& app);
     Result<Unit, std::string> handlePrePipelineInitialization(App& app);
     Result<Unit, std::string> handlePostLoadInitialization(App& app);
-    Result<Unit, std::string> loadBindlessResources(App& app);
+    Result<Unit, std::string> loadAndSubmitBindlessResources(App& app);
 }
