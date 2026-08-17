@@ -14,6 +14,7 @@ struct PerObject
     uint matId;
     float4x4 model;
     float4x4 normal;
+    float4x4 modelView;
 };
 
 ParameterBlock<OnCreate> onCreate;
@@ -53,8 +54,8 @@ VSOutput vertMain(VSInput input)
     VSOutput output;
 
     // calculate positions
-    output.vertPos = mul(frame.projection, mul(frame.view, mul(obj.model, float4(input.inPosition, 1.0))));
-    output.vertPosView = mul(frame.view, mul(obj.model, float4(input.inPosition, 1.0)));
+    output.vertPos = mul(frame.projection, mul(obj.modelView, float4(input.inPosition, 1.0)));
+    output.vertPosView = mul(obj.modelView, float4(input.inPosition, 1.0));
 
     // calculate normal
     output.vertNormalLocal = float4(input.normal, 0.0);

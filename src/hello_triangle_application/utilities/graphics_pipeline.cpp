@@ -44,7 +44,7 @@ namespace HelloTriangleApplication::Utilities
             vk::PushConstantRange {
                 .stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
                 .offset = 0,
-                .size = sizeof(PushConstants)
+                .size = sizeof(ScenePushConstants)
             }
         };
 

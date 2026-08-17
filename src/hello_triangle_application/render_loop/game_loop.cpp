@@ -152,15 +152,16 @@ namespace HelloTriangleApplication::RenderLoop
 
         // upload per-object data
         mat4 model = obj.transform.global();
-        PushConstants pushConstants {
+        ScenePushConstants pushConstants {
             .matId = app.resources.bindless().getIndex("material", obj.material).unwrap(),
             .model = model,
-            .normal = glm::transpose(glm::inverse(app.view * model))
+            .normal = glm::transpose(glm::inverse(app.view * model)),
+            .modelView = app.view * model
         };
         commandBuffer.pushConstants(
             *app.pipelines.get("scene").layout,
             vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-            0, sizeof(PushConstants), &pushConstants
+            0, sizeof(ScenePushConstants), &pushConstants
         );
         
         // draw the damn thing
