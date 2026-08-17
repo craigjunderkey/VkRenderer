@@ -21,10 +21,10 @@ public:
 
     u32 id = NONE;
 
-    StringId() : id(NONE) {};
-    StringId(u32 id) : id(id) {};
+    constexpr StringId() : id(NONE) {};
+    constexpr StringId(u32 id) : id(id) {};
 
-    StringId(const std::string& id)
+    constexpr StringId(const std::string& id)
         : id(Crc32::hash(id.data(), id.length()))
     {
     #ifndef NDEBUG
@@ -32,7 +32,7 @@ public:
     #endif
     }
     
-    StringId(const char* id)
+    constexpr StringId(const char* id)
         : id(Crc32::hash(id))
     {
     #ifndef NDEBUG

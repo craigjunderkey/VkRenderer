@@ -82,6 +82,10 @@ namespace HelloTriangleApplication::RenderLoop
             };
             this->app_.environment.numSpotLights++;
         }
+
+        // set skybox
+        this->app_.environment.skyboxTexId = this->app_.resources.bindless().getIndex("cubemap", "skybox").unwrap();
+        this->app_.environment.skyboxSamplerId = this->app_.resources.bindless().getIndex("sampler", "clamped").unwrap();
     }
 
     void GameLoop::startFrame()

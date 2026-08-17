@@ -29,4 +29,7 @@ struct Environment
     uint numDirectionalLights;
     SpotLight spotLights[MAX_SPOT_LIGHTS];
     uint numSpotLights;
+
+    uint skyboxTexId;
+    uint skyboxSamplerId;
 };

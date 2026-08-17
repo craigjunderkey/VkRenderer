@@ -48,4 +48,6 @@ struct Environment
     u32 numDirectionalLights                                                alignas(4);
     std::array<SpotLight, MAX_SPOT_LIGHTS> spotLights                       alignas(16);
     u32 numSpotLights                                                       alignas(4);
+    u32 skyboxTexId                                                         alignas(4);
+    u32 skyboxSamplerId                                                     alignas(4);
 };

@@ -19,8 +19,8 @@ namespace HelloTriangleApplication::Resources
         app.resources.addResourceType(Types::mesh());
         app.resources.addResourceType(Types::material());
         app.resources.addResourceType(Types::texture());
-        app.resources.addResourceType(Types::shader());
         app.resources.addResourceType(Types::cubemap());
+        app.resources.addResourceType(Types::shader());
         return Ok();
     }
 
@@ -87,8 +87,8 @@ namespace HelloTriangleApplication::Resources
         loader.load<Geometry::Mesh>("mesh").unwrap();
         loader.load<RenderLoop::Material>("material").unwrap();
         loader.load<Geometry::Texture>("texture").unwrap();
-        loader.load<Shader>("shader").unwrap();
         loader.load<RenderLoop::Cubemap>("cubemap").unwrap();
+        loader.load<Shader>("shader").unwrap();
 
         return Ok();
     }
@@ -123,6 +123,20 @@ namespace HelloTriangleApplication::Resources
                 .stages = vk::ShaderStageFlagBits::eFragment
             },
             std::move(texIdVec)
+        );
+
+        // cubemap
+        std::vector<StringId> cubeIdVec = app.resources.registry().getMap<RenderLoop::Cubemap>().makeIdVec();
+        std::sort(cubeIdVec.begin(), cubeIdVec.end());
+        bindless.addBindlessResource(
+            BindlessResource {
+                .name = "cubemap",
+                .virtualCount = static_cast<u32>(cubeIdVec.size()),
+                .descriptorCount = static_cast<u32>(cubeIdVec.size()),
+                .descriptorType = vk::DescriptorType::eSampledImage,
+                .stages = vk::ShaderStageFlagBits::eFragment
+            },
+            std::move(cubeIdVec)
         );
 
         // sampler
@@ -191,6 +205,19 @@ namespace HelloTriangleApplication::Resources
             std::sort(texIdVec.begin(), texIdVec.end());
             std::vector<const Geometry::Texture*> texVec = app.resources.registry().getMap<Geometry::Texture>().makePtrVec(texIdVec);
             CHECK(bindless.load("texture", texVec));
+        }
+
+        // cubemap
+        {
+            std::vector<StringId> cubeIdVec = app.resources.registry().getMap<RenderLoop::Cubemap>().makeIdVec();
+            std::sort(cubeIdVec.begin(), cubeIdVec.end());
+            std::vector<const Geometry::Texture*> texVec;
+            texVec.reserve(cubeIdVec.size());
+            for (StringId id : cubeIdVec)
+            {
+                texVec.push_back(&app.resources.get<RenderLoop::Cubemap>(id).texArray);
+            }
+            CHECK(bindless.load("cubemap", texVec));
         }
 
         // samplers

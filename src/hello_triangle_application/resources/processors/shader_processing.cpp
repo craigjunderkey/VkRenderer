@@ -68,7 +68,8 @@ namespace HelloTriangleApplication::Resources
         auto texCountStr = std::to_string(processingData.resourceCounts.get("texture"));
         auto matCountStr = std::to_string(processingData.resourceCounts.get("material"));
         auto samplerCountStr = std::to_string(RenderLoop::SamplerName::None);
-        std::array<slang::PreprocessorMacroDesc, 3> macros {
+        auto cubeMapCountStr = std::to_string(processingData.resourceCounts.get("cubemap"));
+        std::array<slang::PreprocessorMacroDesc, 4> macros {
             slang::PreprocessorMacroDesc {
                 .name = "NUM_TEXTURES",
                 .value = texCountStr.data()
@@ -80,6 +81,10 @@ namespace HelloTriangleApplication::Resources
             slang::PreprocessorMacroDesc {
                 .name = "NUM_SAMPLERS",
                 .value = samplerCountStr.data()
+            },
+            slang::PreprocessorMacroDesc {
+                .name = "NUM_TEXCUBES",
+                .value = cubeMapCountStr.data()
             }
         };
         
