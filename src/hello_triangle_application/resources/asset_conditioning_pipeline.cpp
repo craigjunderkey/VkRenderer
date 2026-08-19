@@ -72,10 +72,9 @@ namespace HelloTriangleApplication::Resources
         data.resourceCounts.add(type.resourceName, numResources);
     }
 
-    Result<Unit, std::string> AssetConditioningPipeline::buildAssets(bool doLogging)
+    Result<Unit, std::string> AssetConditioningPipeline::buildAssets()
     {
-        if (doLogging)
-            std::cout << "Building assets\n";
+        log("resources", 0, "Building resources");
         
         this->prepareExportDirectory();
 
@@ -229,18 +228,17 @@ namespace HelloTriangleApplication::Resources
         }
 
         // log build duration
-        if (doLogging)
+        std::stringstream buildOut;
+        buildOut << "\n\ttype\texport\tcompile\tlink\ttotal\n";
+        for (const ResourceType& type : this->types_)
         {
-            std::cout << "\ttype\texport\tcompile\tlink\ttotal\n";
-            for (const ResourceType& type : this->types_)
-            {
-                const auto& stats = buildProgress.get(type.resourceName);
-                std::chrono::milliseconds resTotal = stats.exportTime + stats.compileTime + stats.linkTime;
-                std::cout << "\t" << type.resourceName << "\t" << stats.exportTime
-                    << "\t" << stats.compileTime << "\t" << stats.linkTime
-                    << "\t" << resTotal << "\n";
-            }
+            const auto& stats = buildProgress.get(type.resourceName);
+            std::chrono::milliseconds resTotal = stats.exportTime + stats.compileTime + stats.linkTime;
+            buildOut << "\t" << type.resourceName << "\t" << stats.exportTime
+                << "\t" << stats.compileTime << "\t" << stats.linkTime
+                << "\t" << resTotal << "\n";
         }
+        log("resources", 0, buildOut.str());
 
         return Ok();
     }

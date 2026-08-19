@@ -15,13 +15,11 @@ namespace HelloTriangleApplication
         struct AssetBuild
         {
             BuildOption buildOption;
-            bool doBuildLogging;
         };
     }
 
     struct RuntimeConfig
     {
         Setting::AssetBuild assetBuild;
-        bool logAssetBuild;
     };
 }

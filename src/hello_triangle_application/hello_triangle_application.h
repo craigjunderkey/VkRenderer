@@ -91,6 +91,7 @@ namespace HelloTriangleApplication
         Texture colorTexture;
 
     private:
+        void initLogger();
         void initResources();
         void initWindow();
         void initVulkan();

@@ -28,11 +28,13 @@ namespace HelloTriangleApplication::Resources
     {
     private:
         ResourceRegistry& registry_;
+        std::stringstream loadOut_;
     
     public:
         LogLoader(ResourceRegistry& registry) : registry_(registry)
         {
-            std::cout << "Loading resources\n";
+            log("resources", 0, "Loading resources");
+            loadOut_ << "\n";
         }
 
         template <typename T>
@@ -42,8 +44,13 @@ namespace HelloTriangleApplication::Resources
             CHECK(this->registry_.loadResources<T>(resourceName));
             auto stop = std::chrono::high_resolution_clock::now();
             auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-            std::cout << "\t" << resourceName.string() << "\t\t" << this->registry_.getMap<T>().size() << "\t" << ms << std::endl;
+            loadOut_ << "\t" << resourceName.string() << "\t\t" << this->registry_.getMap<T>().size() << "\t" << ms << std::endl;
             return Ok();
+        }
+
+        ~LogLoader()
+        {
+            log("resources", 0, this->loadOut_.str());
         }
     };
 
@@ -66,12 +73,11 @@ namespace HelloTriangleApplication::Resources
 
         if (shouldBuild)
         {
-            CHECK(app.resources.conditioningPipeline().buildAssets(App::RUNTIME_CONFIG.assetBuild.doBuildLogging));
+            CHECK(app.resources.conditioningPipeline().buildAssets());
         }
         else
         {
-            if (App::RUNTIME_CONFIG.assetBuild.doBuildLogging)
-                std::cout << "Skipped asset build\n";
+            log("engine", 0, "Skipped asset build");
         }
 
         return Ok();

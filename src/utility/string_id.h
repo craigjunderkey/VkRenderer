@@ -11,7 +11,7 @@ struct StringId
 private:
     static std::unordered_map<u32, std::string> strings_;
 
-    static void internStringPrehashed(const char* string, u32 hash)
+    static void internStringPrehashed(std::string_view string, u32 hash)
     {
         strings_.try_emplace(hash, string);
     }
@@ -24,22 +24,30 @@ public:
     constexpr StringId() : id(NONE) {};
     constexpr StringId(u32 id) : id(id) {};
 
-    constexpr StringId(const std::string& id)
-        : id(Crc32::hash(id.data(), id.length()))
+    constexpr StringId(std::string_view string)
+        : id(Crc32::hash(string.data(), string.length()))
     {
     #ifndef NDEBUG
-        internStringPrehashed(id.data(), this->id);
+        internStringPrehashed(string, this->id);
     #endif
     }
-    
-    constexpr StringId(const char* id)
-        : id(Crc32::hash(id))
+
+    constexpr StringId(const char* string)
+        : id(Crc32::hash(string))
     {
     #ifndef NDEBUG
-        internStringPrehashed(id, this->id);
+        internStringPrehashed(string, this->id);
     #endif
     }
-    
+
+    constexpr StringId(const std::string& string)
+        : id(Crc32::hash(string.data(), string.length()))
+    {
+    #ifndef NDEBUG
+        internStringPrehashed(string, this->id);
+    #endif
+    }
+        
     constexpr operator u32() const
     {
         return this->id;

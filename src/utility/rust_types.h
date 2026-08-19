@@ -12,30 +12,15 @@ inline Unit Ok()
 
 
 // control flow
-inline void err(std::string message)
-{
-    std::cerr << "ERROR: " << message << std::endl;
-}
-
 inline void panic(std::string message)
 {
-    err(message);
+    std::cerr << "ERROR: " << message << std::endl;
     std::exit(EXIT_FAILURE);
 }
 
 inline void panic()
 {
     std::exit(EXIT_FAILURE);
-}
-
-inline void println(const char* message)
-{
-    std::cout << message << std::endl;
-}
-
-inline void warn(std::string message)
-{
-    std::cerr << "WARNING: " << message << std::endl;
 }
 
 
