@@ -22,8 +22,8 @@
 #include "resources/prepare_app_resources.h"
 #include "resources/image_data.h"
 
-#define ENABLE_STATIC_LOGGING
 #include "../utility/log.h"
+#include "../utility/log_utils.h"
 
 using namespace HelloTriangleApplication::Utilities;
 using namespace HelloTriangleApplication::Geometry;
@@ -50,7 +50,7 @@ namespace HelloTriangleApplication
 
     void App::initLogger()
     {
-        logger = new Log::Logger(
+        Log::logger = new Log::Logger(
             std::make_shared<Log::LoggingContext>(Log::LoggingContext(
                 2,
                 { "engine", "resources", "vulkan", "game_loop" }

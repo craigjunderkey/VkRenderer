@@ -4,7 +4,7 @@
 #include "../../utility/macros.h"
 #include "../../utility/helper_funcs.h"
 #include "../../utility/vector_ops.h"
-#define ENABLE_STATIC_LOGGING
 #include "../../utility/log.h"
+#include "../../utility/log_utils.h"
 #include "../app_config.h"
 #include "../runtime_config.h"

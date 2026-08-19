@@ -6,12 +6,14 @@
 #include <memory>
 #include <initializer_list>
 
+#define LOG_BUFFER_SIZE 256
+
 namespace Log
 {
     struct LoggingContext
     {
         u32 maxVerbosity;
-        std::array<char, 256> buffer;
+        std::array<char, LOG_BUFFER_SIZE> buffer;
         StringIdMap<std::string_view> channels { "log_channels" };
 
         LoggingContext(u32 maxVerbosity, std::initializer_list<std::string_view> channelNames);
@@ -112,75 +114,3 @@ namespace Log
         }
     };
 }
-
-#ifdef ENABLE_STATIC_LOGGING
-
-static Log::Logger* logger;
-
-template <typename... Args>
-void log(StringId channel, u32 verbosity, std::format_string<Args...> format, Args&&... args)
-{
-    logger->logTyped(Log::LogMessageType::Log, channel, verbosity, std::move(format), std::forward<Args>(args)...);
-}
-
-inline void log(StringId channel, u32 verbosity, const std::string& msg)
-{
-    logger->logTyped(Log::LogMessageType::Log, channel, verbosity, msg);
-}
-
-template <typename... Args>
-void dbglog(std::format_string<Args...> format, Args&&... args)
-{
-    logger->logTyped(Log::LogMessageType::Log, {}, 0, std::move(format), std::forward<Args>(args)...);
-}
-
-inline void dbglog(const std::string& msg)
-{
-    logger->logTyped(Log::LogMessageType::Log, {}, 0, msg);
-}
-
-template <typename... Args>
-void err(StringId channel, u32 verbosity, std::format_string<Args...> format, Args&&... args)
-{
-    logger->logTyped(Log::LogMessageType::Error, channel, verbosity, std::move(format), std::forward<Args>(args)...);
-}
-
-inline void err(StringId channel, u32 verbosity, const std::string& msg)
-{
-    logger->logTyped(Log::LogMessageType::Error, channel, verbosity, msg);
-}
-
-template <typename... Args>
-void dbgerr(std::format_string<Args...> format, Args&&... args)
-{
-    logger->logTyped(Log::LogMessageType::Error, {}, 0, std::move(format), std::forward<Args>(args)...);
-}
-
-inline void dbgerr(const std::string& msg)
-{
-    logger->logTyped(Log::LogMessageType::Error, {}, 0, msg);
-}
-
-template <typename... Args>
-void warn(StringId channel, u32 verbosity, std::format_string<Args...> format, Args&&... args)
-{
-    logger->logTyped(Log::LogMessageType::Warning, channel, verbosity, std::move(format), std::forward<Args>(args)...);
-}
-
-inline void warn(StringId channel, u32 verbosity, const std::string& msg)
-{
-    logger->logTyped(Log::LogMessageType::Warning, channel, verbosity, msg);
-}
-
-template <typename... Args>
-void dbgwarn(std::format_string<Args...> format, Args&&... args)
-{
-    logger->logTyped(Log::LogMessageType::Warning, {}, 0, std::move(format), std::forward<Args>(args)...);
-}
-
-inline void dbgwarn(const std::string& msg)
-{
-    logger->logTyped(Log::LogMessageType::Warning, {}, 0, msg);
-}
-
-#endif
