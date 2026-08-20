@@ -3,7 +3,6 @@
 struct Wisdom
 {
     u32 numbers[16];
-    Wisdom() = delete;
     Wisdom(u32 num)
     {
         for (u32 i = 0; i < 16; i++)
@@ -15,13 +14,12 @@ struct Wisdom
 
 int main()
 {
-    ObjectPool<Wisdom> pool = ObjectPool<Wisdom>(4, true);
-    Wisdom* wisdoms[5];
-    for (u32 i = 0; i < 4; i++)
+    ObjectPool<Wisdom> pool = ObjectPool<Wisdom>(4, true, "wisdom_pool");
+    PoolPtr<Wisdom> wisdoms[5];
+    for (u32 i = 0; i < 5; i++)
     {
-        wisdoms[i] = new(pool.alloc()) Wisdom(i + 1);
+        wisdoms[i] = pool.alloc(Wisdom(i + 1));
     }
-    wisdoms[4] = new(pool.alloc()) Wisdom(5);
     for (u32 i = 0; i < 5; i++)
     {
         for (u32 j = 0; j < 16; j++)
@@ -30,10 +28,11 @@ int main()
         }
         std::cout << "\n";
     }
-    for (u32 i = 0; i < 5; i++)
-    {
-        pool.free(wisdoms[i]);
-    }
+    pool.free(wisdoms[3]);
+    // for (u32 i = 0; i < 5; i++)
+    // {
+    //     pool.free(wisdoms[i]);
+    // }
 }
 
 // #include "hello_triangle_application/hello_triangle_application.h"
