@@ -33,7 +33,7 @@ namespace HelloTriangleApplication::Resources
     public:
         LogLoader(ResourceRegistry& registry) : registry_(registry)
         {
-            log("resources", 0, "Loading resources");
+            log({ .channel = "resources" }, "Loading resources");
             loadOut_ << "\n";
         }
 
@@ -50,7 +50,7 @@ namespace HelloTriangleApplication::Resources
 
         ~LogLoader()
         {
-            log("resources", 0, this->loadOut_.str());
+            log({ .channel = "resources" }, this->loadOut_.str());
         }
     };
 
@@ -77,7 +77,7 @@ namespace HelloTriangleApplication::Resources
         }
         else
         {
-            log("engine", 0, "Skipped asset build");
+            log({ .channel = "engine" }, "Skipped asset build");
         }
 
         return Ok();

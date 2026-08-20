@@ -29,6 +29,7 @@ using namespace HelloTriangleApplication::Utilities;
 using namespace HelloTriangleApplication::Geometry;
 using namespace HelloTriangleApplication::RenderLoop;
 using namespace HelloTriangleApplication::Resources;
+using namespace LogUtils;
 
 namespace HelloTriangleApplication
 {
@@ -50,13 +51,13 @@ namespace HelloTriangleApplication
 
     void App::initLogger()
     {
-        Log::logger = new Log::Logger(
+        setGlobalLogger(new Log::Logger(
             std::make_shared<Log::LoggingContext>(Log::LoggingContext(
                 2,
                 { "engine", "resources", "vulkan", "game_loop" }
             )),
             std::make_unique<Log::ConsoleOutput>()
-        );
+        ));
     }
 
     void App::initResources()
@@ -78,7 +79,7 @@ namespace HelloTriangleApplication
 
     void App::initVulkan()
     {
-        log("engine", 0, "Initializing Vulkan");
+        log({ .channel = "engine" }, "Initializing Vulkan");
 
         createInstance(*this).unwrap();
         createSurface(*this).unwrap();
@@ -105,7 +106,7 @@ namespace HelloTriangleApplication
 
     void App::mainLoop()
     {
-        log("engine", 0, "Entering main loop");
+        log({ .channel = "engine" }, "Entering main loop");
         
         this->loop.initialize();
         this->camera.registerControls();
@@ -141,7 +142,7 @@ namespace HelloTriangleApplication
 
     void App::cleanup()
     {
-        log("engine", 0, "Cleaning up");
+        log({ .channel = "engine" }, "Cleaning up");
 
         this->resources.registry().shutdown().unwrap();
         glfwTerminate();

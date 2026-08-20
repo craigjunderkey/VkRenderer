@@ -12,47 +12,51 @@ namespace Log
         }
     }
 
-    void ConsoleOutput::log(LogMessageType type, Option<std::string_view> channel, std::string_view formattedMessage)
+    void ConsoleOutput::log(LogMessageDetails details, std::string_view message)
     {
-        if (channel)
+        if (details.channel != StringId::NONE)
         {
-            switch (type)
+            switch (details.type)
             {
                 case LogMessageType::Log:
-                    std::cout << "    (" << channel.value() << ") " << formattedMessage << "\n";
+                    std::cout << "    (" << details.channel << ") " << message << "\n";
                     break;
                 case LogMessageType::Error:
-                    std::cerr << "\x1B[31m[!] (" << channel.value() << ") " << formattedMessage << "\x1B[0m\n";
+                    std::cerr << "\x1B[31m[!] (" << details.channel << ") " << message << "\x1B[0m\n";
                     break;
                 case LogMessageType::Warning:
-                    std::cerr << "\x1B[33m[?] (" << channel.value() << ") " << formattedMessage << "\x1B[0m\n";
+                    std::cerr << "\x1B[33m[?] (" << details.channel << ") " << message << "\x1B[0m\n";
                     break;
             }
         }
         else
         {
-            switch (type)
+            switch (details.type)
             {
                 case LogMessageType::Log:
-                    std::cout << "    " << formattedMessage << "\n";
+                    std::cout << "    " << message << "\n";
                     break;
                 case LogMessageType::Error:
-                    std::cout << "\x1B[31m[!] " << formattedMessage << "\x1B[0m\n";
+                    std::cout << "\x1B[31m[!] " << message << "\x1B[0m\n";
                     break;
                 case LogMessageType::Warning:
-                    std::cout << "\x1B[33m[?] " << formattedMessage << "\x1B[0m\n";
+                    std::cout << "\x1B[33m[?] " << message << "\x1B[0m\n";
                     break;
             }
         }
     }
 
-    void Logger::logFormatted(LogMessageType type, Option<std::string_view> channel, u32 verbosity, std::string_view formattedMessage)
+    void Logger::log(LogMessageDetails details, std::string_view message)
     {
         assert(this->output_ != nullptr);
-        if (verbosity <= this->verbosity_)
-            this->output_->log(type, channel, formattedMessage);
+        if (details.verbosity <= this->verbosity_)
+        {
+            this->output_->log(details, message);
+        }
         if (this->forwardTo_)
-            this->forwardTo_->logFormatted(type, channel, verbosity, formattedMessage);
+        {
+            this->forwardTo_->log(std::move(details), std::move(message));
+        }
     }
 
     Logger::Logger(std::shared_ptr<LoggingContext> context, std::unique_ptr<LoggerOutput> output)
@@ -62,13 +66,13 @@ namespace Log
         this->verbosity_ = this->context_->maxVerbosity;
     }
 
-    Logger& Logger::forwardTo(Logger& other)
+    Logger& Logger::forwardTo(std::unique_ptr<Logger> other)
     {
-        assert(other.context_ == this->context_);
+        assert(other->context_ == this->context_);
         if (this->forwardTo_)
-            this->forwardTo_->forwardTo(other);
+            this->forwardTo_->forwardTo(std::move(other));
         else
-            this->forwardTo_ = &other;
+            this->forwardTo_ = std::move(other);
         return *this;
     }
 
@@ -77,13 +81,5 @@ namespace Log
         assert(verbosity <= this->context_->maxVerbosity);
         this->verbosity_ = verbosity;
         return *this;
-    }
-
-    void Logger::logTyped(LogMessageType type, StringId channel, u32 verbosity, const std::string& msg)
-    {
-        if (channel.isNull())
-            this->logFormatted(type, {}, verbosity, msg);
-        else
-            this->logFormatted(type, this->context_->channels.get(channel), verbosity, msg);
     }
 }

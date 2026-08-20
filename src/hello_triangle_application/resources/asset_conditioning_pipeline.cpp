@@ -74,7 +74,7 @@ namespace HelloTriangleApplication::Resources
 
     Result<Unit, std::string> AssetConditioningPipeline::buildAssets()
     {
-        log("resources", 0, "Building resources");
+        log({ .channel = "resources" }, "Building resources");
         
         this->prepareExportDirectory();
 
@@ -238,7 +238,7 @@ namespace HelloTriangleApplication::Resources
                 << "\t" << stats.compileTime << "\t" << stats.linkTime
                 << "\t" << resTotal << "\n";
         }
-        log("resources", 0, buildOut.str());
+        log({ .channel = "resources" }, buildOut.str());
 
         return Ok();
     }

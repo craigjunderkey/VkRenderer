@@ -132,10 +132,10 @@ namespace HelloTriangleApplication::Resources
         bool success = tinyobj::LoadObj(&attributes, &shapes, &materials, &warnText, &errText, path.c_str());
         
         if (!warnText.empty())
-            warn("resources", 0, warnText);
+            warn({ .channel = "resources" }, warnText);
 
         if (!errText.empty())
-            err("resources", 0, errText);
+            err({ .channel = "resources" }, errText);
 
         if (!success)
             return Err<std::string>(errText);

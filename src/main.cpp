@@ -1,4 +1,7 @@
 #include "utility/object_pool.h"
+#include "utility/log_utils.h"
+
+using namespace LogUtils;
 
 struct Wisdom
 {
@@ -29,6 +32,23 @@ int main()
         std::cout << "\n";
     }
     pool.free(wisdoms[3]);
+
+
+    setGlobalLogger(new Log::Logger(
+        std::make_shared<Log::LoggingContext>(Log::LoggingContext(
+            2,
+            { "engine", "resources", "vulkan", "game_loop" }
+        )),
+        std::make_unique<Log::ConsoleOutput>()
+    ));
+
+    log({}, "Life is le beautiful");
+    log({}, "Life is le beautiful, {}", "bro");
+    getGlobalLogger().log({}, "Life is le beautiful");
+    getGlobalLogger().log({}, "Life is le beautiful, {}", "bro");
+    warn({}, "Warning {}", 1);
+    err({}, "Err {}", 2);
+
     // for (u32 i = 0; i < 5; i++)
     // {
     //     pool.free(wisdoms[i]);

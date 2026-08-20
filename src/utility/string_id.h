@@ -53,9 +53,14 @@ public:
         return this->id;
     }
     
-    bool operator==(const StringId& other) const
+    constexpr bool operator==(const StringId& other) const
     {
         return this->id == other.id;
+    }
+
+    constexpr bool operator==(u32 other) const
+    {
+        return this->id == other;
     }
 
     constexpr operator bool() const
@@ -63,7 +68,7 @@ public:
         return this->id != NONE;
     }
     
-    bool isNull() const
+    constexpr bool isNull() const
     {
         return this->id == NONE;
     }

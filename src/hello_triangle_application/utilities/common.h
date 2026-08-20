@@ -8,3 +8,5 @@
 #include "../../utility/log_utils.h"
 #include "../app_config.h"
 #include "../runtime_config.h"
+
+using namespace LogUtils;

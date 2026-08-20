@@ -63,6 +63,10 @@ public:
 
     Result<Unit, std::string> tryAdd(StringId id, T item)
     {
+        if (id == StringId::NONE)
+            return Err<std::string>("Tried to add a mapping for StringId::NONE to " + std::string(this->name)
+                + "; this value is reserved for null/empty values.");
+
         auto insertResult = this->map_.insert({id, std::move(item)});
         if (!insertResult.second)
         {

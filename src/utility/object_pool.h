@@ -61,6 +61,11 @@ public:
         return this->ptr_;
     }
 
+    constexpr operator bool() const
+    {
+        return this->ptr_ != nullptr;
+    }
+
     constexpr T* get() const
     {
         return this->ptr_;
