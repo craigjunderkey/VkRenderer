@@ -98,8 +98,7 @@ namespace HelloTriangleApplication::RenderLoop
                 return;
             this->config.xzSpeed = newSpeed;
             
-            if (this->config.logCameraChanges)
-                std::cout << "Camera xz-speed changed to " << this->config.xzSpeed << std::endl;
+            log({ .channel = "game_loop", .verbosity = 2 }, "Camera xz-speed changed to {}", this->config.xzSpeed);
             
             return;
         }
@@ -113,8 +112,7 @@ namespace HelloTriangleApplication::RenderLoop
                 return;
             this->config.ySpeed = newSpeed;
 
-            if (this->config.logCameraChanges)
-                std::cout << "Camera y-speed changed to " << this->config.ySpeed << std::endl;
+            log({ .channel = "game_loop", .verbosity = 2 }, "Camera y-speed changed to {}", this->config.ySpeed);
             
             return;
         }
@@ -125,17 +123,13 @@ namespace HelloTriangleApplication::RenderLoop
         if (this->inputs_.keyboard().pressed("cam_change_mode"))
         {
             this->config.followMouseStyle = !this->config.followMouseStyle;
-            
-            if (this->config.logCameraChanges)
+            if (this->config.followMouseStyle)
             {
-                if (this->config.followMouseStyle)
-                {
-                    std::cout << "Camera now following mouse\n";
-                }
-                else
-                {
-                    std::cout << "Camera no longer following mouse\n";
-                }
+                log({ .channel = "game_loop", .verbosity = 2 }, "Camera now following mouse");
+            }
+            else
+            {
+                log({ .channel = "game_loop", .verbosity = 2 }, "Camera no longer following mouse");
             }
         }
     }

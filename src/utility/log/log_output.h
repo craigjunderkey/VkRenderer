@@ -17,7 +17,7 @@ namespace Log
     private:
         std::filesystem::path logDirectory_;
         std::ofstream globalLogFile_;
-        StringIdMap<std::ofstream> logFiles_;
+        StringIdMap<std::ofstream> logFiles_ { "log_files" };
         std::array<char, 8> timeBuffer_;
 
     public:

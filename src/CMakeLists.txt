@@ -35,6 +35,7 @@ target_precompile_headers(
         <filesystem>
         <fstream>
         <memory>
+        <concepts>
         <vulkan/vulkan_raii.hpp>
         <vulkan/vulkan_to_string.hpp>
         <slang.h>

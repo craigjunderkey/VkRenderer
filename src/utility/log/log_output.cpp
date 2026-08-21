@@ -32,20 +32,6 @@ namespace Log
                 break;
         }
     }
-
-    void Logger::log(LogMessageDetails details, std::string_view message)
-    {
-        assert(this->output_ != nullptr);
-        assert(this->context_ != nullptr && this->context_->hasChannel(details.channel));
-        if (details.verbosity <= this->verbosity && this->filter.containsChannel(*this->context_, details.channel))
-        {
-            this->output_->log(details, message);
-        }
-        if (this->forwardTo_)
-        {
-            this->forwardTo_->log(std::move(details), std::move(message));
-        }
-    }
     
     FileOutput::FileOutput(std::filesystem::path logDirectory)
         : logDirectory_(logDirectory)
@@ -59,7 +45,7 @@ namespace Log
         std::filesystem::create_directory(this->logDirectory_);
 
         // create log files
-        this->globalLogFile_ = std::ofstream(this->logDirectory_ / "_global.log");
+        this->globalLogFile_ = std::ofstream(this->logDirectory_ / "_all.log");
         this->globalLogFile_ << "all channels" << std::endl;
         for (u32 i = 0; i < context.numChannels(); i++)
         {
@@ -105,16 +91,20 @@ namespace Log
 
     void FileOutput::log(LogMessageDetails details, std::string_view message)
     {
+        // get time string
         auto timeFmtResult = std::format_to_n(
             this->timeBuffer_.begin(),
             this->timeBuffer_.size(),
             "{:%T}",
             std::chrono::system_clock::now()
         );
-        
         std::string_view time = std::string_view(this->timeBuffer_.data(), this->timeBuffer_.size());
         
+        // log the message with time included
         fileLog(this->globalLogFile_, details, message, time, true);
-        fileLog(this->logFiles_.get(details.channel), details, message, time, false);
+        if (details.channel != StringId::NONE)
+        {
+            fileLog(this->logFiles_.get(details.channel), details, message, time, false);
+        }
     }
 }

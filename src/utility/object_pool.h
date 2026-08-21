@@ -68,12 +68,27 @@ public:
         return this->ptr_;
     }
 
+    constexpr const T* operator->() const
+    {
+        return this->ptr_;
+    }
+
     constexpr T operator*()
     {
         return *this->ptr_;
     }
 
-    constexpr operator T*() const
+    constexpr const T operator*() const
+    {
+        return *this->ptr_;
+    }
+
+    constexpr operator T*()
+    {
+        return this->ptr_;
+    }
+
+    constexpr operator const T*() const
     {
         return this->ptr_;
     }
@@ -83,7 +98,12 @@ public:
         return this->ptr_ != nullptr;
     }
 
-    constexpr T* get() const
+    constexpr T* get()
+    {
+        return this->ptr_;
+    }
+    
+    constexpr const T* get() const
     {
         return this->ptr_;
     }

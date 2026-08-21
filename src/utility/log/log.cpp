@@ -22,7 +22,7 @@ namespace Log
 
     bool LoggingContext::hasChannel(StringId channel) const
     {
-        return this->getChannelIndex(channel).has_value();
+        return channel == StringId::NONE || this->getChannelIndex(channel).has_value();
     }
 
     Option<u32> LoggingContext::getChannelIndex(StringId channel) const
@@ -45,6 +45,22 @@ namespace Log
         assert(this->output_ != nullptr);
         this->output_->init(*this->context_);
         this->verbosity = this->context_->maxVerbosity;
+    }
+
+    void Logger::log(LogMessageDetails details, std::string_view message)
+    {
+        assert(this->output_ != nullptr);
+        assert(this->context_ != nullptr);
+        assert(this->context_->hasChannel(details.channel));
+
+        if (details.verbosity <= this->verbosity || this->filter.containsChannel(*this->context_, details.channel))
+        {
+            this->output_->log(details, message);
+        }
+        if (this->forwardTo_)
+        {
+            this->forwardTo_->log(std::move(details), std::move(message));
+        }
     }
 
     Logger* Logger::forwardTo(std::unique_ptr<Logger> other)
@@ -93,6 +109,8 @@ namespace Log
 
     bool LogFilter::containsChannel(LoggingContext& context, StringId id) const
     {
+        if (id == StringId::NONE)
+            return true;
         Option<u32> index = context.getChannelIndex(id);
         if (!index)
             std::cerr << "ERROR: " << id << " not in logging context channels.\n";
@@ -103,8 +121,13 @@ namespace Log
     BufferedLogMessage&& BufferedLogMessage::setText(std::string_view message)
     {
         memcpy(this->buffer_->data(), message.data(), message.size());
-        this->text_ = std::string_view(this->buffer_->data(), message.size());
+        this->buffer_->data()[message.size()] = '\0';
         return std::move(*this);
+    }
+
+    std::string_view BufferedLogMessage::getText() const
+    {
+        return std::string_view(this->buffer_->data());
     }
 
     BufferedLogMessage LoggingContext::makeBufferedMessage(LogMessageDetails details)

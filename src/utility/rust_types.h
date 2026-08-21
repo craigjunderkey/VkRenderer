@@ -1,6 +1,7 @@
 #pragma once
 #include <expected>
 #include <iostream>
+#include <concepts>
 
 // unit
 struct Unit {};
@@ -11,9 +12,9 @@ inline Unit Ok()
 
 
 // control flow
-inline void panic(std::string message)
+inline void panic(std::string_view message)
 {
-    std::cerr << "ERROR: " << message << std::endl;
+    std::cerr << "\x1B[31mERROR: " << message << "\x1B[0m\n";
     std::exit(EXIT_FAILURE);
 }
 
@@ -23,12 +24,44 @@ inline void panic()
 }
 
 
+// error
+template<typename E>
+concept IErrorReporter = requires(E error) {
+    error.reportError();
+    std::convertible_to<E, std::string_view>;
+};
+
+template<typename E>
+void reportError(E& error) requires IErrorReporter<E>
+{
+    error.reportError();
+}
+
+template<typename E>
+void reportError(E& error) requires std::convertible_to<E, std::string_view>
+{
+    std::cerr << "\x1B[31mERROR: " << static_cast<std::string_view>(error) << "\x1B[0m\n";
+}
+
+template<typename E>
+void reportError(E& error)
+{
+    std::cerr << "\x1B[31mERROR (no additional info provided)\x1B[0m\n";
+}
+
 // result
 template <typename T, typename E>
 class Result
 {
 private:
     std::expected<T, E> val_;
+
+    void useError()
+    {
+        assert(!this->val_.has_value());
+        reportError<E>(this->val_.error());
+        panic();
+    }
 
 public:
     
@@ -47,7 +80,7 @@ public:
     T&& unwrap()
     {
         if (!this->val_)
-            panic(std::format("{}", this->val_.error()));
+            this->useError();
 
         return std::move(this->val_).value();
     }
@@ -55,7 +88,7 @@ public:
     T&& expect(const char* message)
     {
         if (!this->val_)
-            panic(std::format("{}", this->val_.error()));
+            this->useError();
         
         return std::move(this->val_).value();
     }
@@ -64,7 +97,7 @@ public:
     {
         #ifdef NDEBUG
         if (!this->val_)
-            panic(std::format("{}", this->val_.error()));
+            this->useError();
         #endif
 
         return std::move(this->val_).value();

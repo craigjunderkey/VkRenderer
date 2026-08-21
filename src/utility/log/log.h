@@ -57,7 +57,6 @@ namespace Log
     struct BufferedLogMessage
     {
     private:
-        std::string_view text_;
         PoolPtr<LogBuffer> buffer_ = PoolPtr<LogBuffer>();
 
     public:
@@ -81,15 +80,14 @@ namespace Log
                 std::forward<Args>(args)...
             );
             (*this->buffer_.get())[fmtResult.size] = '\0';
-            this->text_ = std::string_view(this->buffer_->data(), fmtResult.size);
             return std::move(*this);
         }
         
         // copies contents of `text` into this's buffer
         BufferedLogMessage&& setText(std::string_view text);
 
-        std::string_view getText() const { return this->text_; }
-        constexpr operator std::string_view() { return this->text_; }
+        std::string_view getText() const;
+        constexpr operator std::string_view() const { return this->getText(); }
     };
 
     using Message = BufferedLogMessage;

@@ -52,13 +52,24 @@ namespace HelloTriangleApplication
 
     void App::initLogger()
     {
-        setGlobalLogger(new Log::Logger(
-            std::make_shared<Log::LoggingContext>(Log::LoggingContext(
+        auto logContext = std::make_shared<Log::LoggingContext>(
+            Log::LoggingContext(
                 2,
                 { "engine", "resources", "vulkan", "game_loop" }
-            )),
+            )
+        );
+        setGlobalLogger(new Log::Logger(
+            logContext,
             std::make_unique<Log::ConsoleOutput>()
         ));
+        getGlobalLogger().forwardTo(
+            std::make_unique<Log::Logger>(
+                Log::Logger(
+                    logContext,
+                    std::make_unique<Log::FileOutput>(Log::FileOutput("log"))
+                )
+            )
+        );
     }
 
     void App::initResources()
