@@ -48,7 +48,9 @@ namespace Log
                     std::cout << "    (" << details.channel.string() << ") " << message << "\n";
                     break;
                 case LogMessageType::Error:
-                    std::cerr << "\x1B[31m[!] (" << details.channel.string() << ") " << message << "\x1B[0m\n";
+                    std::cerr << "\x1B[31m[!] (" << details.channel.string() << ") " << message
+                        << "\n    in " << details.sourceLoc.file_name() << "\n    " << details.sourceLoc.function_name()
+                        << " @ line " << details.sourceLoc.line() << "\x1B[0m\n";
                     break;
                 case LogMessageType::Warning:
                     std::cerr << "\x1B[33m[?] (" << details.channel.string() << ") " << message << "\x1B[0m\n";
@@ -63,10 +65,12 @@ namespace Log
                     std::cout << "    " << message << "\n";
                     break;
                 case LogMessageType::Error:
-                    std::cout << "\x1B[31m[!] " << message << "\x1B[0m\n";
+                    std::cerr << "\x1B[31m[!] " << message
+                        << "\n    in " << details.sourceLoc.file_name() << "\n    " << details.sourceLoc.function_name()
+                        << " @ line " << details.sourceLoc.line() << "\x1B[0m\n";
                     break;
                 case LogMessageType::Warning:
-                    std::cout << "\x1B[33m[?] " << message << "\x1B[0m\n";
+                    std::cerr << "\x1B[33m[?] " << message << "\x1B[0m\n";
                     break;
             }
         }
@@ -89,7 +93,9 @@ namespace Log
     Logger::Logger(std::shared_ptr<LoggingContext> context, std::unique_ptr<LoggerOutput> output)
         : context_(std::move(context)), output_(std::move(output))
     {
-        this->output_->init();
+        assert(this->context_ != nullptr);
+        assert(this->output_ != nullptr);
+        this->output_->init(*this->context_);
         this->verbosity = this->context_->maxVerbosity;
     }
 
@@ -144,5 +150,39 @@ namespace Log
             std::cerr << "ERROR: " << id << " not in logging context channels.\n";
         u64 channelMask = 0x1 << index.value();
         return static_cast<bool>(this->mask & channelMask);
+    }
+
+    BufferedLogMessage&& BufferedLogMessage::setText(std::string_view message)
+    {
+        memcpy(this->buffer_->data(), message.data(), message.size());
+        this->text_ = std::string_view(this->buffer_->data(), message.size());
+        return std::move(*this);
+    }
+
+    BufferedLogMessage LoggingContext::makeBufferedMessage(LogMessageDetails details)
+    {
+        BufferedLogMessage message = BufferedLogMessage(std::move(this->buffers.alloc()));
+        message.details = std::move(details);
+        return std::move(message);
+    }
+
+    void Logger::log(BufferedLogMessage& message)
+    {
+        this->log(message.details, message.getText());
+    }
+
+    void Logger::log(BufferedLogMessage&& message)
+    {
+        this->log(message.details, message.getText());
+    }
+
+    void FileOutput::init(LoggingContext& context)
+    {
+        
+    }
+
+    void FileOutput::log(LogMessageDetails, std::string_view message)
+    {
+
     }
 }

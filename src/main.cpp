@@ -33,13 +33,15 @@ int main()
     }
     pool.free(wisdoms[3]);
 
-
+    std::cout << "Henry here\n";
+    auto gregory = std::make_shared<Log::LoggingContext>(std::move(Log::LoggingContext(
+        2,
+        { "engine", "resources", "vulkan", "game_loop" }
+    )));
+    std::cout << "Henry there\n";
     setGlobalLogger(
         (new Log::Logger(
-            std::make_shared<Log::LoggingContext>(Log::LoggingContext(
-                2,
-                { "engine", "resources", "vulkan", "game_loop" }
-            )),
+            gregory,
             std::make_unique<Log::ConsoleOutput>()
         ))->setFilter({ "engine", "resources" })
     );
@@ -51,6 +53,12 @@ int main()
     getGlobalLogger().log({ .channel = "resources" }, "Life is le beautiful, {}", "bro");
     warn({ .channel = "vulkan" }, "Warning {}", 1);
     err({ .channel = "vulkan" }, "Err {}", 2);
+
+    Log::BufferedLogMessage msg = getGlobalLogger().context()
+        .makeBufferedMessage({ .channel = "vulkan" })
+        .setText("I love my {} to the {}.", "little sister", "MAX");
+    
+    getGlobalLogger().log(std::move(msg));
 
     // for (u32 i = 0; i < 5; i++)
     // {

@@ -1,10 +1,12 @@
 #pragma once
 #include "types.h"
 #include "string_id_map.h"
+#include "object_pool.h"
 #include <format>
 #include <memory>
 #include <initializer_list>
 #include <source_location>
+#include <filesystem>
 
 #define LOG_BUFFER_SIZE 256
 
@@ -53,6 +55,46 @@ namespace Log
         inline constexpr operator bool() const { return static_cast<bool>(this->mask); }
     };
 
+    struct BufferedLogMessage
+    {
+    private:
+        std::string_view text_;
+        PoolPtr<LogBuffer> buffer_ = PoolPtr<LogBuffer>();
+
+    public:
+        LogMessageDetails details;
+        
+        BufferedLogMessage() = default;
+        BufferedLogMessage(PoolPtr<LogBuffer>&& buffer) : buffer_(std::move(buffer)) {}
+        BufferedLogMessage(BufferedLogMessage&) = delete;
+        BufferedLogMessage& operator=(BufferedLogMessage&) = delete;
+        BufferedLogMessage(BufferedLogMessage&&) = default;
+        BufferedLogMessage& operator=(BufferedLogMessage&&) = default;
+
+        // formats the string in this's buffer
+        template <typename... Args>
+        BufferedLogMessage&& setText(std::format_string<Args...> format, Args&&... args)
+        {
+            auto fmtResult = std::format_to_n(
+                this->buffer_->begin(),
+                this->buffer_->size() - 1,
+                std::forward<std::format_string<Args...>>(format),
+                std::forward<Args>(args)...
+            );
+            (*this->buffer_.get())[fmtResult.size] = '\0';
+            this->text_ = std::string_view(this->buffer_->data(), fmtResult.size);
+            return std::move(*this);
+        }
+        
+        // copies contents of `text` into this's buffer
+        BufferedLogMessage&& setText(std::string_view text);
+
+        std::string_view getText() const { return this->text_; }
+        constexpr operator std::string_view() { return this->text_; }
+    };
+
+    using Message = BufferedLogMessage;
+
     struct LoggingContext
     {
     private:
@@ -62,20 +104,23 @@ namespace Log
 
     public:
         u32 maxVerbosity;
+        ObjectPool<LogBuffer> buffers = ObjectPool<LogBuffer>(7, true, "log_buffers");
         LogBuffer immediateBuffer;
+
+        LoggingContext(u32 maxVerbosity, std::initializer_list<std::string_view> channelNames);
 
         constexpr const std::array<StringId, 64>& getChannels() const { return this->channels_; }
         constexpr u32 numChannels() const { return this->numChannels_; }
         bool hasChannel(StringId channel) const;
         Option<u32> getChannelIndex(StringId channel) const;
-
-        LoggingContext(u32 maxVerbosity, std::initializer_list<std::string_view> channelNames);
+        
+        BufferedLogMessage makeBufferedMessage(LogMessageDetails details);
     };
 
     class LoggerOutput
     {
     public:
-        virtual void init() = 0;
+        virtual void init(LoggingContext& context) = 0;
         virtual void log(LogMessageDetails details, std::string_view message) = 0;
         virtual ~LoggerOutput() = default;
     };
@@ -83,7 +128,21 @@ namespace Log
     class ConsoleOutput : public LoggerOutput
     {
     public:
-        virtual void init() override {}
+        virtual void init(LoggingContext& context) override {}
+        virtual void log(LogMessageDetails, std::string_view message) override;
+    };
+
+    class FileOutput : public LoggerOutput
+    {
+    private:
+        std::filesystem::path logDirectory_;
+        std::filesystem::path globalLogFile_;
+        StringIdMap<std::filesystem::path> logFiles_;
+
+    public:
+        FileOutput(std::filesystem::path logDirectory) : logDirectory_(logDirectory) {}
+
+        virtual void init(LoggingContext& context) override;
         virtual void log(LogMessageDetails, std::string_view message) override;
     };
 
@@ -136,5 +195,8 @@ namespace Log
             
             this->log(std::move(details), std::move(formattedMessage));
         }
+
+        void log(BufferedLogMessage& message);
+        void log(BufferedLogMessage&& message);
     };
 }

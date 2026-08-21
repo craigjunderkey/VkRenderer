@@ -18,7 +18,7 @@ void freePoolPtr(ObjectPool<T>* pool, T* ptr);
 
 /*
 An owning smart pointer a la `std::unique_ptr` which contains a data pointer and a pointer to the
-pool which created it. Upon desruction, `PoolPtr` calls `ObjectPool::free` on the data pointer.
+pool which created it. Upon destruction, `PoolPtr` calls the data's destructor then `ObjectPool::free`.
 */
 template <typename T>
 struct PoolPtr
@@ -28,7 +28,8 @@ private:
     T* ptr_ = nullptr;
 
 public:
-    PoolPtr() = default;
+    PoolPtr() : pool_(nullptr), ptr_(nullptr) {}
+    
     PoolPtr(ObjectPool<T>& pool, T* ptr) : ptr_(ptr)
     {
         assert(ptr != nullptr);
@@ -36,14 +37,30 @@ public:
     }
 
     PoolPtr(PoolPtr& other) = delete;
-    PoolPtr(PoolPtr&& other) { std::swap(this->ptr_, other.ptr_); std::swap(this->pool_, other.pool_); }
+    
+    PoolPtr(PoolPtr&& other) : pool_(nullptr), ptr_(nullptr)
+    {
+        std::swap(this->ptr_, other.ptr_);
+        std::swap(this->pool_, other.pool_);
+    }
+    
     PoolPtr& operator =(PoolPtr& other) = delete;
-    PoolPtr& operator =(PoolPtr&& other) { std::swap(this->ptr_, other.ptr_); std::swap(this->pool_, other.pool_); return *this; };
+    
+    PoolPtr& operator =(PoolPtr&& other)
+    {
+        std::swap(this->ptr_, other.ptr_);
+        std::swap(this->pool_, other.pool_);
+        return *this;
+    };
 
     ~PoolPtr()
     {
-        this->ptr_->~T();
-        freePoolPtr<T>(pool_, ptr_);
+        if (this->ptr_)
+        {
+            assert(this->pool_ != nullptr);
+            this->ptr_->~T();
+            freePoolPtr<T>(pool_, ptr_);
+        }
     }
 
     constexpr T* operator->()
@@ -119,9 +136,34 @@ public:
         }
     }
 
+    ObjectPool(ObjectPool&) = delete;
+    ObjectPool& operator=(ObjectPool&) = delete;
+    ObjectPool(ObjectPool&& other) : pool_(nullptr), head_(nullptr)
+    {
+        std::swap(this->pool_, other.pool_);
+        std::swap(this->head_, other.head_);
+        std::swap(this->capacity_, other.capacity_);
+        std::swap(this->allowDynamicAlloc_, other.allowDynamicAlloc_);
+        std::swap(this->name_, other.name_);
+    }
+    ObjectPool& operator=(ObjectPool&& other)
+    {
+        this->pool_ = nullptr;
+        this->head_ = nullptr;
+        std::swap(this->pool_, other.pool_);
+        std::swap(this->head_, other.head_);
+        std::swap(this->capacity_, other.capacity_);
+        std::swap(this->allowDynamicAlloc_, other.allowDynamicAlloc_);
+        std::swap(this->name_, other.name_);
+        return *this;
+    }
+
     ~ObjectPool()
     {
-        std::free(this->pool_);
+        if (this->pool_)
+        {
+            std::free(this->pool_);
+        }
     }
 
     constexpr bool isFull()
