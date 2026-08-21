@@ -27,11 +27,47 @@ namespace Log
         std::source_location sourceLoc = std::source_location::current();
     };
 
+    struct LoggingContext;
+
+    struct LogFilter
+    {
+        u64 mask = 0xFFFFFFFFFFFFFFFF;
+
+        constexpr LogFilter() = default;
+        constexpr LogFilter(u64 mask) : mask(mask) {}
+        LogFilter(LoggingContext& context, std::initializer_list<StringId> ids);
+
+        bool containsChannel(LoggingContext& context, StringId id) const;
+
+        inline constexpr LogFilter operator&(const LogFilter& other) const { return this->mask & other.mask; }
+        inline constexpr LogFilter& operator&=(const LogFilter& other) { this->mask &= other.mask; return *this; }
+        inline constexpr LogFilter operator|(const LogFilter& other) const { return this->mask | other.mask; }
+        inline constexpr LogFilter& operator|=(const LogFilter& other) { this->mask |= other.mask; return *this;}
+        inline constexpr LogFilter operator^(const LogFilter& other) const { return this->mask ^ other.mask; }
+        inline constexpr LogFilter& operator^=(const LogFilter& other) { this->mask ^= other.mask; return *this; }
+        inline constexpr LogFilter operator~() const { return ~this->mask; }
+        inline constexpr LogFilter operator<<(u64 n) const { return this->mask << n; }
+        inline constexpr LogFilter& operator<<=(u64 n) { this->mask <<= n; return *this; }
+        inline constexpr LogFilter operator>>(u64 n) const { return this->mask >> n; }
+        inline constexpr LogFilter& operator>>=(u64 n) { this->mask >>= n; return *this; }
+        inline constexpr operator bool() const { return static_cast<bool>(this->mask); }
+    };
+
     struct LoggingContext
     {
+    private:
+        std::array<StringId, 64> channels_;
+        StringIdMap<u32> channelIndices_ { "log_channel_indices" };
+        u32 numChannels_;
+
+    public:
         u32 maxVerbosity;
         LogBuffer immediateBuffer;
-        StringIdMap<std::string_view> channels { "log_channels" };
+
+        constexpr const std::array<StringId, 64>& getChannels() const { return this->channels_; }
+        constexpr u32 numChannels() const { return this->numChannels_; }
+        bool hasChannel(StringId channel) const;
+        Option<u32> getChannelIndex(StringId channel) const;
 
         LoggingContext(u32 maxVerbosity, std::initializer_list<std::string_view> channelNames);
     };
@@ -57,14 +93,30 @@ namespace Log
         std::unique_ptr<Logger> forwardTo_ = nullptr;
         std::shared_ptr<LoggingContext> context_ = nullptr;
         std::unique_ptr<LoggerOutput> output_ = nullptr;
-        u32 verbosity_ = 0;
 
     public:
+        u32 verbosity = 0;
+        LogFilter filter = LogFilter();
+
         Logger() = default;
         Logger(std::shared_ptr<LoggingContext> context, std::unique_ptr<LoggerOutput> output);
 
-        Logger& forwardTo(std::unique_ptr<Logger> other);
-        Logger& setVerbosity(u32 verbosity);
+        Logger* forwardTo(std::unique_ptr<Logger> other);
+        Logger* setVerbosity(u32 verbosity);
+        Logger* setFilter(LogFilter filter);
+        Logger* setFilter(std::initializer_list<StringId> channels);
+        
+        LoggingContext& context()
+        {
+            assert(this->context_ != nullptr);
+            return *this->context_;
+        }
+
+        LoggerOutput& output()
+        {
+            assert(this->output_ != nullptr);
+            return *this->output_;
+        }
 
         void log(LogMessageDetails details, std::string_view message);
         

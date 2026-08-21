@@ -73,17 +73,16 @@ public:
         return this->id == NONE;
     }
 
-    static StringId internString(const char* string)
+    static StringId internString(std::string_view string)
     {
-        u32 hash = Crc32::hash(string);
+        u32 hash = Crc32::hash(string.data(), string.size());
         strings_.try_emplace(hash, string);
         return hash;
     }
 
-    static const std::string& getString(StringId id)
+    static const std::string_view getString(StringId id)
     {
-        static constexpr std::string NONE_STRING = "NULL";
-        if (id.isNull()) return NONE_STRING;
+        if (id.isNull()) return "NULL";
 
         auto searchResult = strings_.find(id);
         if (searchResult == strings_.end())
@@ -94,7 +93,7 @@ public:
         return searchResult->second;
     }
 
-     const std::string& string() const
+    const std::string_view string() const
     {
         return getString(this->id);
     }
@@ -111,7 +110,7 @@ public:
     operator std::string() const
     {
         #ifndef NDEBUG
-            return std::to_string(this->id) + " (" + this->string() + ")";
+            return std::to_string(this->id) + " (" + this->string().data() + ")";
         #else
             return std::to_string(this->id);
         #endif

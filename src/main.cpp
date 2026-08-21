@@ -34,20 +34,23 @@ int main()
     pool.free(wisdoms[3]);
 
 
-    setGlobalLogger(new Log::Logger(
-        std::make_shared<Log::LoggingContext>(Log::LoggingContext(
-            2,
-            { "engine", "resources", "vulkan", "game_loop" }
-        )),
-        std::make_unique<Log::ConsoleOutput>()
-    ));
+    setGlobalLogger(
+        (new Log::Logger(
+            std::make_shared<Log::LoggingContext>(Log::LoggingContext(
+                2,
+                { "engine", "resources", "vulkan", "game_loop" }
+            )),
+            std::make_unique<Log::ConsoleOutput>()
+        ))->setFilter({ "engine", "resources" })
+    );
+    getGlobalLogger().filter = ~getGlobalLogger().filter;
 
-    log({}, "Life is le beautiful");
-    log({}, "Life is le beautiful, {}", "bro");
-    getGlobalLogger().log({}, "Life is le beautiful");
-    getGlobalLogger().log({}, "Life is le beautiful, {}", "bro");
-    warn({}, "Warning {}", 1);
-    err({}, "Err {}", 2);
+    log({ .channel = "engine" }, "Life is le beautiful");
+    log({ .channel = "engine" }, "Life is le beautiful, {}", "bro");
+    getGlobalLogger().log({ .channel = "resources" }, "Life is le beautiful");
+    getGlobalLogger().log({ .channel = "resources" }, "Life is le beautiful, {}", "bro");
+    warn({ .channel = "vulkan" }, "Warning {}", 1);
+    err({ .channel = "vulkan" }, "Err {}", 2);
 
     // for (u32 i = 0; i < 5; i++)
     // {
