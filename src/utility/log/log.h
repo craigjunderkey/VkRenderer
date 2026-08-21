@@ -1,12 +1,11 @@
 #pragma once
-#include "types.h"
-#include "string_id_map.h"
-#include "object_pool.h"
+#include "../types.h"
+#include "../string_id_map.h"
+#include "../object_pool.h"
 #include <format>
 #include <memory>
 #include <initializer_list>
 #include <source_location>
-#include <filesystem>
 
 #define LOG_BUFFER_SIZE 256
 
@@ -123,27 +122,6 @@ namespace Log
         virtual void init(LoggingContext& context) = 0;
         virtual void log(LogMessageDetails details, std::string_view message) = 0;
         virtual ~LoggerOutput() = default;
-    };
-
-    class ConsoleOutput : public LoggerOutput
-    {
-    public:
-        virtual void init(LoggingContext& context) override {}
-        virtual void log(LogMessageDetails, std::string_view message) override;
-    };
-
-    class FileOutput : public LoggerOutput
-    {
-    private:
-        std::filesystem::path logDirectory_;
-        std::filesystem::path globalLogFile_;
-        StringIdMap<std::filesystem::path> logFiles_;
-
-    public:
-        FileOutput(std::filesystem::path logDirectory) : logDirectory_(logDirectory) {}
-
-        virtual void init(LoggingContext& context) override;
-        virtual void log(LogMessageDetails, std::string_view message) override;
     };
 
     class Logger

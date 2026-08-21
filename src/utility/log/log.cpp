@@ -38,58 +38,6 @@ namespace Log
         }
     }
 
-    void ConsoleOutput::log(LogMessageDetails details, std::string_view message)
-    {
-        if (details.channel != StringId::NONE)
-        {
-            switch (details.type)
-            {
-                case LogMessageType::Log:
-                    std::cout << "    (" << details.channel.string() << ") " << message << "\n";
-                    break;
-                case LogMessageType::Error:
-                    std::cerr << "\x1B[31m[!] (" << details.channel.string() << ") " << message
-                        << "\n    in " << details.sourceLoc.file_name() << "\n    " << details.sourceLoc.function_name()
-                        << " @ line " << details.sourceLoc.line() << "\x1B[0m\n";
-                    break;
-                case LogMessageType::Warning:
-                    std::cerr << "\x1B[33m[?] (" << details.channel.string() << ") " << message << "\x1B[0m\n";
-                    break;
-            }
-        }
-        else
-        {
-            switch (details.type)
-            {
-                case LogMessageType::Log:
-                    std::cout << "    " << message << "\n";
-                    break;
-                case LogMessageType::Error:
-                    std::cerr << "\x1B[31m[!] " << message
-                        << "\n    in " << details.sourceLoc.file_name() << "\n    " << details.sourceLoc.function_name()
-                        << " @ line " << details.sourceLoc.line() << "\x1B[0m\n";
-                    break;
-                case LogMessageType::Warning:
-                    std::cerr << "\x1B[33m[?] " << message << "\x1B[0m\n";
-                    break;
-            }
-        }
-    }
-
-    void Logger::log(LogMessageDetails details, std::string_view message)
-    {
-        assert(this->output_ != nullptr);
-        assert(this->context_ != nullptr && this->context_->hasChannel(details.channel));
-        if (details.verbosity <= this->verbosity && this->filter.containsChannel(*this->context_, details.channel))
-        {
-            this->output_->log(details, message);
-        }
-        if (this->forwardTo_)
-        {
-            this->forwardTo_->log(std::move(details), std::move(message));
-        }
-    }
-
     Logger::Logger(std::shared_ptr<LoggingContext> context, std::unique_ptr<LoggerOutput> output)
         : context_(std::move(context)), output_(std::move(output))
     {
@@ -174,15 +122,5 @@ namespace Log
     void Logger::log(BufferedLogMessage&& message)
     {
         this->log(message.details, message.getText());
-    }
-
-    void FileOutput::init(LoggingContext& context)
-    {
-        
-    }
-
-    void FileOutput::log(LogMessageDetails, std::string_view message)
-    {
-
     }
 }

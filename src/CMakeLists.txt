@@ -30,7 +30,12 @@ target_precompile_headers(
         <iostream>
         <expected>
         <cstdlib>
+        <chrono>
         <nlohmann/json.hpp>
-        <slang.h>
+        <filesystem>
+        <fstream>
+        <memory>
         <vulkan/vulkan_raii.hpp>
+        <vulkan/vulkan_to_string.hpp>
+        <slang.h>
 )

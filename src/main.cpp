@@ -1,5 +1,6 @@
 #include "utility/object_pool.h"
-#include "utility/log_utils.h"
+#include "utility/log/log_utils.h"
+#include "utility/log/log_output.h"
 
 using namespace LogUtils;
 
@@ -17,35 +18,27 @@ struct Wisdom
 
 int main()
 {
-    ObjectPool<Wisdom> pool = ObjectPool<Wisdom>(4, true, "wisdom_pool");
-    PoolPtr<Wisdom> wisdoms[5];
-    for (u32 i = 0; i < 5; i++)
-    {
-        wisdoms[i] = pool.alloc(Wisdom(i + 1));
-    }
-    for (u32 i = 0; i < 5; i++)
-    {
-        for (u32 j = 0; j < 16; j++)
-        {
-            std::cout << wisdoms[i]->numbers[j] << " ";
-        }
-        std::cout << "\n";
-    }
-    pool.free(wisdoms[3]);
-
-    std::cout << "Henry here\n";
-    auto gregory = std::make_shared<Log::LoggingContext>(std::move(Log::LoggingContext(
-        2,
-        { "engine", "resources", "vulkan", "game_loop" }
-    )));
-    std::cout << "Henry there\n";
+    std::shared_ptr<Log::LoggingContext> logContext = std::make_shared<Log::LoggingContext>(
+        Log::LoggingContext(
+            2,
+            { "engine", "resources", "vulkan", "game_loop" }
+        )
+    );
     setGlobalLogger(
         (new Log::Logger(
-            gregory,
+            logContext,
             std::make_unique<Log::ConsoleOutput>()
         ))->setFilter({ "engine", "resources" })
     );
     getGlobalLogger().filter = ~getGlobalLogger().filter;
+    getGlobalLogger().forwardTo(
+        std::make_unique<Log::Logger>(
+            Log::Logger(
+                logContext,
+                std::make_unique<Log::FileOutput>(Log::FileOutput("log"))
+            )
+        )
+    );
 
     log({ .channel = "engine" }, "Life is le beautiful");
     log({ .channel = "engine" }, "Life is le beautiful, {}", "bro");

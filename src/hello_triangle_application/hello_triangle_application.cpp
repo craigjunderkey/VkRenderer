@@ -22,8 +22,9 @@
 #include "resources/prepare_app_resources.h"
 #include "resources/image_data.h"
 
-#include "../utility/log.h"
-#include "../utility/log_utils.h"
+#include "../utility/log/log.h"
+#include "../utility/log/log_utils.h"
+#include "../utility/log/log_output.h"
 
 using namespace HelloTriangleApplication::Utilities;
 using namespace HelloTriangleApplication::Geometry;

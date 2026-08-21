@@ -2,3 +2,5 @@
 build
 .clangd
 assets_export
+log
+!src/utility/log
