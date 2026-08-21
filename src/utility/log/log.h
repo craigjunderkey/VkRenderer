@@ -60,7 +60,7 @@ namespace Log
         PoolPtr<LogBuffer> buffer_ = PoolPtr<LogBuffer>();
 
     public:
-        LogMessageDetails details;
+        LogMessageDetails details = {};
         
         BufferedLogMessage() = default;
         BufferedLogMessage(PoolPtr<LogBuffer>&& buffer) : buffer_(std::move(buffer)) {}
@@ -73,6 +73,7 @@ namespace Log
         template <typename... Args>
         BufferedLogMessage&& setText(std::format_string<Args...> format, Args&&... args)
         {
+            assert(this->buffer_ != nullptr);
             auto fmtResult = std::format_to_n(
                 this->buffer_->begin(),
                 this->buffer_->size() - 1,

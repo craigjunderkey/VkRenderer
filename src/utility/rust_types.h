@@ -2,6 +2,7 @@
 #include <expected>
 #include <iostream>
 #include <concepts>
+#include "error.h"
 
 // unit
 struct Unit {};
@@ -24,31 +25,6 @@ inline void panic()
 }
 
 
-// error
-template<typename E>
-concept IErrorReporter = requires(E error) {
-    error.reportError();
-    std::convertible_to<E, std::string_view>;
-};
-
-template<typename E>
-void reportError(E& error) requires IErrorReporter<E>
-{
-    error.reportError();
-}
-
-template<typename E>
-void reportError(E& error) requires std::convertible_to<E, std::string_view>
-{
-    std::cerr << "\x1B[31mERROR: " << static_cast<std::string_view>(error) << "\x1B[0m\n";
-}
-
-template<typename E>
-void reportError(E& error)
-{
-    std::cerr << "\x1B[31mERROR (no additional info provided)\x1B[0m\n";
-}
-
 // result
 template <typename T, typename E>
 class Result
@@ -58,31 +34,32 @@ private:
 
     void useError()
     {
-        assert(!this->val_.has_value());
-        reportError<E>(this->val_.error());
+        E error = std::move(this->val_).error();
+        reportError<E>(error);
         panic();
     }
 
 public:
     
-    // Result(std::expected<T, E> val) : val_(val) {}
     Result(std::expected<T, E>&& val) : val_(std::move(val)) {}
 
-    // Result(std::unexpected<E> val) : val_(val) {}
     Result(std::unexpected<E>&& val) : val_(std::move(val)) {}
 
-    // Result(E err) : val_(std::unexpected<E>(err)) {}
     Result(T&& val) : val_(std::expected<T, E>(std::move(val))) {}
 
     operator bool() const { return this->val_.has_value(); }
-    operator std::expected<T, E>() { return std::move(this->val_); } // will this cause problems?
+    operator std::expected<T, E>() { return std::move(this->val_); }
 
+    Result(Result<T, E>&) = delete;
+    Result& operator=(Result<T, E>&) = delete;
+    Result(Result<T, E>&&) = default;
+    Result& operator=(Result<T, E>&&) = default;
+    
     T&& unwrap()
     {
         if (!this->val_)
             this->useError();
-
-        return std::move(this->val_).value();
+        return *std::move(this->val_);
     }
 
     T&& expect(const char* message)
@@ -90,23 +67,21 @@ public:
         if (!this->val_)
             this->useError();
         
-        return std::move(this->val_).value();
+        return *std::move(this->val_);
     }
 
     T&& take()
     {
-        #ifdef NDEBUG
         if (!this->val_)
             this->useError();
-        #endif
 
-        return std::move(this->val_).value();
+        return *std::move(this->val_);
     }
 
     T& value()
     {
         assert(this->val_.has_value());
-        return this->val_.value();
+        return *this->val_;
     }
     
     E& error()

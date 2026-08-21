@@ -120,6 +120,7 @@ namespace Log
 
     BufferedLogMessage&& BufferedLogMessage::setText(std::string_view message)
     {
+        assert(this->buffer_ != nullptr);
         memcpy(this->buffer_->data(), message.data(), message.size());
         this->buffer_->data()[message.size()] = '\0';
         return std::move(*this);
@@ -127,6 +128,7 @@ namespace Log
 
     std::string_view BufferedLogMessage::getText() const
     {
+        assert(this->buffer_ != nullptr);
         return std::string_view(this->buffer_->data());
     }
 

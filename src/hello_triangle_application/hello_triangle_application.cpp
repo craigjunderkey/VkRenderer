@@ -25,6 +25,7 @@
 #include "../utility/log/log.h"
 #include "../utility/log/log_utils.h"
 #include "../utility/log/log_output.h"
+#include "../utility/log/log_error.h"
 
 using namespace HelloTriangleApplication::Utilities;
 using namespace HelloTriangleApplication::Geometry;
@@ -48,6 +49,11 @@ namespace HelloTriangleApplication
         initVulkan();
         mainLoop();
         cleanup();
+    }
+
+    Result<Unit, ErrorMessage> testFate()
+    {
+        return ErrorMessage({}, "I truly love my life");
     }
 
     void App::initLogger()

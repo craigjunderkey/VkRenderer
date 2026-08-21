@@ -108,6 +108,16 @@ public:
         return this->ptr_;
     }
 
+    constexpr bool operator==(T* other) const
+    {
+        return this->ptr_ == other;
+    }
+
+    constexpr bool operator==(const PoolPtr<T>& other) const
+    {
+        return this->ptr_ == other.ptr;
+    }
+
     // converts this into a raw pointer
     // that is, `release` returns this's data pointer then nullifies this's data and pool pointers
     T* release()
