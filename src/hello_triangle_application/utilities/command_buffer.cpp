@@ -123,7 +123,7 @@ namespace HelloTriangleApplication::Utilities
         vk::ClearValue clearColor { .color = vk::ClearColorValue(CLEAR_COLOR) };
         vk::RenderingAttachmentInfo colorAttachment;
 
-        if (CONFIG.antiAliasing == Setting::AntiAliasing::None)
+        if (App::CONFIG.graphics.antiAliasing == Setting::AntiAliasing::None)
         {
             colorAttachment = {
                 .imageView = app.swapChainImageViews[imageIndex],

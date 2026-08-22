@@ -35,10 +35,10 @@ using namespace LogUtils;
 
 namespace HelloTriangleApplication
 {
-    RuntimeConfig App::RUNTIME_CONFIG {};
-    App::App(RuntimeConfig config)
+    Config App::CONFIG {};
+    App::App(Config config)
     {
-        RUNTIME_CONFIG = config;
+        CONFIG = config;
     }
     
     void App::run()

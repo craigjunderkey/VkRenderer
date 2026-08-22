@@ -57,7 +57,7 @@ namespace HelloTriangleApplication::Utilities
 
     Result<vk::SampleCountFlagBits, std::string> getSampleCount(App& app)
     {
-        vk::SampleCountFlagBits desired = aaSettingToSampleCount(CONFIG.antiAliasing);
+        vk::SampleCountFlagBits desired = aaSettingToSampleCount(App::CONFIG.graphics.antiAliasing);
         if (deviceSupportsSampleCount(app.physicalDevice, desired))
         {
             return desired;

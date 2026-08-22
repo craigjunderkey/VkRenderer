@@ -7,7 +7,7 @@
 
 #include "../utility/types.h"
 #include "../utility/constants.h"
-#include "runtime_config.h"
+#include "config.h"
 #include "window.h"
 #include "input/input_manager.h"
 #include "utilities/queue.h"
@@ -38,8 +38,8 @@ namespace HelloTriangleApplication
     class App
     {
     public:
-        App(RuntimeConfig config);
-        static RuntimeConfig RUNTIME_CONFIG;
+        App(Config config);
+        static Config CONFIG;
         void run();
 
         // setup

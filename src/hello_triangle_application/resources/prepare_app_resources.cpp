@@ -58,7 +58,7 @@ namespace HelloTriangleApplication::Resources
     {
         bool shouldBuild;
 
-        switch (App::RUNTIME_CONFIG.assetBuild.buildOption)
+        switch (App::CONFIG.build.buildOption)
         {
             case Setting::BuildOption::ForceBuild:
                 shouldBuild = true;

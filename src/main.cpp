@@ -2,11 +2,14 @@
 
 using namespace HelloTriangleApplication;
 
-RuntimeConfig getConfig()
+Config getConfig()
 {
-    return RuntimeConfig {
-        .assetBuild = {
+    return Config {
+        .build = {
             .buildOption = Setting::BuildOption::ForceBuild
+        },
+        .graphics = {
+            .antiAliasing = Setting::AntiAliasing::MSAAx4
         }
     };
 }
