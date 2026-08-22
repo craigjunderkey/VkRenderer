@@ -33,7 +33,7 @@ namespace HelloTriangleApplication::Resources
     public:
         LogLoader(ResourceRegistry& registry) : registry_(registry)
         {
-            log({ .channel = "resources" }, "Loading resources");
+            log({ .channel = "engine" }, "Loading resources");
             loadOut_ << "\n";
         }
 
@@ -50,7 +50,7 @@ namespace HelloTriangleApplication::Resources
 
         ~LogLoader()
         {
-            log({ .channel = "resources" }, this->loadOut_.str());
+            log({ .channel = "resources", .verbosity = 1 }, this->loadOut_.str());
         }
     };
 

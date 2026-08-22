@@ -49,6 +49,7 @@ namespace HelloTriangleApplication
         vk::raii::Instance instance = nullptr;
         vk::raii::PhysicalDevice physicalDevice = nullptr;
         vk::raii::Device device = nullptr;
+        vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
         FatQueue graphicsQueue;
         FatQueue transferQueue;
 

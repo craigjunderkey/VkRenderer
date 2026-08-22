@@ -74,7 +74,7 @@ namespace HelloTriangleApplication::Resources
 
     Result<Unit, ErrorMessage> AssetConditioningPipeline::buildAssets()
     {
-        log({ .channel = "resources" }, "Building resources");
+        log({ .channel = "engine" }, "Building resources");
         
         this->prepareExportDirectory();
 
@@ -238,7 +238,7 @@ namespace HelloTriangleApplication::Resources
                 << "\t" << stats.compileTime << "\t" << stats.linkTime
                 << "\t" << resTotal << "\n";
         }
-        log({ .channel = "resources" }, buildOut.str());
+        log({ .channel = "resources", .verbosity = 1 }, buildOut.str());
 
         return Ok();
     }

@@ -10,6 +10,7 @@
 #include "utilities/command_buffer.h"
 #include "utilities/sync_objects.h"
 #include "utilities/draw.h"
+#include "utilities/vulkan_debug_output.h"
 #include "geometry/vertex_buffer.h"
 #include "geometry/descriptor_set_layout.h"
 #include "geometry/uniform_buffer.h"
@@ -71,6 +72,7 @@ namespace HelloTriangleApplication
                 )
             )
         );
+        getGlobalLogger().setVerbosity(1);
     }
 
     void App::initResources()
@@ -95,6 +97,7 @@ namespace HelloTriangleApplication
         log({ .channel = "engine" }, "Initializing Vulkan");
 
         createInstance(*this).unwrap();
+        createDebugMessenger(*this).unwrap();
         createSurface(*this).unwrap();
         pickPhysicalDevice(*this).unwrap();
         createLogicalDevice(*this).unwrap();

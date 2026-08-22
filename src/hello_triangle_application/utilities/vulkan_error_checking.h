@@ -51,3 +51,4 @@ inline Result<Unit, ErrorMessage> castVkResult(VkResult result)
         return ErrorMessage({ .channel = "vulkan" }, "From Vulkan: {}.", vkResultToString(result));
     }
 }
+

@@ -3,50 +3,47 @@
 
 using HelloTriangleApplication::App;
 
-struct Extensions
-{
-    const char** extensionNames;
-    u32 count;
-};
-
-Result<Extensions, ErrorMessage> fetchExtensions(App& app)
+Result<std::vector<const char*>, ErrorMessage> fetchExtensions(App& app)
 {
     // get required instance extensions from GLFW
     u32 glfwExtensionCount = 0;
     auto glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+    
+    // set required extensions
+    std::vector<const char*> extensions;
+    for (u32 i = 0; i < glfwExtensionCount; i++)
+    {
+        extensions.push_back(glfwExtensions[i]);
+    }
+    if (VALIDATION_LAYERS_ENABLED)
+        extensions.push_back(vk::EXTDebugUtilsExtensionName);
 
     // check if all the required GLFW extensions are supported
     std::vector<vk::ExtensionProperties> extensionProperties;
     TRY_ASSIGN(extensionProperties, castVkResult(app.context.enumerateInstanceExtensionProperties()));
     bool missingExtension = false;
-    for (u32 i = 0; i < glfwExtensionCount; i++)
+    for (u32 i = 0; i < extensions.size(); i++)
     {
         bool extensionNotFound = std::ranges::none_of(
             extensionProperties,
-            [glfwExtension = glfwExtensions[i]] (auto const& extensionProperty)
-                { return strcmp(extensionProperty.extensionName, glfwExtension) == 0; }
+            [extension = extensions[i]] (auto const& extensionProperty)
+                { return strcmp(extensionProperty.extensionName, extension) == 0; }
         );
 
         if (extensionNotFound)
         {
             missingExtension = true;
-            err({ .channel = "vulkan" }, "Required GLFW extension not supported: {}.", std::string(glfwExtensions[i]));
+            err({ .channel = "vulkan" }, "Required extension not supported: {}.", extensions[i]);
         }
     }
 
     if (missingExtension)
         return ErrorMessage();
 
-    return Extensions { .extensionNames = glfwExtensions, .count = glfwExtensionCount };
+    return std::move(extensions);
 }
 
-struct ValidationLayers
-{
-    std::vector<const char*> layerNames;
-    u32 count;
-};
-
-Result<ValidationLayers, ErrorMessage> fetchValidationLayers(App& app)
+Result<std::vector<const char*>, ErrorMessage> fetchValidationLayers(App& app)
 {
     // get the required layers
     std::vector<const char*> requiredLayers;
@@ -68,9 +65,7 @@ Result<ValidationLayers, ErrorMessage> fetchValidationLayers(App& app)
     if (unsupportedLayerIt != layerProperties.end())
         return ErrorMessage({ .channel = "vulkan" }, "Required validation layer not supported: {}.", unsupportedLayerIt->layerName);
     
-    u32 layerCount = requiredLayers.size();
-
-    return ValidationLayers { .layerNames = std::move(requiredLayers), .count = layerCount };
+    return std::move(requiredLayers);
 }
 
 namespace HelloTriangleApplication::Utilities
@@ -89,20 +84,20 @@ namespace HelloTriangleApplication::Utilities
         // fetch the extensions
         auto extensionsResult = fetchExtensions(app);
         CHECK_KEEP(extensionsResult);
-        Extensions extensions = extensionsResult.take();
+        std::vector<const char*> extensions = extensionsResult.take();
 
         // fetch the validation layers
         auto validationLayersResult = fetchValidationLayers(app);
         CHECK_KEEP(validationLayersResult);
-        ValidationLayers layers = validationLayersResult.take();
+        std::vector<const char*> layers = validationLayersResult.take();
 
         // create the instance
         vk::InstanceCreateInfo createInfo {
             .pApplicationInfo = &appInfo,
-            .enabledLayerCount = layers.count,
-            .ppEnabledLayerNames = layers.layerNames.data(),
-            .enabledExtensionCount = extensions.count,
-            .ppEnabledExtensionNames = extensions.extensionNames
+            .enabledLayerCount = static_cast<u32>(layers.size()),
+            .ppEnabledLayerNames = layers.data(),
+            .enabledExtensionCount = static_cast<u32>(extensions.size()),
+            .ppEnabledExtensionNames = extensions.data()
         };
 
         auto createResult = castVkResult(app.context.createInstance(createInfo));

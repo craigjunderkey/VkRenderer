@@ -57,7 +57,7 @@ namespace Log
         assert(this->context_ != nullptr);
         assert(this->context_->hasChannel(details.channel));
 
-        if (details.verbosity <= this->verbosity || this->filter.containsChannel(*this->context_, details.channel))
+        if (details.verbosity <= this->verbosity && this->filter.containsChannel(*this->context_, details.channel))
         {
             this->output_->log(details, message);
         }
