@@ -39,18 +39,18 @@ NextImageResult nextImageInSwapChain(App& app)
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> drawFrame(App& app, RenderLoop::GameLoop& loop)
+    Result<Unit, ErrorMessage> drawFrame(App& app, RenderLoop::GameLoop& loop)
     {
         // wait for draw fence to be signaled
         vk::Result fenceResult = app.device.waitForFences(*app.inFlightFences[app.frameIndex], true, DISABLE_TIMEOUT);
         if (fenceResult != vk::Result::eSuccess)
-            return Err<std::string>("Failed to wait for fence.");
+            return ErrorMessage({ .channel = "vulkan" }, "Failed to wait for fence.");
 
         // so, we now have that the previous frame is done being drawn to the screen
         // so, request the next image from the swap chain
         auto nextImage = nextImageInSwapChain(app);
         if (!nextImage.imageIndex)
-            return Err<std::string>("Failed to fetch next image from the swap chain.");
+            return ErrorMessage({ .channel = "vulkan" }, "Failed to fetch next image from the swap chain.");
         else if (nextImage.recreatedSwapChain)
             return Ok();
         
@@ -82,7 +82,7 @@ namespace HelloTriangleApplication::Utilities
 
         vk::Result submitResult = app.graphicsQueue.queue.submit(submitInfo, *app.inFlightFences[app.frameIndex]);
         if (submitResult != vk::Result::eSuccess)
-            return Err<std::string>("Failed to submit render request.");
+            return ErrorMessage({ .channel = "vulkan" }, "Failed to submit render request.");
 
         // present the frame
         vk::PresentInfoKHR presentInfo = {

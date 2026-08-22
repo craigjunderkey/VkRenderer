@@ -5,7 +5,7 @@ using HelloTriangleApplication::Resources::Shader;
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<vk::raii::ShaderModule, std::string> createShaderModule(App& app, const Resources::Shader& shader)
+    Result<vk::raii::ShaderModule, ErrorMessage> createShaderModule(App& app, const Resources::Shader& shader)
     {
         vk::ShaderModuleCreateInfo shaderModuleCreateInfo {
             .codeSize = shader.code.size() * sizeof(char),

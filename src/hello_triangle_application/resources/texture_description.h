@@ -34,7 +34,7 @@ namespace HelloTriangleApplication::Resources
         // if `image` is null, then `additionalImages` must be empty
         std::vector<StringId> additionalImages = {}; 
 
-        Result<Unit, std::string> check(const StringIdMap<ImageData>& images) const;
+        Result<Unit, ErrorMessage> check(const StringIdMap<ImageData>& images) const;
         
         static TextureDescription defaultTexture();
 
@@ -55,7 +55,7 @@ namespace HelloTriangleApplication::Resources
         StringIdMap<TextureDescription>& descs() { return this->descs_; }
     
         TextureDescription& getOrAdd(StringId texture);
-        Result<Unit, std::string> drop(StringId texture);
-        Result<Unit, std::string> attachPath(StringId texture, std::filesystem::path path);
+        Result<Unit, ErrorMessage> drop(StringId texture);
+        Result<Unit, ErrorMessage> attachPath(StringId texture, std::filesystem::path path);
     };
 }

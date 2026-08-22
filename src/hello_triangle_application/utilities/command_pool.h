@@ -3,5 +3,5 @@
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createCommandPools(App& app);
+    Result<Unit, ErrorMessage> createCommandPools(App& app);
 }

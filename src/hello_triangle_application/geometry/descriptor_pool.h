@@ -5,6 +5,6 @@ namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<Unit, std::string> createDescriptorPool(App& app);
-    Result<Unit, std::string> createDescriptorSets(App& app);
+    Result<Unit, ErrorMessage> createDescriptorPool(App& app);
+    Result<Unit, ErrorMessage> createDescriptorSets(App& app);
 }

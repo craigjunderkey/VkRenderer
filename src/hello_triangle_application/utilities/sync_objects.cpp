@@ -5,7 +5,7 @@ using HelloTriangleApplication::App;
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createSyncObjects(App& app)
+    Result<Unit, ErrorMessage> createSyncObjects(App& app)
     {
         assert(app.presentCompleteSemaphores.empty()
             && app.renderFinishedSemaphores.empty()
@@ -14,31 +14,24 @@ namespace HelloTriangleApplication::Utilities
         
         for (u32 i = 0; i < app.swapChainImages.size(); i++)
         {
-            vk::raii::Semaphore semaphore = nullptr;
-            TRY_ASSIGN(
-                semaphore,
-                castVkResult(app.device.createSemaphore(vk::SemaphoreCreateInfo()))
-            );
-            app.renderFinishedSemaphores.emplace_back(std::move(semaphore));
+            auto semaphoreResult = castVkResult(app.device.createSemaphore(vk::SemaphoreCreateInfo()));
+            CHECK_KEEP(semaphoreResult);
+            app.renderFinishedSemaphores.emplace_back(std::move(semaphoreResult.take()));
         }
 
         for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
             // add semaphore
-            vk::raii::Semaphore semaphore = nullptr;
-            TRY_ASSIGN(
-                semaphore,
-                castVkResult(app.device.createSemaphore(vk::SemaphoreCreateInfo()))
-            );
-            app.presentCompleteSemaphores.emplace_back(std::move(semaphore));
+            auto semaphoreResult = castVkResult(app.device.createSemaphore(vk::SemaphoreCreateInfo()));
+            CHECK_KEEP(semaphoreResult);
+            app.presentCompleteSemaphores.emplace_back(std::move(semaphoreResult.take()));
             
             // add fence
-            vk::raii::Fence fence = nullptr;
-            TRY_ASSIGN(
-                fence,
-                castVkResult(app.device.createFence(vk::FenceCreateInfo { .flags = vk::FenceCreateFlagBits::eSignaled }))
+            auto fenceResult = castVkResult(
+                app.device.createFence(vk::FenceCreateInfo { .flags = vk::FenceCreateFlagBits::eSignaled })
             );
-            app.inFlightFences.emplace_back(std::move(fence));
+            CHECK_KEEP(fenceResult);
+            app.inFlightFences.emplace_back(std::move(fenceResult.take()));
         }
 
         return Ok();

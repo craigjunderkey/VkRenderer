@@ -16,14 +16,38 @@ inline std::string vkResultToString(vk::Result result)
 }
 
 template<typename T>
-inline Result<T, std::string> castVkResult(vk::ResultValue<T> result)
+inline Result<T, ErrorMessage> castVkResult(vk::ResultValue<T> result)
 {
     if (result.has_value())
     {
-        return Result<T, std::string>(std::move(result.value));
+        return Result<T, ErrorMessage>(std::move(result.value));
     }
     else
     {
-        return Err<std::string>(vkResultToString(result.result));
+        return ErrorMessage({ .channel = "vulkan" }, "From Vulkan: {}.", vkResultToString(result.result));
     }
 } 
+
+inline Result<Unit, ErrorMessage> castVkResult(vk::Result result)
+{
+    if (result == vk::Result::eSuccess)
+    {
+        return Ok();
+    }
+    else
+    {
+        return ErrorMessage({ .channel = "vulkan" }, "From Vulkan: {}.", vkResultToString(result));
+    }
+}
+
+inline Result<Unit, ErrorMessage> castVkResult(VkResult result)
+{
+    if (result == VkResult::VK_SUCCESS)
+    {
+        return Ok();
+    }
+    else
+    {
+        return ErrorMessage({ .channel = "vulkan" }, "From Vulkan: {}.", vkResultToString(result));
+    }
+}

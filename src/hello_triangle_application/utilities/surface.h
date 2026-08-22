@@ -3,5 +3,5 @@
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createSurface(App& app);
+    Result<Unit, ErrorMessage> createSurface(App& app);
 }

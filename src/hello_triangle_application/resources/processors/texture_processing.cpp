@@ -23,7 +23,7 @@ namespace HelloTriangleApplication::Resources
         readVec<StringId>(in, desc.additionalImages);
     }
     
-    Result<Unit, std::string> TextureExporter::exportResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
+    Result<Unit, ErrorMessage> TextureExporter::exportResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
     {
         StringId name = pathToName(path);
         TextureDescription& desc = processingData.texDescs->getOrAdd(name);
@@ -37,7 +37,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> TextureLinker::linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
+    Result<Unit, ErrorMessage> TextureLinker::linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
     {
         TextureDescription& desc = processingData.texDescs->getOrAdd(pathToName(path));
         auto file = std::ofstream(path, std::ios::binary);
@@ -45,7 +45,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> TextureLoader::loadResource(const std::filesystem::path& path, std::any resource, RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> TextureLoader::loadResource(const std::filesystem::path& path, std::any resource, RuntimeProcessingData& processingData)
     {
         StringId name = pathToName(path);
         
@@ -59,12 +59,12 @@ namespace HelloTriangleApplication::Resources
         readTexDesc(in, desc);
         in.ignore();
         if (!in.eof())
-            return Err<std::string>("Read all texture info in " + path.string() + " but didn't reach end-of-file.\n");
+            warn({ .channel = "resources" }, "Read all texture info in {} but didn't reach end-of-file.", path);
         
         return Ok();
     }
 
-    Result<Unit, std::string> TextureInitializer::postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> TextureInitializer::postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData)
     {
         Geometry::Texture* tex = std::any_cast<Geometry::Texture*>(resource); 
         auto loadResult = Geometry::Texture::fromDescription(*processingData.app, processingData.texDescs->descs().get(tex->name));
@@ -73,31 +73,31 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> TextureInitializer::end(RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> TextureInitializer::end(RuntimeProcessingData& processingData)
     {
         processingData.texDescs->descs().clear();
         return Ok();
     }
 
-    Result<Unit, std::string> OfflineTextureTasks::onBuildStarted(OfflineProcessingData& processingData)
+    Result<Unit, ErrorMessage> OfflineTextureTasks::onBuildStarted(OfflineProcessingData& processingData)
     {
         processingData.texDescs = new TextureDescriptionManager();
         return Ok();
     }
 
-    Result<Unit, std::string> OfflineTextureTasks::onBuildFinished(OfflineProcessingData& processingData)
+    Result<Unit, ErrorMessage> OfflineTextureTasks::onBuildFinished(OfflineProcessingData& processingData)
     {
         delete processingData.texDescs;
         return Ok();
     }
 
-    Result<Unit, std::string> RuntimeTextureTasks::onStartup(RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> RuntimeTextureTasks::onStartup(RuntimeProcessingData& processingData)
     {
         processingData.texDescs = new TextureDescriptionManager();
         return Ok();
     }
 
-    Result<Unit, std::string> RuntimeTextureTasks::onShutdown(RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> RuntimeTextureTasks::onShutdown(RuntimeProcessingData& processingData)
     {
         delete processingData.texDescs;
         return Ok();

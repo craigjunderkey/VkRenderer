@@ -1,7 +1,8 @@
 #pragma once
-#include <filesystem>
 #include "log.h"
+#include <filesystem>
 #include <fstream>
+#include "../string_id_map.h"
 
 namespace Log
 {

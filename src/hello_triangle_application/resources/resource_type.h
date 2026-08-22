@@ -49,16 +49,16 @@ namespace HelloTriangleApplication::Resources
         OfflineResourceProcessors offline;
         RuntimeResourceProcessors runtime;
 
-        Result<Unit, std::string> check();
+        Result<Unit, ErrorMessage> check();
     };
 
     class ResourceExporter
     {
     public:
-        virtual Result<Unit, std::string> begin(OfflineProcessingData& processingData) { return Ok(); }
-        virtual Result<Unit, std::string> end(OfflineProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> begin(OfflineProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> end(OfflineProcessingData& processingData) { return Ok(); }
 
-        virtual Result<Unit, std::string> exportResource(
+        virtual Result<Unit, ErrorMessage> exportResource(
             const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
         
         virtual ~ResourceExporter() = default;
@@ -76,10 +76,10 @@ namespace HelloTriangleApplication::Resources
     class ResourceCompiler
     {
     public:
-        virtual Result<Unit, std::string> begin(OfflineProcessingData& processingData) { return Ok(); }
-        virtual Result<Unit, std::string> end(OfflineProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> begin(OfflineProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> end(OfflineProcessingData& processingData) { return Ok(); }
 
-        virtual Result<Unit, std::string> compileResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
+        virtual Result<Unit, ErrorMessage> compileResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
 
         virtual ~ResourceCompiler() = default;
     
@@ -90,10 +90,10 @@ namespace HelloTriangleApplication::Resources
     class ResourceLinker
     {
     public:
-        virtual Result<Unit, std::string> begin(OfflineProcessingData& processingData) { return Ok(); }
-        virtual Result<Unit, std::string> end(OfflineProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> begin(OfflineProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> end(OfflineProcessingData& processingData) { return Ok(); }
 
-        virtual Result<Unit, std::string> linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
+        virtual Result<Unit, ErrorMessage> linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData) = 0;
         
         virtual ~ResourceLinker() = default;
     
@@ -104,8 +104,8 @@ namespace HelloTriangleApplication::Resources
     class OfflineResourceTasks
     {
     public:
-        virtual Result<Unit, std::string> onBuildStarted(OfflineProcessingData& processingData) = 0;
-        virtual Result<Unit, std::string> onBuildFinished(OfflineProcessingData& processingData) = 0;
+        virtual Result<Unit, ErrorMessage> onBuildStarted(OfflineProcessingData& processingData) = 0;
+        virtual Result<Unit, ErrorMessage> onBuildFinished(OfflineProcessingData& processingData) = 0;
 
         virtual ~OfflineResourceTasks() = default;
     };
@@ -113,12 +113,12 @@ namespace HelloTriangleApplication::Resources
     class ResourceLoader
     {
     public:
-        virtual Result<Unit, std::string> begin(RuntimeProcessingData& processingData) { return Ok(); }
-        virtual Result<Unit, std::string> end(RuntimeProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> begin(RuntimeProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> end(RuntimeProcessingData& processingData) { return Ok(); }
 
         // std::any resource must be a pointer to an instance of the resource type, which loadResource
         // will load data into using the file described by the path
-        virtual Result<Unit, std::string> loadResource(const std::filesystem::path& path, std::any resource, RuntimeProcessingData& processingData) = 0;
+        virtual Result<Unit, ErrorMessage> loadResource(const std::filesystem::path& path, std::any resource, RuntimeProcessingData& processingData) = 0;
         
         virtual ~ResourceLoader() = default;
     };
@@ -126,11 +126,11 @@ namespace HelloTriangleApplication::Resources
     class ResourceUnloader
     {
     public:
-        virtual Result<Unit, std::string> begin(RuntimeProcessingData& processingData) { return Ok(); }
-        virtual Result<Unit, std::string> end(RuntimeProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> begin(RuntimeProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> end(RuntimeProcessingData& processingData) { return Ok(); }
 
         // std::any resource must be a pointer to an instance of the resource type to unload
-        virtual Result<Unit, std::string> unloadResource(std::any resource, RuntimeProcessingData& processingData) = 0;
+        virtual Result<Unit, ErrorMessage> unloadResource(std::any resource, RuntimeProcessingData& processingData) = 0;
         
         virtual ~ResourceUnloader() = default;
     };
@@ -138,11 +138,11 @@ namespace HelloTriangleApplication::Resources
     class ResourcePostLoadInitializer
     {
     public:
-        virtual Result<Unit, std::string> begin(RuntimeProcessingData& processingData) { return Ok(); }
-        virtual Result<Unit, std::string> end(RuntimeProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> begin(RuntimeProcessingData& processingData) { return Ok(); }
+        virtual Result<Unit, ErrorMessage> end(RuntimeProcessingData& processingData) { return Ok(); }
 
         // std::any resource must be a pointer to an instance of the resource type to post-load initialize
-        virtual Result<Unit, std::string> postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData) = 0;
+        virtual Result<Unit, ErrorMessage> postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData) = 0;
         
         virtual ~ResourcePostLoadInitializer() = default;
     };
@@ -150,8 +150,8 @@ namespace HelloTriangleApplication::Resources
     class RuntimeResourceTasks
     {
     public:
-        virtual Result<Unit, std::string> onStartup(RuntimeProcessingData& processingData) = 0;
-        virtual Result<Unit, std::string> onShutdown(RuntimeProcessingData& processingData) = 0;
+        virtual Result<Unit, ErrorMessage> onStartup(RuntimeProcessingData& processingData) = 0;
+        virtual Result<Unit, ErrorMessage> onShutdown(RuntimeProcessingData& processingData) = 0;
 
         virtual ~RuntimeResourceTasks() = default;
     };

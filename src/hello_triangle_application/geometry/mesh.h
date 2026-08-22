@@ -22,6 +22,6 @@ namespace HelloTriangleApplication::Geometry
         FatBuffer indexBuffer = {};
 
         static std::vector<u32> queueFamilies(App& app);
-        Result<Unit, std::string> makeBuffers(App& app);
+        Result<Unit, ErrorMessage> makeBuffers(App& app);
     };
 }

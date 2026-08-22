@@ -1,5 +1,6 @@
 #pragma once
 #include "types.h"
+#include "log/log_error.h"
 #include <unordered_map>
 #include <vector>
 
@@ -33,7 +34,8 @@ public:
         auto searchResult = this->map_.find(id);
         if (searchResult == this->map_.end())
         {
-            panic("Couldn't find " + std::string(id) + " in " + std::string(this->name) + ".");
+            LogUtils::err({}, "Couldn't find {} in {}.", id, this->name);
+            panic();
         }
         return searchResult->second;
     }
@@ -56,21 +58,22 @@ public:
         auto searchResult = this->map_.find(id);
         if (searchResult == this->map_.end())
         {
-            panic("Couldn't find " + std::string(id) + " in " + std::string(this->name) + ".");
+            LogUtils::err({}, "Couldn't find {} in {}.", id, this->name);
+            panic();
         }
         return searchResult->second;
     }
 
-    Result<Unit, std::string> tryAdd(StringId id, T item)
+    Result<Unit, LogUtils::ErrorMessage> tryAdd(StringId id, T item)
     {
         if (id == StringId::NONE)
-            return Err<std::string>("Tried to add a mapping for StringId::NONE to " + std::string(this->name)
-                + "; this value is reserved for null/empty values.");
+            return LogUtils::ErrorMessage({}, "Tried to add a mapping for StringId::NONE to {}; \
+this value is reserved for null/empty values.", this->name);
 
         auto insertResult = this->map_.insert({id, std::move(item)});
         if (!insertResult.second)
         {
-            return Err<std::string>("Tried to add " + std::string(id) + " in " + std::string(this->name) + " multiple times.");
+            return LogUtils::ErrorMessage({}, "Failed to insert {0} in {1}, likely due to inserting {0} multiple times", id, this->name);
         }
         else
         {
@@ -102,7 +105,8 @@ public:
         auto removeResult = this->tryRemove(id);
         if (!removeResult)
         {
-            panic("Couldn't find " + std::string(id) + " in " + std::string(this->name) + ".");
+            LogUtils::err({}, "Couldn't find {} in {}.", id, this->name);
+            panic();
         }
         return std::move(removeResult).value();
     }

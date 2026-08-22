@@ -15,7 +15,7 @@ using HelloTriangleApplication::Resources::ShaderStage;
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createScenePipeline(App& app, PipelineBuilder& pipelineBuilder)
+    Result<Unit, ErrorMessage> createScenePipeline(App& app, PipelineBuilder& pipelineBuilder)
     {
         pipelineBuilder.setDefaults(app);
         
@@ -60,7 +60,7 @@ namespace HelloTriangleApplication::Utilities
         return Ok();
     }
 
-    Result<Unit, std::string> createSkyboxPipeline(App& app, PipelineBuilder& pipelineBuilder)
+    Result<Unit, ErrorMessage> createSkyboxPipeline(App& app, PipelineBuilder& pipelineBuilder)
     {
         // make programmable stages
         Shader& shader = app.resources.get<Shader>("skybox");
@@ -82,7 +82,7 @@ namespace HelloTriangleApplication::Utilities
         return Ok();
     }
 
-    Result<Unit, std::string> createLightDebugPipeline(App& app, PipelineBuilder& pipelineBuilder)
+    Result<Unit, ErrorMessage> createLightDebugPipeline(App& app, PipelineBuilder& pipelineBuilder)
     {
         // make programmable stages
         Shader& shader = app.resources.get<Shader>("light_debug");
@@ -119,7 +119,7 @@ namespace HelloTriangleApplication::Utilities
         return Ok();
     }
 
-    Result<Unit, std::string> createGraphicsPipeline(App& app)
+    Result<Unit, ErrorMessage> createGraphicsPipeline(App& app)
     {
         PipelineBuilder pipelineBuilder;
         CHECK(createScenePipeline(app, pipelineBuilder));

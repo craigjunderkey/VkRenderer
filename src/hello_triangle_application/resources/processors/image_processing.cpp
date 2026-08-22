@@ -10,7 +10,7 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<ImageData, std::string> loadImage(const std::filesystem::path& path)
+    Result<ImageData, ErrorMessage> loadImage(const std::filesystem::path& path)
     {
         ImageData image;
         image.pixels = stbi_load(
@@ -22,12 +22,12 @@ namespace HelloTriangleApplication::Resources
         );
 
         if (!image.pixels)
-            return Err<std::string>("Failed to load image " + path.string() + ".");
+            return ErrorMessage({ .channel = "resources" }, "Failed to load image {}.", path);
 
         return std::move(image);
     }
 
-    Result<Unit, std::string> ImageDataLoader::loadResource(const std::filesystem::path& path,
+    Result<Unit, ErrorMessage> ImageDataLoader::loadResource(const std::filesystem::path& path,
             std::any resource, RuntimeProcessingData& processingData)
     {
         ImageData* imageData = std::any_cast<ImageData*>(resource);
@@ -38,17 +38,17 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> ImageDataUnloader::unloadResource(std::any resource, RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> ImageDataUnloader::unloadResource(std::any resource, RuntimeProcessingData& processingData)
     {
         ImageData* imageData = std::any_cast<ImageData*>(resource);
         if (!imageData->pixels)
-            return Err<std::string>("Unloading image data " + std::string(imageData->name) + " but pixels == nullptr.");
+            return ErrorMessage({ .channel = "resources" }, "Unloading image data {} but pixels == nullptr.", imageData->name);
         stbi_image_free(imageData->pixels);
         return Ok();
     }
 
     // NOTE: this exporter is unused since CopyExporter produces quicker load (and build) times
-    Result<Unit, std::string> ImageDataExporter::exportResource(
+    Result<Unit, ErrorMessage> ImageDataExporter::exportResource(
         const std::filesystem::path& path, OfflineProcessingData& processingData)
     {
         // load image

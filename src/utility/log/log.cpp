@@ -14,7 +14,11 @@ namespace Log
         {
             StringId id = StringId::internString(name);
             this->channels_[i] = id;
-            this->channelIndices_.add(id, i);
+            
+            auto insertResult = this->channelIndices_.insert({ id, i });
+            if (!insertResult.second)
+                panic(std::format("Failed to add channel {}. It was likely added multiple times.", id));
+
             i++;
         }
         std::sort(this->channels_.begin(), this->channels_.begin() + this->numChannels_);
@@ -27,14 +31,14 @@ namespace Log
 
     Option<u32> LoggingContext::getChannelIndex(StringId channel) const
     {
-        Option<const u32*> id = this->channelIndices_.tryGet(channel);
-        if (id)
+        auto searchResult = this->channelIndices_.find(channel);
+        if (searchResult == this->channelIndices_.end())
         {
-            return *id.value();
+            return {};
         }
         else
         {
-            return {};
+            return searchResult->second;
         }
     }
 
@@ -100,7 +104,7 @@ namespace Log
         {
             Option<u32> index = context.getChannelIndex(id);
             if (!index)
-                std::cerr << "ERROR: " << id << " not in logging context channels.\n";
+                panic(std::format({"{} not in logging  context channels."}, id));
             u64 channelMask = 0x1 << index.value();
             idsMask |= channelMask;
         }
@@ -113,7 +117,7 @@ namespace Log
             return true;
         Option<u32> index = context.getChannelIndex(id);
         if (!index)
-            std::cerr << "ERROR: " << id << " not in logging context channels.\n";
+            panic(std::format("{} not in logging context channels.", id));
         u64 channelMask = 0x1 << index.value();
         return static_cast<bool>(this->mask & channelMask);
     }
@@ -128,8 +132,10 @@ namespace Log
 
     std::string_view BufferedLogMessage::getText() const
     {
-        assert(this->buffer_ != nullptr);
-        return std::string_view(this->buffer_->data());
+        if (this->buffer_ != nullptr)
+            return std::string_view(this->buffer_->data());
+        else
+            return std::string_view();
     }
 
     BufferedLogMessage LoggingContext::makeBufferedMessage(LogMessageDetails details)
@@ -141,11 +147,15 @@ namespace Log
 
     void Logger::log(BufferedLogMessage& message)
     {
-        this->log(message.details, message.getText());
+        std::string_view text = message.getText();
+        if (text.size() > 0)
+            this->log(message.details, std::move(text));
     }
 
     void Logger::log(BufferedLogMessage&& message)
     {
-        this->log(message.details, message.getText());
+        std::string_view text = message.getText();
+        if (text.size() > 0)
+            this->log(message.details, std::move(text));
     }
 }

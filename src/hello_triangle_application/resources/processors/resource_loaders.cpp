@@ -7,7 +7,7 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> TextDataLoader::loadResource(const std::filesystem::path& path,
+    Result<Unit, ErrorMessage> TextDataLoader::loadResource(const std::filesystem::path& path,
         std::any resource, RuntimeProcessingData& processingData)
     {
         TextData* textData = std::any_cast<TextData*>(resource);
@@ -25,7 +25,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> JsonDataLoader::loadResource(const std::filesystem::path& path,
+    Result<Unit, ErrorMessage> JsonDataLoader::loadResource(const std::filesystem::path& path,
         std::any resource, RuntimeProcessingData& processingData)
     {
         nlohmann::json* jsonData = std::any_cast<nlohmann::json*>(resource);

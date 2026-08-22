@@ -4,7 +4,7 @@
 
 using HelloTriangleApplication::App;
 
-Result<bool, std::string> isDeviceSuitable(const vk::raii::PhysicalDevice& device)
+Result<bool, ErrorMessage> isDeviceSuitable(const vk::raii::PhysicalDevice& device)
 {
     // supports Vulkan 1.3
     auto properties = device.getProperties();
@@ -22,8 +22,9 @@ Result<bool, std::string> isDeviceSuitable(const vk::raii::PhysicalDevice& devic
     if (!supportsGraphics) return false;
 
     // supports all extensions
-    std::vector<vk::ExtensionProperties> availableDeviceExtensions;
-    TRY_ASSIGN(availableDeviceExtensions, castVkResult(device.enumerateDeviceExtensionProperties()));
+    auto deviceExtResult = castVkResult(device.enumerateDeviceExtensionProperties());
+    CHECK_KEEP(deviceExtResult);
+    std::vector<vk::ExtensionProperties> availableDeviceExtensions = deviceExtResult.take();
 
     bool supportsAllRequiredExtensions =
         std::ranges::all_of(
@@ -54,25 +55,25 @@ Result<bool, std::string> isDeviceSuitable(const vk::raii::PhysicalDevice& devic
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> pickPhysicalDevice(App& app)
+    Result<Unit, ErrorMessage> pickPhysicalDevice(App& app)
     {
         std::vector<vk::raii::PhysicalDevice> physicalDevices;
         TRY_ASSIGN(physicalDevices, castVkResult(app.instance.enumeratePhysicalDevices()));
 
         if (physicalDevices.empty())
-            return Err<std::string>("Failed to find GPUs with Vulkan support.");
+            return ErrorMessage({ .channel = "vulkan" }, "Failed to find GPUs with Vulkan support.");
 
         auto deviceIter = std::ranges::find_if(
             physicalDevices,
             [](const vk::raii::PhysicalDevice& physicalDevice) {
-                Result<bool, std::string> suitability = isDeviceSuitable(physicalDevice);
+                Result<bool, ErrorMessage> suitability = isDeviceSuitable(physicalDevice);
                 return suitability.isOk() && suitability.value();
             }
         );
 
         if (deviceIter == physicalDevices.end())
         {
-            return Err<std::string>("Failed to find a suitable GPU.");
+            return ErrorMessage({ .channel = "vulkan" }, "Failed to find a suitable GPU.");
         }
 
         app.physicalDevice = *deviceIter;

@@ -5,5 +5,5 @@ namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<Unit, std::string> createDepthTexture(App& app);
+    Result<Unit, ErrorMessage> createDepthTexture(App& app);
 }

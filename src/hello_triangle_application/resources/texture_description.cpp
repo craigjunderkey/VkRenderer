@@ -2,15 +2,15 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> TextureDescription::check(const StringIdMap<ImageData>& images) const
+    Result<Unit, ErrorMessage> TextureDescription::check(const StringIdMap<ImageData>& images) const
     {
         // check `dimensions`
         if (this->image.isNull() && !this->dimensions)
-            return Err<std::string>("If `image` is null, then `dimensions` must be set.");
+            return ErrorMessage({ .channel = "resources" }, "If `image` is null, then `dimensions` must be set.");
         
         // check `additionalImages`
         if (this->image.isNull() && !this->additionalImages.empty())
-            return Err<std::string>("If `image` is null, then `additionalImages` must be empty.");
+            return ErrorMessage({ .channel = "resources" }, "If `image` is null, then `additionalImages` must be empty.");
         
         if (!this->image.isNull())
         {
@@ -21,7 +21,7 @@ namespace HelloTriangleApplication::Resources
                 bool matchesDimensions = imageData.width == layerData.width
                     && imageData.height == layerData.height;
                 if (!matchesDimensions)
-                    return Err<std::string>("All images in `additionalImages` must have the same dimensions as `image`.");
+                    return ErrorMessage({ .channel = "resources" }, "All images in `additionalImages` must have the same dimensions as `image`.");
             }
         }
 
@@ -31,7 +31,7 @@ namespace HelloTriangleApplication::Resources
             imagesFound++;
         imagesFound += this->additionalImages.size();
         if (imagesFound > numLayers)
-            return Err<std::string>("`numLayers` <= the number of images supplied.");
+            return ErrorMessage({ .channel = "resources" }, "`numLayers` <= the number of images supplied.");
 
         return Ok();
     }
@@ -85,12 +85,12 @@ namespace HelloTriangleApplication::Resources
         }
     }
 
-    Result<Unit, std::string> TextureDescriptionManager::drop(StringId texture)
+    Result<Unit, ErrorMessage> TextureDescriptionManager::drop(StringId texture)
     {
         auto removeDescResult = this->descs_.tryRemove(texture);
         auto removePathResult = this->paths_.tryRemove(texture);
         if (!removeDescResult)
-            return Err<std::string>("Tried to drop " + std::string(texture) + " from TextureDescriptionsManager, but couldn't find it.");
+            return ErrorMessage({ .channel = "resources" }, "Tried to drop {} from TextureDescriptionsManager, but couldn't find it.", texture);
         
         if (removePathResult)
         {
@@ -101,10 +101,10 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> TextureDescriptionManager::attachPath(StringId texture, std::filesystem::path path)
+    Result<Unit, ErrorMessage> TextureDescriptionManager::attachPath(StringId texture, std::filesystem::path path)
     {
         if (!this->descs_.tryGet(texture))
-            return Err<std::string>("Tried to attach path to " + std::string(texture) + " but it's not in the description map.");
+            return ErrorMessage({ .channel = "resources" }, "Tried to attach path to {} but it's not in the description map.", texture);
         CHECK(this->paths_.tryAdd(texture, std::move(path)));
         return Ok();
     }

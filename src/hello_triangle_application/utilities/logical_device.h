@@ -3,5 +3,5 @@
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createLogicalDevice(App& app);
+    Result<Unit, ErrorMessage> createLogicalDevice(App& app);
 }

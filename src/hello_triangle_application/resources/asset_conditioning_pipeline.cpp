@@ -5,7 +5,7 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<std::vector<std::filesystem::path>, std::string> AssetConditioningPipeline::findAssets(const ResourceType& resourceType)
+    Result<std::vector<std::filesystem::path>, ErrorMessage> AssetConditioningPipeline::findAssets(const ResourceType& resourceType)
     {
         std::vector<std::filesystem::path> paths = {};
 
@@ -34,7 +34,7 @@ namespace HelloTriangleApplication::Resources
         return std::move(paths);
     }
 
-    Result<Unit, std::string> AssetConditioningPipeline::prepareExportDirectory()
+    Result<Unit, ErrorMessage> AssetConditioningPipeline::prepareExportDirectory()
     {
         // clear the export directory
         std::filesystem::remove_all(RES_EXPORT_DIR);
@@ -72,7 +72,7 @@ namespace HelloTriangleApplication::Resources
         data.resourceCounts.add(type.resourceName, numResources);
     }
 
-    Result<Unit, std::string> AssetConditioningPipeline::buildAssets()
+    Result<Unit, ErrorMessage> AssetConditioningPipeline::buildAssets()
     {
         log({ .channel = "resources" }, "Building resources");
         

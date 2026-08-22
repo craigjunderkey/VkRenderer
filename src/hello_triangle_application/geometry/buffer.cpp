@@ -5,7 +5,7 @@ using HelloTriangleApplication::App;
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<u32, std::string> findMemoryType(App& app, u32 typeFilter, vk::MemoryPropertyFlags properties)
+    Result<u32, ErrorMessage> findMemoryType(App& app, u32 typeFilter, vk::MemoryPropertyFlags properties)
     {
         vk::PhysicalDeviceMemoryProperties availableTypes = app.physicalDevice.getMemoryProperties();
 
@@ -20,31 +20,30 @@ namespace HelloTriangleApplication::Geometry
             }
         }
 
-        return Err<std::string>("Failed to find suitable memory type.");
+        return ErrorMessage({ .channel = "vulkan" }, "Failed to find suitable memory type.");
     }
 
-    Result<vk::raii::DeviceMemory, std::string> allocateMemory(App& app, vk::raii::Buffer& buffer, vk::MemoryPropertyFlags properties)
+    Result<vk::raii::DeviceMemory, ErrorMessage> allocateMemory(App& app, vk::raii::Buffer& buffer, vk::MemoryPropertyFlags properties)
     {
         vk::MemoryRequirements memRequirements = buffer.getMemoryRequirements();
 
-        Result<u32, std::string> memTypeIndex = findMemoryType(
+        Result<u32, ErrorMessage> memTypeIndex = findMemoryType(
             app,
             memRequirements.memoryTypeBits,
             properties
         );
 
-        if (!memTypeIndex)
-            return Err<std::string>(memTypeIndex.error());
+        CHECK_KEEP(memTypeIndex);
 
         vk::MemoryAllocateInfo memAllocateInfo {
             .allocationSize = memRequirements.size,
-            .memoryTypeIndex = memTypeIndex.value()
+            .memoryTypeIndex = memTypeIndex.take()
         };
 
         return std::move(castVkResult(app.device.allocateMemory(memAllocateInfo)));
     }
     
-    Result<FatBuffer, std::string> FatBuffer::create(
+    Result<FatBuffer, ErrorMessage> FatBuffer::create(
         App& app,
         vk::DeviceSize size,
         vk::BufferUsageFlags usage,
@@ -67,40 +66,33 @@ namespace HelloTriangleApplication::Geometry
             bufferCreateInfo.sharingMode = vk::SharingMode::eConcurrent;
         }
 
-        TRY_ASSIGN(
-            buffer.buffer,
-            castVkResult(app.device.createBuffer(bufferCreateInfo))
-        );
+        auto createBufferResult = castVkResult(app.device.createBuffer(bufferCreateInfo));
+        CHECK_KEEP(createBufferResult);
+        buffer.buffer = createBufferResult.take();
         
-        TRY_ASSIGN(
-            buffer.memory,
-            allocateMemory(app, buffer.buffer, properties)
-        );
+        auto allocMemoryResult = allocateMemory(app, buffer.buffer, properties);
+        CHECK_KEEP(allocMemoryResult);
+        buffer.memory = allocMemoryResult.take();
 
         buffer.buffer.bindMemory(*buffer.memory, 0);
 
         return std::move(buffer);
     }
 
-    Result<MappedBuffer, std::string> FatBuffer::makeMapped()
+    Result<MappedBuffer, ErrorMessage> FatBuffer::makeMapped()
     {
-        void* data;
-        TRY_ASSIGN(
-            data,
-            castVkResult(this->memory.mapMemory(0, this->size))
-        );
+        auto mapMemoryResult = castVkResult(this->memory.mapMemory(0, this->size));
+        CHECK_KEEP(mapMemoryResult);
         
         return MappedBuffer {
             .buffer = std::move(*this),
-            .data = data
+            .data = mapMemoryResult.take()
         };
     }
 
-    Result<MappedBuffer, std::string> MappedBuffer::fromFatBufferResult(Result<FatBuffer, std::string>&& fatBufferResult)
+    Result<MappedBuffer, ErrorMessage> MappedBuffer::fromFatBufferResult(Result<FatBuffer, ErrorMessage>&& fatBufferResult)
     {
-        if (!fatBufferResult)
-            return Err<std::string>(fatBufferResult.error());
-        
+        CHECK_KEEP(fatBufferResult);
         return fatBufferResult.take().makeMapped();
     }
 

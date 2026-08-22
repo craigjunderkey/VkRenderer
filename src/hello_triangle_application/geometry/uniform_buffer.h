@@ -13,6 +13,6 @@ namespace HelloTriangleApplication::Geometry
         Environment env;
     };
 
-    Result<Unit, std::string> createUniformBuffers(App& app);
+    Result<Unit, ErrorMessage> createUniformBuffers(App& app);
     void updateUniformBuffer(App& app, u32 frameIndex);
 }

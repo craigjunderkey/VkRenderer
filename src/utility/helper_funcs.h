@@ -2,6 +2,7 @@
 #include "types.h"
 #include <vector>
 #include <unordered_map>
+#include <format>
 
 // ostream overloads
 namespace glm
@@ -22,6 +23,23 @@ namespace glm
     }
 }
 
+namespace std
+{
+    template<>
+    struct formatter<filesystem::path>
+    {
+        constexpr auto parse(auto& ctx) const
+        {
+            return ctx.begin();
+        }
+
+        auto format(const filesystem::path& path, auto& ctx) const
+        {
+            return std::format_to(ctx.out(), "{}", path.c_str());
+        }
+    };
+}
+
 template <typename T>
 void printVecAsOrderedList(const std::vector<T>& vec)
 {
@@ -39,57 +57,3 @@ void printMap(const std::unordered_map<K, V> map)
         std::cout << "(" << pair.first << ", " << pair.second << ")\n";
     }
 }
-
-template <typename K, typename V>
-std::vector<const V*> mapValuesAsConstPtrs(const std::unordered_map<K, V>& map)
-{
-    std::vector<const V*> vec {};
-    vec.reserve(map.size());
-    for (const auto& pair : map)
-    {
-        const V* valPtr = &pair.second;
-        vec.push_back(valPtr);
-    }
-    return std::move(vec);
-}
-
-template<typename K, typename V>
-std::vector<const K*> mapKeysAsConstPtrs(const std::unordered_map<K, V>& map)
-{
-    std::vector<const K*> vec {};
-    vec.reserve(map.size());
-    for (const auto& pair : map)
-    {
-        const K* keyPtr = &pair.first;
-        vec.push_back(keyPtr);
-    }
-    return std::move(vec);
-}
-
-template<typename K, typename V>
-std::unordered_map<K, u32> idMapFromKeys(const std::unordered_map<K, V>& map)
-{
-    std::vector<const K*> idVec = mapKeysAsConstPtrs(map);
-    
-    auto idMap = std::unordered_map<K, u32>();
-    for (u32 i = 0; i < idVec.size(); i++)
-    {
-        idMap.insert({ *idVec[i], i });
-    }
-    
-    return std::move(idMap);
-} 
-
-template<typename K, typename V>
-std::unordered_map<K, u32> idMapFromValues(const std::unordered_map<K, V>& map)
-{
-    std::vector<const K*> idVec = mapValuesAsConstPtrs(map);
-    
-    auto idMap = std::unordered_map<K, u32>();
-    for (u32 i = 0; i < idVec.size(); i++)
-    {
-        idMap.insert({ *idVec[i], i });
-    }
-    
-    return std::move(idMap);
-} 

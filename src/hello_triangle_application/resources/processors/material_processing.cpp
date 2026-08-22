@@ -30,7 +30,7 @@ namespace HelloTriangleApplication::Resources
         return std::move(mat);
     }
     
-    Result<Unit, std::string> MaterialExporter::exportResource(const std::filesystem::path& path,
+    Result<Unit, ErrorMessage> MaterialExporter::exportResource(const std::filesystem::path& path,
         OfflineProcessingData& processingData)
     {
         auto json = JsonHelper::load(path);
@@ -56,7 +56,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> MaterialLoader::loadResource(const std::filesystem::path& path,
+    Result<Unit, ErrorMessage> MaterialLoader::loadResource(const std::filesystem::path& path,
         std::any resource, RuntimeProcessingData& processingData)
     {
         Material* mat = std::any_cast<Material*>(resource);
@@ -64,11 +64,11 @@ namespace HelloTriangleApplication::Resources
         in.read(reinterpret_cast<char*>(mat), sizeof(Material));
         in.ignore();
         if (!in.eof())
-            return Err<std::string>("Read all material info in " + path.string() + " but didn't reach end-of-file.\n");
+            warn({ .channel = "resources"}, "Read all material info in {} but didn't reach end-of-file.", path);
         return Ok();
     }
 
-    Result<Unit, std::string> MaterialInitializer::begin(RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> MaterialInitializer::begin(RuntimeProcessingData& processingData)
     {
         App& app = *processingData.app;
         BindlessManager& bindless = app.resources.bindless();
@@ -105,12 +105,12 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> MaterialInitializer::end(RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> MaterialInitializer::end(RuntimeProcessingData& processingData)
     {
         return Ok();
     }
 
-    Result<Unit, std::string> MaterialInitializer::postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> MaterialInitializer::postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData)
     {
         return Ok();
     }

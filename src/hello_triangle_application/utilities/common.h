@@ -6,6 +6,7 @@
 #include "../../utility/vector_ops.h"
 #include "../../utility/log/log.h"
 #include "../../utility/log/log_utils.h"
+#include "../../utility/log/log_error.h"
 #include "../config.h"
 
 using namespace LogUtils;

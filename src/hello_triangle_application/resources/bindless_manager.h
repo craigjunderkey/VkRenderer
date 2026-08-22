@@ -71,21 +71,21 @@ namespace HelloTriangleApplication::Resources
         inline vk::raii::DescriptorPool& getDescriptorPool() { return this->pool_; }
         inline vk::raii::DescriptorSet& getDescriptorSet() { return this->set_; }
         
-        Result<Unit, std::string> addBindlessResource(BindlessResource resource, std::vector<StringId> orderedIds);
-        Result<Unit, std::string> addBuffer(StringId bufferName, Geometry::MappedBuffer&& buffer);
-        Result<Unit, std::string> buildLayout();
+        Result<Unit, ErrorMessage> addBindlessResource(BindlessResource resource, std::vector<StringId> orderedIds);
+        Result<Unit, ErrorMessage> addBuffer(StringId bufferName, Geometry::MappedBuffer&& buffer);
+        Result<Unit, ErrorMessage> buildLayout();
 
         StringIdMap<u32>& getIndexTable(StringId resName);
         const BindlessResource& getBindlessResource(StringId resName);
-        Result<u32, std::string> getIndex(StringId resName, StringId id);
-        Result<i32, std::string> getNullableIndex(StringId resName, StringId id);
+        Result<u32, ErrorMessage> getIndex(StringId resName, StringId id);
+        Result<i32, ErrorMessage> getNullableIndex(StringId resName, StringId id);
         Geometry::MappedBuffer& getBuffer(StringId bufferName);
 
-        Result<Unit, std::string> load(StringId resName, BindlessDescriptorSubmission submission);
+        Result<Unit, ErrorMessage> load(StringId resName, BindlessDescriptorSubmission submission);
         
-        Result<Unit, std::string> load(StringId resName, const std::vector<const Geometry::FatBuffer*>& buffers);
-        Result<Unit, std::string> load(StringId resName, const std::vector<const Geometry::Texture*>& textures);
-        Result<Unit, std::string> load(StringId resName, const std::vector<vk::Sampler>& samplers);
+        Result<Unit, ErrorMessage> load(StringId resName, const std::vector<const Geometry::FatBuffer*>& buffers);
+        Result<Unit, ErrorMessage> load(StringId resName, const std::vector<const Geometry::Texture*>& textures);
+        Result<Unit, ErrorMessage> load(StringId resName, const std::vector<vk::Sampler>& samplers);
 
         void submitLoadToGpu();
     };

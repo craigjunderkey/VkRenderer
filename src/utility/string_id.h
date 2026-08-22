@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <unordered_map>
+#include <format>
 #include "crc32.h"
 
 struct StringId
@@ -122,12 +123,31 @@ public:
 
 namespace std
 {
-    template<> struct hash<StringId>
+    template<>
+    struct hash<StringId>
     {
         size_t operator()(const StringId& stringId) const
         {
             hash<u32> hasher;
             return hasher(stringId.id);
+        }
+    };
+
+    template<>
+    struct formatter<StringId>
+    {
+        constexpr auto parse(auto& ctx) const
+        {
+            return ctx.begin();
+        }
+
+        auto format(const StringId& id, auto& ctx) const
+        {
+        #ifndef NDEBUG
+            return std::format_to(ctx.out(), "{} ({})", id.id, id.string());
+        #else
+            return std::format_to(ctx.out(), "{}", id.id);
+        #endif
         }
     };
 }

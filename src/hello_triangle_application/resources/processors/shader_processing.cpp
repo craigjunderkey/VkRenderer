@@ -8,7 +8,7 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> castSlangResult(SlangResult result)
+    Result<Unit, ErrorMessage> castSlangResult(SlangResult result)
     {
         if (SLANG_SUCCEEDED(result))
         {
@@ -16,7 +16,7 @@ namespace HelloTriangleApplication::Resources
         }
         else
         {
-            return Err<std::string>("Slang error: " + std::to_string(result) +" .");
+            return ErrorMessage({ .channel = "resources" }, "Slang error: {}.", result);
         }
     }
 
@@ -24,7 +24,7 @@ namespace HelloTriangleApplication::Resources
         if (x) \
             std::cout << "Slang diagnostics: " << x->getBufferPointer() << std::endl;
     
-    Result<Unit, std::string> ShaderExporter::exportResource(const std::filesystem::path& srcPath, OfflineProcessingData& processingData)
+    Result<Unit, ErrorMessage> ShaderExporter::exportResource(const std::filesystem::path& srcPath, OfflineProcessingData& processingData)
     {
         std::filesystem::path dstDir = getExportDirectory("shaders") / "src";
         std::filesystem::create_directory(dstDir);
@@ -35,7 +35,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> ShaderLinker::begin(OfflineProcessingData& processingData)
+    Result<Unit, ErrorMessage> ShaderLinker::begin(OfflineProcessingData& processingData)
     {
         // create global session
         SlangResult globalResult = slang::createGlobalSession(this->globalSession_.writeRef());
@@ -122,7 +122,7 @@ namespace HelloTriangleApplication::Resources
             char[] funcName
         char[] code
     */
-    Result<Unit, std::string> ShaderLinker::linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
+    Result<Unit, ErrorMessage> ShaderLinker::linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
     {
         // load shader code
         std::filesystem::path moduleName = path.stem();
@@ -130,7 +130,7 @@ namespace HelloTriangleApplication::Resources
         Slang::ComPtr<slang::IBlob> diagnostics;
         Slang::ComPtr<slang::IModule> shaderModule(this->session_->loadModule(moduleNameCStr, diagnostics.writeRef()));
         if (diagnostics)
-            return Err<std::string>(reinterpret_cast<const char*>(diagnostics->getBufferPointer()));
+            return ErrorMessage({ .channel = "resources" }, reinterpret_cast<const char*>(diagnostics->getBufferPointer()));
         
         // get all entry points
         std::vector<Slang::ComPtr<slang::IEntryPoint>> slangEntryPoints;
@@ -164,16 +164,16 @@ namespace HelloTriangleApplication::Resources
 
                 if (!stage.has_value())
                 {
-                    return Err<std::string>("Found an entry point in " + moduleName.string() + " (" + entryPoint.functionName
-                        + "), but the argument for [shader(...)] is not valid.");
+                    return ErrorMessage({ .channel = "resources" }, "Found an entry point in {} ({}), but the argument for \
+[shader(...)] is not valid.", moduleName, entryPoint.functionName);
                 }
             }
 
             // ensure each entry point has a [shader(...)] attribute
             if (!stage.has_value())
             {
-                return Err<std::string>("Found an entry point in " + moduleName.string() + " (" + entryPoint.functionName
-                    + "), but it isn't marked with a [shader(...)] attribute.");
+                return ErrorMessage({ .channel = "resources" }, "Found an entry point in {} ({}), but it isn't marked with \
+a [shader(...)] attribute.", moduleName, entryPoint.functionName);
             }
             else
             {
@@ -225,7 +225,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> ShaderLinker::end(OfflineProcessingData& processingData)
+    Result<Unit, ErrorMessage> ShaderLinker::end(OfflineProcessingData& processingData)
     {
         // destroy session
         this->session_.setNull();
@@ -239,7 +239,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> ShaderLoader::loadResource(const std::filesystem::path& path, std::any resource, RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> ShaderLoader::loadResource(const std::filesystem::path& path, std::any resource, RuntimeProcessingData& processingData)
     {
         Shader* shader = std::any_cast<Shader*>(resource);
         shader->name = pathToName(path);
@@ -273,7 +273,7 @@ namespace HelloTriangleApplication::Resources
         // check that we've reached the end of the file
         in.ignore();
         if (!in.eof())
-            return Err<std::string>("Read all shader information in " + path.string() + " but didn't reach end-of-file.\n");
+            warn({ .channel = "resources" }, "Read all shader information in {} but didn't reach end-of-file.", path);
 
         return Ok();
     }

@@ -3,7 +3,7 @@
 
 using HelloTriangleApplication::App;
 
-Result<u32, std::string> getGraphicsFamilyIndex(App& app, const std::vector<vk::QueueFamilyProperties>& families)
+Result<u32, ErrorMessage> getGraphicsFamilyIndex(App& app, const std::vector<vk::QueueFamilyProperties>& families)
 {
     // get index of first queue family that supports graphics and presentation
     Option<u32> index;
@@ -12,7 +12,7 @@ Result<u32, std::string> getGraphicsFamilyIndex(App& app, const std::vector<vk::
         const vk::QueueFamilyProperties& properties = families[i];
         bool supportsGraphics = static_cast<bool>(properties.queueFlags & vk::QueueFlagBits::eGraphics);
 
-        Result<u32, std::string> surfaceSupport = castVkResult(app.physicalDevice.getSurfaceSupportKHR(i, *app.surface));
+        Result<u32, ErrorMessage> surfaceSupport = castVkResult(app.physicalDevice.getSurfaceSupportKHR(i, *app.surface));
         bool supportsSurfaces = surfaceSupport.isOk() && surfaceSupport.value() != 0;
 
         if (supportsGraphics && supportsSurfaces)
@@ -22,12 +22,13 @@ Result<u32, std::string> getGraphicsFamilyIndex(App& app, const std::vector<vk::
         }
     }
 
-    if (!index) return Err<std::string>("Failed to find a queue family that supports graphics and presenting.");
+    if (!index)
+        return ErrorMessage({ .channel = "vulkan" }, "Failed to find a queue family that supports graphics and presenting.");
 
     return (u32)index.value();
 }
 
-Result<u32, std::string> getTransferFamilyIndex(App& app, const std::vector<vk::QueueFamilyProperties>& families)
+Result<u32, ErrorMessage> getTransferFamilyIndex(App& app, const std::vector<vk::QueueFamilyProperties>& families)
 {
     // get index of first queue family that supports transfer but not graphics
     Option<u32> index;
@@ -44,14 +45,15 @@ Result<u32, std::string> getTransferFamilyIndex(App& app, const std::vector<vk::
         }
     }
 
-    if (!index) return Err<std::string>("Failed to find a queue family that supports transfer but not graphics.");
+    if (!index)
+        return ErrorMessage({ .channel = "vulkan" }, "Failed to find a queue family that supports transfer but not graphics.");
 
     return (u32)index.value();
 }
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createLogicalDevice(App& app)
+    Result<Unit, ErrorMessage> createLogicalDevice(App& app)
     {
         std::vector<vk::QueueFamilyProperties> queueFamilies = app.physicalDevice.getQueueFamilyProperties();
         std::array<vk::DeviceQueueCreateInfo, 2> queueCreateInfos = {};

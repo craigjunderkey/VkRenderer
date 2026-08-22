@@ -39,7 +39,7 @@ namespace HelloTriangleApplication::Resources
         
         RuntimeProcessingData& processingData() { return this->processingData_; }
 
-        Result<Unit, std::string> startup()
+        Result<Unit, ErrorMessage> startup()
         {
             NullRuntimeTasks defaultTasks;
             for (const ResourceType& type : this->types_)
@@ -54,10 +54,14 @@ namespace HelloTriangleApplication::Resources
             return Ok();
         }
 
-        Result<Unit, std::string> shutdown()
+        Result<Unit, ErrorMessage> shutdown()
         {
             if (this->hasShutdown_)
-                panic("Called shutdown on ResourceRegistry but it's already been shut down.");
+            {
+                warn({ .channel = "resources" }, "Called shutdown on ResourceRegistry but it's already shutdown.");
+                return Ok();
+            }
+
             NullRuntimeTasks defaultTasks;
             for (const ResourceType& type : this->types_)
             {
@@ -68,22 +72,19 @@ namespace HelloTriangleApplication::Resources
                     tasks = &defaultTasks;
                 CHECK(tasks->onShutdown(this->processingData_));
             }
+
             this->hasShutdown_ = true;
             return Ok();
         }
 
-        // ~ResourceRegistry()
-        // {
-        //     if (!this->hasShutdown_)
-        //         panic("Destroyed ResourceRegistry without having first called shutdown.");
-        // }
-
         // make a map for each resource type and associate it with a C++ type
         template <typename T>
         StringIdMap<T>& getMap()
-        {
-            panic("Type has no resource associated with it.");
+        {   
+            err({ .channel = "resource" }, "Type has no resource associated with it.");
+            panic();
         }
+
         REGISTER_RESOURCE_TYPE(TextData, text)
         REGISTER_RESOURCE_TYPE(nlohmann::json, json)
         REGISTER_RESOURCE_TYPE(ImageData, image)
@@ -94,7 +95,7 @@ namespace HelloTriangleApplication::Resources
         REGISTER_RESOURCE_TYPE(RenderLoop::Cubemap, cubemap)
 
         template <typename T>
-        Result<Unit, std::string> loadResources(StringId resourceName)
+        Result<Unit, ErrorMessage> loadResources(StringId resourceName)
         {
             StringIdMap<T>& map = this->getMap<T>();
             const ResourceType& type = this->types_[this->typeMap_.get(resourceName)];
@@ -124,7 +125,7 @@ namespace HelloTriangleApplication::Resources
         }
 
         template <typename T>
-        Result<Unit, std::string> unloadResources(StringId resourceName)
+        Result<Unit, ErrorMessage> unloadResources(StringId resourceName)
         {
             StringIdMap<T>& map = this->getMap<T>();
             const ResourceType& type = this->types_[this->typeMap_.get(resourceName)];
@@ -152,7 +153,7 @@ namespace HelloTriangleApplication::Resources
         }
 
         template <typename T>
-        Result<Unit, std::string> postLoadInitialize(StringId resourceName)
+        Result<Unit, ErrorMessage> postLoadInitialize(StringId resourceName)
         {
             StringIdMap<T>& map = this->getMap<T>();
             const ResourceType& type = this->types_[this->typeMap_.get(resourceName)];

@@ -27,16 +27,19 @@ namespace HelloTriangleApplication::Resources
             return nullptr;
     }
     
-    Result<Unit, std::string> BindlessManager::addBindlessResource(BindlessResource resource, std::vector<StringId> orderedIds)
+    Result<Unit, ErrorMessage> BindlessManager::addBindlessResource(BindlessResource resource, std::vector<StringId> orderedIds)
     {
         if (this->isLayoutBuilt())
-            panic("If BindlessManager layout is built, then addBindlessResource cannot be called.");
+        {
+            err({ .channel = "resources" }, "If BindlessManager layout is built, then addBindlessResource cannot be called.");
+            panic();
+        }
 
         // verify virtual count and vector size match
         std::string resName = resource.name;
         if (orderedIds.size() != resource.virtualCount)
-            return Err<std::string>("Ordered StringId vector for bindless_" + resName + " has "
-                + std::to_string(orderedIds.size()) + " elements, but resource's virtual count is " + std::to_string(resource.virtualCount) + ".");
+            return ErrorMessage({ .channel = "resources" }, "Ordered StringId vector for bindless_{} has {} elements, but \
+resource's virtual count is {}.", resName, orderedIds.size(), resource.virtualCount);
 
         // add resource and create index table
         this->resources_.emplace_back(std::move(resource));
@@ -53,19 +56,24 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> BindlessManager::addBuffer(StringId bufferName, Geometry::MappedBuffer&& buffer)
+    Result<Unit, ErrorMessage> BindlessManager::addBuffer(StringId bufferName, Geometry::MappedBuffer&& buffer)
     {
         if (this->isLayoutBuilt())
-            panic("If BindlessManager layout is built, then addBuffer cannot be called.");
-        
+        {
+            err({ .channel = "resources" }, "If BindlessManager layout is built, then addBuffer cannot be called.");
+            panic();
+        }
         CHECK(this->buffers_.tryAdd(bufferName, std::move(buffer)));
         return Ok();
     }
 
-    Result<Unit, std::string> BindlessManager::buildLayout()
+    Result<Unit, ErrorMessage> BindlessManager::buildLayout()
     {
         if (this->isLayoutBuilt())
-            panic("BindlessManager layout is already built; can't call buildLayout again.");
+        {
+            err({ .channel = "resources" }, "BindlessManager layout is already built; can't call buildLayout again.");
+            panic();
+        }
 
         // create pool
         {
@@ -133,10 +141,13 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> BindlessManager::load(StringId resName, BindlessDescriptorSubmission submission)
+    Result<Unit, ErrorMessage> BindlessManager::load(StringId resName, BindlessDescriptorSubmission submission)
     {
         if (!this->isLayoutBuilt())
-            panic("BindlessManager layout is not built; can't call load.");
+        {
+            err({ .channel = "resources" }, "BindlessManager layout is not built; can't call load.");
+            panic();
+        }
         CHECK(this->descriptorSubmissions_.tryAdd(resName, std::move(submission)));
         return Ok();
     }
@@ -144,7 +155,10 @@ namespace HelloTriangleApplication::Resources
     void BindlessManager::submitLoadToGpu()
     {
         if (!this->isLayoutBuilt())
-            panic("BindlessManager layout is not built; can't call submitLoadToGpu.");
+        {
+            err({ .channel = "resources" }, "BindlessManager layout is not built; can't call submitLoadToGpu.");
+            panic();
+        }
         
         std::vector<vk::WriteDescriptorSet> writes;
         writes.reserve(this->resources_.size());
@@ -179,12 +193,12 @@ namespace HelloTriangleApplication::Resources
         return this->resources_[this->resourceMap_.get(resName)];
     }
 
-    Result<u32, std::string> BindlessManager::getIndex(StringId resName, StringId id)
+    Result<u32, ErrorMessage> BindlessManager::getIndex(StringId resName, StringId id)
     {
-        return Result<u32, std::string>(this->indexTables_.get(resName).get(id));
+        return std::move(this->indexTables_.get(resName).get(id));
     }
 
-    Result<i32, std::string> BindlessManager::getNullableIndex(StringId resName, StringId id)
+    Result<i32, ErrorMessage> BindlessManager::getNullableIndex(StringId resName, StringId id)
     {
         if (id.isNull())
         {
@@ -192,7 +206,7 @@ namespace HelloTriangleApplication::Resources
         }
         else
         {
-            return Result<i32, std::string>(this->indexTables_.get(resName).get(id));
+            return std::move(this->indexTables_.get(resName).get(id));
         }
     }
 
@@ -201,7 +215,7 @@ namespace HelloTriangleApplication::Resources
         return this->buffers_.get(bufferName);
     }
 
-    Result<Unit, std::string> BindlessManager::load(StringId resName, const std::vector<const Geometry::FatBuffer*>& buffers)
+    Result<Unit, ErrorMessage> BindlessManager::load(StringId resName, const std::vector<const Geometry::FatBuffer*>& buffers)
     {
         std::vector<vk::DescriptorBufferInfo> info;
         info.reserve(buffers.size());
@@ -216,7 +230,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> BindlessManager::load(StringId resName, const std::vector<const Geometry::Texture*>& textures)
+    Result<Unit, ErrorMessage> BindlessManager::load(StringId resName, const std::vector<const Geometry::Texture*>& textures)
     {
         std::vector<vk::DescriptorImageInfo> info;
         info.reserve(textures.size());
@@ -232,7 +246,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> BindlessManager::load(StringId resName, const std::vector<vk::Sampler>& samplers)
+    Result<Unit, ErrorMessage> BindlessManager::load(StringId resName, const std::vector<vk::Sampler>& samplers)
     {
         std::vector<vk::DescriptorImageInfo> info;
         info.reserve(samplers.size());

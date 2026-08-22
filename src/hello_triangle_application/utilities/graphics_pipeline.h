@@ -3,5 +3,5 @@
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createGraphicsPipeline(App& app);
+    Result<Unit, ErrorMessage> createGraphicsPipeline(App& app);
 }

@@ -21,15 +21,15 @@ namespace HelloTriangleApplication::Geometry
         vk::raii::Buffer& operator*() { return this->buffer; }
         const vk::raii::Buffer& operator*() const { return this->buffer; }
 
-        static Result<FatBuffer, std::string> create(
+        static Result<FatBuffer, ErrorMessage> create(
             App& app,
             vk::DeviceSize size,
             vk::BufferUsageFlags usage,
             vk::MemoryPropertyFlags properties,
-            Option<std::vector<u32>> families = None()
+            Option<std::vector<u32>> families = {}
         );
 
-        Result<MappedBuffer, std::string> makeMapped();
+        Result<MappedBuffer, ErrorMessage> makeMapped();
     };
 
     struct MappedBuffer
@@ -40,9 +40,9 @@ namespace HelloTriangleApplication::Geometry
         FatBuffer& operator*() { return this->buffer; }
         FatBuffer&& unmap();
 
-        static Result<MappedBuffer, std::string> fromFatBufferResult(Result<FatBuffer, std::string>&& fatBufferResult);
+        static Result<MappedBuffer, ErrorMessage> fromFatBufferResult(Result<FatBuffer, ErrorMessage>&& fatBufferResult);
     };
 
-    Result<vk::raii::DeviceMemory, std::string> allocateMemory(App& app, vk::raii::Buffer& buffer, vk::MemoryPropertyFlags properties);
-    Result<u32, std::string> findMemoryType(App& app, u32 typeFilter, vk::MemoryPropertyFlags properties);
+    Result<vk::raii::DeviceMemory, ErrorMessage> allocateMemory(App& app, vk::raii::Buffer& buffer, vk::MemoryPropertyFlags properties);
+    Result<u32, ErrorMessage> findMemoryType(App& app, u32 typeFilter, vk::MemoryPropertyFlags properties);
 }

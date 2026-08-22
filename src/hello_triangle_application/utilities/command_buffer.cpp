@@ -56,7 +56,7 @@ namespace HelloTriangleApplication::Utilities
         commandBuffer.pipelineBarrier2(dependencyInfo);
     }
     
-    Result<Unit, std::string> createCommandBuffers(App& app)
+    Result<Unit, ErrorMessage> createCommandBuffers(App& app)
     {
         vk::CommandBufferAllocateInfo allocInfo {
             .commandPool = **app.graphicsQueue.commandPool,
@@ -64,10 +64,9 @@ namespace HelloTriangleApplication::Utilities
             .commandBufferCount = MAX_FRAMES_IN_FLIGHT
         };
 
-        TRY_ASSIGN(
-            app.graphicsQueue.commandBuffers,
-            castVkResult(app.device.allocateCommandBuffers(allocInfo))
-        );
+        auto allocResult = castVkResult(app.device.allocateCommandBuffers(allocInfo));
+        CHECK_KEEP(allocResult);
+        app.graphicsQueue.commandBuffers = allocResult.take();
 
         return Ok();
     }
@@ -313,7 +312,7 @@ namespace HelloTriangleApplication::Utilities
         commandBuffer.end();
     }
 
-    Result<vk::raii::CommandBuffer, std::string> beginSingleTimeCommands(App& app, FatQueue& queue)
+    Result<vk::raii::CommandBuffer, ErrorMessage> beginSingleTimeCommands(App& app, FatQueue& queue)
     {
         vk::CommandBufferAllocateInfo allocInfo {
             .commandPool = *queue.commandPool,
@@ -322,8 +321,7 @@ namespace HelloTriangleApplication::Utilities
         };
 
         auto buffersResult = castVkResult(app.device.allocateCommandBuffers(allocInfo));
-        if (!buffersResult)
-            return Err<std::string>(buffersResult.error());
+        CHECK_KEEP(buffersResult);
         vk::raii::CommandBuffer commandBuffer = std::move(buffersResult.take().front());
 
         vk::CommandBufferBeginInfo beginInfo {
@@ -345,7 +343,7 @@ namespace HelloTriangleApplication::Utilities
         queue.queue.waitIdle();
     }
 
-    Result<Unit, std::string> transitionImageLayout(vk::raii::CommandBuffer& commandBuffer, const vk::Image& image, vk::ImageLayout oldLayout,
+    Result<Unit, ErrorMessage> transitionImageLayout(vk::raii::CommandBuffer& commandBuffer, const vk::Image& image, vk::ImageLayout oldLayout,
         vk::ImageLayout newLayout, u32 mipLevels, u32 numLayers, vk::ImageAspectFlags imageAspectFlags, u32 srcFamily, u32 dstFamily)
     {
         if (oldLayout == newLayout)
@@ -384,7 +382,7 @@ namespace HelloTriangleApplication::Utilities
         }
         else
         {
-            return Err<std::string>("Unsupported layout transition.");
+            return ErrorMessage({ .channel = "vulkan" }, "Unsupported layout transition.");
         }
 
         commandBuffer.pipelineBarrier(sourceStage, destinationStage, {}, {}, nullptr, barrier);

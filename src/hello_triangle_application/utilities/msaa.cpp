@@ -55,7 +55,7 @@ namespace HelloTriangleApplication::Utilities
         return desired;
     }
 
-    Result<vk::SampleCountFlagBits, std::string> getSampleCount(App& app)
+    Result<vk::SampleCountFlagBits, ErrorMessage> getSampleCount(App& app)
     {
         vk::SampleCountFlagBits desired = aaSettingToSampleCount(App::CONFIG.graphics.antiAliasing);
         if (deviceSupportsSampleCount(app.physicalDevice, desired))
@@ -64,7 +64,7 @@ namespace HelloTriangleApplication::Utilities
         }
         else
         {
-            return Err<std::string>("Anti-aliasing setting not supported.");
+            return ErrorMessage({ .channel = "vulkan" }, "Anti-aliasing setting not supported.");
         }
     }
 }

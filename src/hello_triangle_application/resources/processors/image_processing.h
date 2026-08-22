@@ -5,19 +5,19 @@ namespace HelloTriangleApplication::Resources
 {
     class ImageDataExporter : public ResourceExporter
     {
-        Result<Unit, std::string> exportResource(
+        Result<Unit, ErrorMessage> exportResource(
             const std::filesystem::path& path, OfflineProcessingData& processingData) override;
     };
 
     class ImageDataLoader : public ResourceLoader
     {
-        Result<Unit, std::string> loadResource(const std::filesystem::path& path,
+        Result<Unit, ErrorMessage> loadResource(const std::filesystem::path& path,
             std::any resource, RuntimeProcessingData& processingData) override;
     };
 
     class ImageDataUnloader : public ResourceUnloader
     {
     public:
-        Result<Unit, std::string> unloadResource(std::any resource, RuntimeProcessingData& processingData) override;
+        Result<Unit, ErrorMessage> unloadResource(std::any resource, RuntimeProcessingData& processingData) override;
     };
 }

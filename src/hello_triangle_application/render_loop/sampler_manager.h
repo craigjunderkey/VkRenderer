@@ -13,11 +13,11 @@ namespace HelloTriangleApplication::RenderLoop
         std::array<vk::raii::Sampler, SamplerName::None> samplers_ { nullptr, nullptr, nullptr };
     
     public:
-        Result<Unit, std::string> makeSamplers(App& app);
+        Result<Unit, ErrorMessage> makeSamplers(App& app);
         const vk::raii::Sampler& sampler(SamplerName name) const;
         const vk::raii::Sampler& sampler(u32 id) const;
         u32 numSamplers() const;
 
-        static SamplerName samplerNameFromString(const char* str);
+        static SamplerName samplerNameFromString(std::string_view str);
     };
 }

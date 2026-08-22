@@ -51,7 +51,7 @@ namespace HelloTriangleApplication::Utilities
         
         void addShaderStage(vk::ShaderStageFlagBits stage, vk::ShaderModule shader, Option<const char*> entryPoint = {});
         void addShaderStages(vk::ShaderModule shader, const std::vector<Resources::ShaderEntryPoint>& entryPoints);
-        Result<FatPipeline, std::string> build(App& app) const;
+        Result<FatPipeline, ErrorMessage> build(App& app) const;
     };
 
     class PipelineLayoutBuilder
@@ -60,6 +60,6 @@ namespace HelloTriangleApplication::Utilities
         std::vector<vk::DescriptorSetLayout> descriptorSetLayouts;                  // vk::PipelineLayoutCreateInfo
         std::vector<vk::PushConstantRange> pushConstantRanges;                      // --
 
-        Result<std::shared_ptr<vk::raii::PipelineLayout>, std::string> build(App& app) const;
+        Result<std::shared_ptr<vk::raii::PipelineLayout>, ErrorMessage> build(App& app) const;
     };
 }

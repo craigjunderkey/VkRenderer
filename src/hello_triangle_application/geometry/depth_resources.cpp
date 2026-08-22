@@ -6,7 +6,7 @@ using HelloTriangleApplication::Resources::TextureDescription;
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<vk::Format, std::string> findSupportedFormat(App& app, const std::vector<vk::Format>& candidates,
+    Result<vk::Format, ErrorMessage> findSupportedFormat(App& app, const std::vector<vk::Format>& candidates,
         vk::ImageTiling tiling, vk::FormatFeatureFlags features)
     {
         for (vk::Format format : candidates)
@@ -17,10 +17,10 @@ namespace HelloTriangleApplication::Geometry
             if (linearMatch || optimalMatch) return format;
         }
 
-        return Err<std::string>("Failed to find supported depth format.");
+        return ErrorMessage({ .channel = "vulkan" }, "Failed to find supported depth format.");
     }
     
-    Result<Unit, std::string> createDepthTexture(App& app)
+    Result<Unit, ErrorMessage> createDepthTexture(App& app)
     {
         // get format
         auto depthFormatResult = findSupportedFormat(
@@ -28,8 +28,7 @@ namespace HelloTriangleApplication::Geometry
             {vk::Format::eD32Sfloat, vk::Format::eD32SfloatS8Uint, vk::Format::eD24UnormS8Uint},
             vk::ImageTiling::eOptimal, vk::FormatFeatureFlagBits::eDepthStencilAttachment
         );
-        if (!depthFormatResult) return Err<std::string>(depthFormatResult.error());
-
+        CHECK_KEEP(depthFormatResult);
         vk::Format depthFormat = depthFormatResult.take();
 
         // create texture
@@ -41,22 +40,6 @@ namespace HelloTriangleApplication::Geometry
         auto texResult = Texture::fromDescription(app, desc);
         CHECK_KEEP(texResult);
         app.depthTexture = texResult.take();
-
-        // TRY_ASSIGN(
-        //     app.depthTexture,
-        //     Texture::create(
-        //         app,
-        //         app.swapChainExtent.width,
-        //         app.swapChainExtent.height,
-        //         depthFormat,
-        //         vk::ImageTiling::eOptimal,
-        //         vk::ImageUsageFlagBits::eDepthStencilAttachment,
-        //         vk::MemoryPropertyFlagBits::eDeviceLocal,
-        //         vk::ImageAspectFlagBits::eDepth,
-        //         false,
-        //         app.msaaSamples
-        //     )
-        // );
 
         return Ok();
     }

@@ -3,5 +3,5 @@
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createSyncObjects(App& app);
+    Result<Unit, ErrorMessage> createSyncObjects(App& app);
 }

@@ -3,5 +3,5 @@
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> pickPhysicalDevice(App& app);
+    Result<Unit, ErrorMessage> pickPhysicalDevice(App& app);
 }

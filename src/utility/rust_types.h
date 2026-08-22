@@ -21,6 +21,7 @@ inline void panic(std::string_view message)
 
 inline void panic()
 {
+    std::cerr << "\x1B[31mCalled panic.\x1B[0m\n";
     std::exit(EXIT_FAILURE);
 }
 
@@ -90,6 +91,12 @@ public:
         return this->val_.error();
     }
 
+    E&& takeError()
+    {
+        assert(!this->val_.has_value());
+        return std::move(this->val_).error();
+    }
+
     inline bool isErr() const { return !this->val_.has_value(); }
     inline bool isOk() const { return this->val_.has_value(); }
 };
@@ -101,8 +108,3 @@ using Err = std::unexpected<E>;
 // option
 template <typename T>
 using Option = std::optional<T>;
-
-inline constexpr std::nullopt_t None()
-{
-    return std::nullopt;
-}

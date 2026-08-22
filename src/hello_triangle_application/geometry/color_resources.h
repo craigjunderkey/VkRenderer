@@ -5,5 +5,5 @@ namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<Unit, std::string> createColorTexture(App& app);
+    Result<Unit, ErrorMessage> createColorTexture(App& app);
 }

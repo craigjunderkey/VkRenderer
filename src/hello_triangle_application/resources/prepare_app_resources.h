@@ -5,11 +5,11 @@ namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> initializeResourceManager(App& app);
-    Result<Unit, std::string> loadAllResources(App& app);
-    Result<Unit, std::string> addBindlessResources(App& app);
-    Result<Unit, std::string> handleAssetBuild(App& app);
-    Result<Unit, std::string> handlePrePipelineInitialization(App& app);
-    Result<Unit, std::string> handlePostLoadInitialization(App& app);
-    Result<Unit, std::string> loadAndSubmitBindlessResources(App& app);
+    Result<Unit, ErrorMessage> initializeResourceManager(App& app);
+    Result<Unit, ErrorMessage> loadAllResources(App& app);
+    Result<Unit, ErrorMessage> addBindlessResources(App& app);
+    Result<Unit, ErrorMessage> handleAssetBuild(App& app);
+    Result<Unit, ErrorMessage> handlePrePipelineInitialization(App& app);
+    Result<Unit, ErrorMessage> handlePostLoadInitialization(App& app);
+    Result<Unit, ErrorMessage> loadAndSubmitBindlessResources(App& app);
 }

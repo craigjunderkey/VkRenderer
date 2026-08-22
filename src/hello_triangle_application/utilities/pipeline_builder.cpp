@@ -82,7 +82,8 @@ namespace HelloTriangleApplication::Utilities
                     name = "fragMain";
                     break;
                 default:
-                    panic("Shader missing entry point name.");
+                    err({ .channel = "vulkan" }, "Shader missing entry point name");
+                    panic();
             }
         }
 
@@ -139,7 +140,7 @@ namespace HelloTriangleApplication::Utilities
     }
 
 
-    Result<FatPipeline, std::string> PipelineBuilder::build(App& app) const
+    Result<FatPipeline, ErrorMessage> PipelineBuilder::build(App& app) const
     {
         // dynamic state
         vk::PipelineDynamicStateCreateInfo dynamicStateInfo {
@@ -199,17 +200,16 @@ namespace HelloTriangleApplication::Utilities
             .renderPass = nullptr
         };
 
-        Result<vk::raii::Pipeline, std::string> pipeline =
-            castVkResult(app.device.createGraphicsPipeline(nullptr, pipelineInfo));
-        CHECK_KEEP(pipeline);
+        auto pipelineResult = castVkResult(app.device.createGraphicsPipeline(nullptr, pipelineInfo));
+        CHECK_KEEP(pipelineResult);
 
         return FatPipeline {
-            .pipeline = pipeline.take(),
+            .pipeline = pipelineResult.take(),
             .layout = this->layout
         };
     }
 
-    Result<std::shared_ptr<vk::raii::PipelineLayout>, std::string> PipelineLayoutBuilder::build(App& app) const
+    Result<std::shared_ptr<vk::raii::PipelineLayout>, ErrorMessage> PipelineLayoutBuilder::build(App& app) const
     {
         vk::PipelineLayoutCreateInfo createInfo {
             .setLayoutCount = static_cast<u32>(this->descriptorSetLayouts.size()),
@@ -220,9 +220,8 @@ namespace HelloTriangleApplication::Utilities
 
         VkPipelineLayout layout;
         
-        VkResult layoutResult = vkCreatePipelineLayout(*app.device, createInfo, nullptr, &layout);
-        if (layoutResult != VkResult::VK_SUCCESS)
-            return Err<std::string>(vkResultToString(layoutResult));
+        auto layoutResult = castVkResult(vkCreatePipelineLayout(*app.device, createInfo, nullptr, &layout));
+        CHECK(layoutResult);
 
         return std::make_shared<vk::raii::PipelineLayout>(vk::raii::PipelineLayout(app.device, layout));
     }

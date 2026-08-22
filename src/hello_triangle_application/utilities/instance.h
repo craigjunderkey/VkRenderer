@@ -3,5 +3,5 @@
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createInstance(App& app);
+    Result<Unit, ErrorMessage> createInstance(App& app);
 }

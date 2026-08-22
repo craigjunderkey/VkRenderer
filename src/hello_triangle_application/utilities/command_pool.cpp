@@ -4,7 +4,7 @@
 
 using HelloTriangleApplication::App;
 
-Result<Unit, std::string> createGraphicsCommandPool(App& app)
+Result<Unit, ErrorMessage> createGraphicsCommandPool(App& app)
 {
     vk::CommandPoolCreateInfo commandPoolCreateInfo {
         .flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
@@ -19,7 +19,7 @@ Result<Unit, std::string> createGraphicsCommandPool(App& app)
     return Ok();
 }
 
-Result<Unit, std::string> createTransferCommandPool(App& app)
+Result<Unit, ErrorMessage> createTransferCommandPool(App& app)
 {
     vk::CommandPoolCreateInfo commandPoolCreateInfo {
         .flags = vk::CommandPoolCreateFlagBits::eTransient,
@@ -36,7 +36,7 @@ Result<Unit, std::string> createTransferCommandPool(App& app)
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createCommandPools(App& app)
+    Result<Unit, ErrorMessage> createCommandPools(App& app)
     {
         createGraphicsCommandPool(app);
         createTransferCommandPool(app);

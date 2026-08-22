@@ -7,9 +7,10 @@
 
 using HelloTriangleApplication::App;
 
-Result<const vk::SurfaceFormatKHR, std::string> chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats)
+Result<const vk::SurfaceFormatKHR, ErrorMessage> chooseSwapSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& availableFormats)
 {
-    if (availableFormats.empty()) return Err<std::string>("Surface has no available formats.");
+    if (availableFormats.empty())
+        return ErrorMessage({ .channel = "vulkan" }, "Surface has no available formats.");
     
     const auto formatIt = std::ranges::find_if(
         availableFormats,
@@ -31,10 +32,10 @@ Result<const vk::SurfaceFormatKHR, std::string> chooseSwapSurfaceFormat(const st
         format = availableFormats[0];
     }
 
-    return Result<const vk::SurfaceFormatKHR, std::string>(format);
+    return std::move(format);
 }
 
-Result<vk::PresentModeKHR, std::string> chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes)
+Result<vk::PresentModeKHR, ErrorMessage> chooseSwapPresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes)
 {
     bool supportsFifo = std::ranges::any_of(availablePresentModes, [](const auto& mode) { return mode == vk::PresentModeKHR::eFifo; });
     
@@ -53,7 +54,7 @@ Result<vk::PresentModeKHR, std::string> chooseSwapPresentMode(const std::vector<
     }
     else
     {
-        return Err<std::string>("Surface supports neither FIFO nor mailbox present modes.");
+        return ErrorMessage({ .channel = "vulkan" }, "Surface supports neither FIFO nor mailbox present modes.");
     }
 }
 
@@ -87,7 +88,7 @@ u32 chooseSwapMinImageCount(const vk::SurfaceCapabilitiesKHR& capabilities)
     return minImageCount;
 }
 
-Result<Unit, std::string> cleanupSwapChain(App& app)
+Result<Unit, ErrorMessage> cleanupSwapChain(App& app)
 {
     app.swapChainImageViews.clear();
     app.swapChain = nullptr;
@@ -96,7 +97,7 @@ Result<Unit, std::string> cleanupSwapChain(App& app)
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createSwapChain(App& app)
+    Result<Unit, ErrorMessage> createSwapChain(App& app)
     {
         // collect surface details
         vk::SurfaceCapabilitiesKHR surfaceCapabilities;
@@ -146,17 +147,14 @@ namespace HelloTriangleApplication::Utilities
         if (app.swapChain != VK_NULL_HANDLE)
             swapChainCreateInfo.oldSwapchain = *app.swapChain;
 
-        TRY_ASSIGN(
-            app.swapChain,
-            castVkResult(app.device.createSwapchainKHR(swapChainCreateInfo))
-        );
+        auto createSwapResult = castVkResult(app.device.createSwapchainKHR(swapChainCreateInfo));
+        CHECK_KEEP(createSwapResult);
+        app.swapChain = createSwapResult.take();
 
         // fetch swap chain images
-        TRY_ASSIGN(
-            app.swapChainImages,
-            castVkResult(app.swapChain.getImages())
-        );
-        
+        auto getImagesResult = castVkResult(app.swapChain.getImages());
+        CHECK_KEEP(getImagesResult);
+        app.swapChainImages = getImagesResult.take();
 
         // store format and extent
         app.swapChainFormat = format;
@@ -165,7 +163,7 @@ namespace HelloTriangleApplication::Utilities
         return Ok();
     }
 
-    Result<Unit, std::string> recreateSwapChain(App& app)
+    Result<Unit, ErrorMessage> recreateSwapChain(App& app)
     {
         while (app.window.status.isMinimized)
         {

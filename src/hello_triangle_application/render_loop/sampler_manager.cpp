@@ -4,7 +4,7 @@
 
 namespace HelloTriangleApplication::RenderLoop
 {
-    Result<Unit, std::string> SamplerManager::makeSamplers(App& app)
+    Result<Unit, ErrorMessage> SamplerManager::makeSamplers(App& app)
     {
         // make repeat sampler
         {
@@ -15,7 +15,7 @@ namespace HelloTriangleApplication::RenderLoop
 
             auto samplerResult = castVkResult(app.device.createSampler(samplerInfo));
             if (!samplerResult)
-                return Err<std::string>("Failed to create repeat sampler.");
+                return ErrorMessage({ .channel = "vulkan "}, "Failed to create repeat sampler.");
 
             this->samplers_[SamplerName::Repeat] = samplerResult.take();
         }
@@ -29,7 +29,7 @@ namespace HelloTriangleApplication::RenderLoop
 
             auto samplerResult = castVkResult(app.device.createSampler(samplerInfo));
             if (!samplerResult)
-                return Err<std::string>("Failed to create mirrored repeat sampler.");
+                return ErrorMessage({ .channel = "vulkan" }, "Failed to create mirrored repeat sampler.");
 
             this->samplers_[SamplerName::MirroredRepeat] = samplerResult.take();
         }
@@ -43,7 +43,7 @@ namespace HelloTriangleApplication::RenderLoop
 
             auto samplerResult = castVkResult(app.device.createSampler(samplerInfo));
             if (!samplerResult)
-                return Err<std::string>("Failed to create clamped sampler.");
+                return ErrorMessage({ .channel = "vulkan" }, "Failed to create clamped sampler.");
             
             this->samplers_[SamplerName::Clamped] = samplerResult.take();
         }
@@ -67,15 +67,19 @@ namespace HelloTriangleApplication::RenderLoop
         return SamplerName::None;
     }
 
-    SamplerName SamplerManager::samplerNameFromString(const char* str)
+    SamplerName SamplerManager::samplerNameFromString(std::string_view str)
     {
-        if (strcmp(str, "repeat") == 0)
+        if (str.compare("repeat") == 0)
         {
             return SamplerName::Repeat;
         }
-        else if (strcmp(str, "mirrored_repeat") == 0)
+        else if (str.compare("mirrored_repeat") == 0)
         {
             return SamplerName::MirroredRepeat;
+        }
+        else if (str.compare("clamped") == 0)
+        {
+            return SamplerName::Clamped;
         }
         else
         {

@@ -12,7 +12,7 @@ using HelloTriangleApplication::Geometry::Texture;
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> CubemapExporter::exportResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
+    Result<Unit, ErrorMessage> CubemapExporter::exportResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
     {
         // load cubemap json data
         std::array<StringId, 6> sides;
@@ -29,7 +29,7 @@ namespace HelloTriangleApplication::Resources
         foundAllSides = foundAllSides && json.trySetProperty("-z", sides[CubeSide::NegZ]);
 
         if (!foundAllSides)
-            return Err<std::string>("Cubemap " + path.stem().string() + " does not specify all sides.");
+            return ErrorMessage({ .channel = "resources" }, "Cubemap {} does not specify all sides.", path.stem().c_str());
         
         // write the sides
         std::ofstream out(getExportPath("cubemaps", path));
@@ -44,7 +44,8 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> CubemapLoader::loadResource(const std::filesystem::path& path, std::any resource, RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> CubemapLoader::loadResource(const std::filesystem::path& path,
+        std::any resource, RuntimeProcessingData& processingData)
     {
         Cubemap* cubemap = std::any_cast<Cubemap*>(resource);
         std::ifstream in(path);
@@ -52,12 +53,12 @@ namespace HelloTriangleApplication::Resources
 
         in.ignore();
         if (!in.eof())
-            return Err<std::string>("Read all cubemap information in " + path.string() + " but didn't reach end-of-file.\n");
+            warn({ .channel = "resources" }, "Read all cubemap information in {} but didn't reach end-of-file.", path);
 
         return Ok();
     }
 
-    Result<Unit, std::string> CubemapInitializer::postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> CubemapInitializer::postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData)
     {
         Cubemap* cubemap = std::any_cast<Cubemap*>(resource);
 

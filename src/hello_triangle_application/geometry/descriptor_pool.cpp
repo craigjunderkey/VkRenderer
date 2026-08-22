@@ -5,7 +5,7 @@
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<Unit, std::string> createDescriptorPool(App& app)
+    Result<Unit, ErrorMessage> createDescriptorPool(App& app)
     {
         std::array<vk::DescriptorPoolSize, 2> poolSizes {
             vk::DescriptorPoolSize {
@@ -25,15 +25,14 @@ namespace HelloTriangleApplication::Geometry
             .pPoolSizes = poolSizes.data()
         };
 
-        TRY_ASSIGN(
-            app.descriptorPool,
-            castVkResult(app.device.createDescriptorPool(poolInfo))
-        );
+        auto poolResult = castVkResult(app.device.createDescriptorPool(poolInfo));
+        CHECK_KEEP(poolResult);
+        app.descriptorPool = poolResult.take();
 
         return Ok();
     }
 
-    Result<Unit, std::string> createDescriptorSets(App& app)
+    Result<Unit, ErrorMessage> createDescriptorSets(App& app)
     {
         std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, *app.descriptorSetLayout);
         
@@ -43,10 +42,9 @@ namespace HelloTriangleApplication::Geometry
             .pSetLayouts = layouts.data()
         };
 
-        TRY_ASSIGN(
-            app.descriptorSets,
-            castVkResult(app.device.allocateDescriptorSets(allocInfo))
-        );
+        auto allocSetsResult = castVkResult(app.device.allocateDescriptorSets(allocInfo));
+        CHECK_KEEP(allocSetsResult);
+        app.descriptorSets = allocSetsResult.take();
 
         for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {

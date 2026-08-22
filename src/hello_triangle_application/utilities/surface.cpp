@@ -5,13 +5,12 @@
 
 using HelloTriangleApplication::App;
 
-Result<vk::raii::SurfaceKHR, std::string> makeGlfwSurface(App& app)
+Result<vk::raii::SurfaceKHR, ErrorMessage> makeGlfwSurface(App& app)
 {
     VkSurfaceKHR rawSurface;
-    VkResult result = glfwCreateWindowSurface(*app.instance, *app.window, nullptr, &rawSurface);
-    
-    if (result != VkResult::VK_SUCCESS)
-        return Err<std::string>(vkResultToString(result));
+
+    auto result = castVkResult(glfwCreateWindowSurface(*app.instance, *app.window, nullptr, &rawSurface));
+    CHECK(result);
     
     vk::raii::SurfaceKHR surface = vk::raii::SurfaceKHR(app.instance, rawSurface);
 
@@ -20,13 +19,11 @@ Result<vk::raii::SurfaceKHR, std::string> makeGlfwSurface(App& app)
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createSurface(App& app)
+    Result<Unit, ErrorMessage> createSurface(App& app)
     {
-        TRY_ASSIGN(
-            app.surface,
-            makeGlfwSurface(app)
-        );
-
+        auto surfaceResult = makeGlfwSurface(app);
+        CHECK_KEEP(surfaceResult);
+        app.surface = surfaceResult.take();
         return Ok();
     }
 }

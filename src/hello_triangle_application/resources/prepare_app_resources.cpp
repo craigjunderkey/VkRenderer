@@ -11,7 +11,7 @@
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> initializeResourceManager(App& app)
+    Result<Unit, ErrorMessage> initializeResourceManager(App& app)
     {
         app.resources.addResourceType(Types::textData());
         app.resources.addResourceType(Types::jsonData());
@@ -38,7 +38,7 @@ namespace HelloTriangleApplication::Resources
         }
 
         template <typename T>
-        Result<Unit, std::string> load(StringId resourceName)
+        Result<Unit, ErrorMessage> load(StringId resourceName)
         {
             auto start = std::chrono::high_resolution_clock::now();
             CHECK(this->registry_.loadResources<T>(resourceName));
@@ -54,7 +54,7 @@ namespace HelloTriangleApplication::Resources
         }
     };
 
-    Result<Unit, std::string> handleAssetBuild(App& app)
+    Result<Unit, ErrorMessage> handleAssetBuild(App& app)
     {
         bool shouldBuild;
 
@@ -83,7 +83,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> loadAllResources(App& app)
+    Result<Unit, ErrorMessage> loadAllResources(App& app)
     {
         LogLoader loader(app.resources.registry());
 
@@ -99,7 +99,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit ,std::string> addBindlessResources(App& app)
+    Result<Unit, ErrorMessage> addBindlessResources(App& app)
     {
         BindlessManager& bindless = app.resources.bindless();
         
@@ -160,7 +160,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> handlePostLoadInitialization(App& app)
+    Result<Unit, ErrorMessage> handlePostLoadInitialization(App& app)
     {
         CHECK(app.resources.registry().postLoadInitialize<Geometry::Mesh>("mesh"));
         CHECK(app.resources.registry().postLoadInitialize<Geometry::Texture>("texture"));
@@ -172,7 +172,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> handlePrePipelineInitialization(App& app)
+    Result<Unit, ErrorMessage> handlePrePipelineInitialization(App& app)
     {
         // make samplers
         CHECK(app.samplers.makeSamplers(app));
@@ -196,7 +196,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> loadAndSubmitBindlessResources(App& app)
+    Result<Unit, ErrorMessage> loadAndSubmitBindlessResources(App& app)
     {
         BindlessManager& bindless = app.resources.bindless();
 

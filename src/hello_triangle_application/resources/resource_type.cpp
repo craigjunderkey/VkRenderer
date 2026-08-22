@@ -1,34 +1,32 @@
 #include "resource_type.h"
 #include "asset_conditioning_pipeline.h"
 
-#define RESOURCE_NAME_HERE "Resource type " + std::string(resourceName)
-
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> ResourceType::check()
+    Result<Unit, ErrorMessage> ResourceType::check()
     {
         if (resourceName == nullptr)
-            return Err<std::string>("Resource type missing a name.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type missing a name.");
         if (resourceDirectory == nullptr)
-            return Err<std::string>(RESOURCE_NAME_HERE + " missing a directory.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type {} missing a directory.", resourceName);
         if (inFileExtensions[0] == nullptr)
-            return Err<std::string>(RESOURCE_NAME_HERE + " is missing a first input file extension.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type {} is missing a first input file extension.", resourceName);
         if (offline.exporter.has_value() && offline.exporter.value() == nullptr)
-            return Err<std::string>(RESOURCE_NAME_HERE + " has an exporter but it's nullptr.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type {} has an exporter but it's nullptr.", resourceName);
         if (offline.compiler.has_value() && offline.compiler.value() == nullptr)
-            return Err<std::string>(RESOURCE_NAME_HERE + " has a compiler but it's nullptr.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type {} has a compiler but it's nullptr.", resourceName);
         if (offline.linker.has_value() && offline.linker.value() == nullptr)
-            return Err<std::string>(RESOURCE_NAME_HERE + " has a linker but it's nullptr.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type {} has a linker but it's nullptr.", resourceName);
         if (offline.tasks.has_value() && offline.tasks.value() == nullptr)
-            return Err<std::string>(RESOURCE_NAME_HERE + " has offline tasks but it's nullptr.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type {} has offline tasks but it's nullptr.", resourceName);
         if (runtime.loader == nullptr)
-            return Err<std::string>(RESOURCE_NAME_HERE + " is missing a loader.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type {} is missing a loader.", resourceName);
         if (runtime.unloader.has_value() && runtime.unloader.value() == nullptr)
-            return Err<std::string>(RESOURCE_NAME_HERE + " has an unloader but it's nullptr.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type {} has an unloader but it's nullptr.", resourceName);
         if (runtime.postLoadInitializer.has_value() && runtime.postLoadInitializer.value() == nullptr)
-            return Err<std::string>(RESOURCE_NAME_HERE + " has a post-load initializer but it's nullptr.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type {} has a post-load initializer but it's nullptr.", resourceName);
         if (runtime.tasks.has_value() && runtime.tasks.value() == nullptr)
-            return Err<std::string>(RESOURCE_NAME_HERE + " has runtime tasks but it's nullptr.");
+            return ErrorMessage({ .channel = "resources" }, "Resource type {} has runtime tasks but it's nullptr.", resourceName);
 
         return Ok();
     }

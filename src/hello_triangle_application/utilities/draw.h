@@ -5,5 +5,5 @@ namespace HelloTriangleApplication::RenderLoop { class GameLoop; }
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> drawFrame(App& app, RenderLoop::GameLoop& loop);
+    Result<Unit, ErrorMessage> drawFrame(App& app, RenderLoop::GameLoop& loop);
 }

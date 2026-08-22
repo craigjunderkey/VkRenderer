@@ -3,6 +3,6 @@
 
 namespace HelloTriangleApplication::Utilities
 {
-    Result<Unit, std::string> createSwapChain(App& app);
-    Result<Unit, std::string> recreateSwapChain(App& app);
+    Result<Unit, ErrorMessage> createSwapChain(App& app);
+    Result<Unit, ErrorMessage> recreateSwapChain(App& app);
 }

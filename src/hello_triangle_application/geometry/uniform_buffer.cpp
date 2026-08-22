@@ -4,7 +4,7 @@
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<Unit, std::string> createUniformBuffers(App& app)
+    Result<Unit, ErrorMessage> createUniformBuffers(App& app)
     {
         for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
@@ -16,13 +16,9 @@ namespace HelloTriangleApplication::Geometry
                     vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
                 )
             );
-            
-            if (ubo.isErr())
-                return Err<std::string>(ubo.error());
-            
+            CHECK_KEEP(ubo);            
             app.uniformBuffers.emplace_back(ubo.take());
         }
-
         return Ok();
     }
 

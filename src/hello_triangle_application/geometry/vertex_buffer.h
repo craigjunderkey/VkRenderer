@@ -5,8 +5,8 @@
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<FatBuffer, std::string> createStagingBuffer(App& app, void* sourceData, vk::DeviceSize size);
-    Result<Unit, std::string> copyBuffer(App& app, FatBuffer& src, FatBuffer& dst);
+    Result<FatBuffer, ErrorMessage> createStagingBuffer(App& app, void* sourceData, vk::DeviceSize size);
+    Result<Unit, ErrorMessage> copyBuffer(App& app, FatBuffer& src, FatBuffer& dst);
     void copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, const vk::raii::Buffer& buffer,
         vk::raii::Image& image, u32 width, u32 height);
 }

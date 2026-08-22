@@ -5,5 +5,5 @@ namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<Unit, std::string> createDescriptorSetLayout(App& app);
+    Result<Unit, ErrorMessage> createDescriptorSetLayout(App& app);
 }

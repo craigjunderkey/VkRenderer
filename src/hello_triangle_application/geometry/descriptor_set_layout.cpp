@@ -3,7 +3,7 @@
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<Unit, std::string> createDescriptorSetLayout(App& app)
+    Result<Unit, ErrorMessage> createDescriptorSetLayout(App& app)
     {
         std::array<vk::DescriptorSetLayoutBinding, 2> bindings {
             vk::DescriptorSetLayoutBinding {
@@ -25,10 +25,9 @@ namespace HelloTriangleApplication::Geometry
             .pBindings = bindings.data()
         };
 
-        TRY_ASSIGN(
-            app.descriptorSetLayout,
-            castVkResult(app.device.createDescriptorSetLayout(layoutInfo))
-        );
+        auto layoutResult = castVkResult(app.device.createDescriptorSetLayout(layoutInfo));
+        CHECK_KEEP(layoutResult);
+        app.descriptorSetLayout = layoutResult.take();
 
         return Ok();
     }

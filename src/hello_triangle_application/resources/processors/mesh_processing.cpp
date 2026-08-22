@@ -14,7 +14,7 @@ using HelloTriangleApplication::Geometry::MeshData;
 
 namespace HelloTriangleApplication::Resources
 {
-    Result<Unit, std::string> MeshExporter::exportResource(
+    Result<Unit, ErrorMessage> MeshExporter::exportResource(
         const std::filesystem::path& path, OfflineProcessingData& processingData)
     {
         MeshImporter* importer;
@@ -23,9 +23,13 @@ namespace HelloTriangleApplication::Resources
         ObjImporter objImporter;
         std::filesystem::path extension = path.extension();
         if (strcmp(extension.c_str(), ".obj") == 0)
+        {
             importer = &objImporter;
+        }
         else
-            panic("MeshExporter received a file with an invalid extension.");
+        {
+            return ErrorMessage({ .channel = "resources" }, "MeshExporter received a file with an invalid extension.");
+        }
 
         // import vertices
         auto importResult = importer->importMesh(path);
@@ -64,7 +68,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<Unit, std::string> MeshLoader::loadResource(const std::filesystem::path& path,
+    Result<Unit, ErrorMessage> MeshLoader::loadResource(const std::filesystem::path& path,
         std::any resource, RuntimeProcessingData& processingData)
     {
         // read in vertex/index metadata
@@ -79,16 +83,14 @@ namespace HelloTriangleApplication::Resources
         // check that vertex and index size match application's
         if (vertexSize != sizeof(Vertex))
         {
-            std::ostringstream msg;
-            msg << path.string() << " vertex size is " << vertexSize << " but application vertex size is " << sizeof(Vertex) << ".";
-            return Err<std::string>(msg.str());
+            return ErrorMessage({ .channel = "resources" }, 
+                "{} vertex size is {} but application vertex size is {}.", path, vertexSize, sizeof(Vertex));
         }
 
         if (indexSize != sizeof(u32))
         {
-            std::ostringstream msg;
-            msg << path.string() << " index size is " << indexSize << " but application index size is " << sizeof(u32) << ".";
-            return Err<std::string>(msg.str());
+            return ErrorMessage({ .channel = "resources" },
+                "{} index size is {} but application index size is {}.", path, indexSize, sizeof(u32));
         }
 
         // read in vertex information
@@ -105,8 +107,8 @@ namespace HelloTriangleApplication::Resources
         {
             std::ostringstream remainder;
             remainder << in.rdbuf();
-            return Err<std::string>("Read all vertex and index information in " + path.string() + " but didn't reach end-of-file.\n" +
-                "Remaining: " + remainder.str() + "\n");
+            warn({ .channel = "resources" },
+                "Read all vertex and index information in {} but didn't reach end-of-file. Remaining: {}.", path, remainder.str());
         }
 
         // send information to mesh
@@ -121,7 +123,7 @@ namespace HelloTriangleApplication::Resources
         return Ok();
     }
 
-    Result<std::vector<Vertex>, std::string> ObjImporter::importMesh(const std::filesystem::path& path)
+    Result<std::vector<Vertex>, ErrorMessage> ObjImporter::importMesh(const std::filesystem::path& path)
     {
         // load the obj file
         tinyobj::attrib_t attributes;
@@ -138,7 +140,7 @@ namespace HelloTriangleApplication::Resources
             err({ .channel = "resources" }, errText);
 
         if (!success)
-            return Err<std::string>(errText);
+            return ErrorMessage();
         
         // load vertices from obj faces
         std::vector<Vertex> vertices = {};
@@ -173,7 +175,7 @@ namespace HelloTriangleApplication::Resources
         return std::move(vertices);
     }
     
-    Result<Unit, std::string> MeshInitializer::postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData)
+    Result<Unit, ErrorMessage> MeshInitializer::postLoadInitializeResource(std::any resource, RuntimeProcessingData& processingData)
     {
         Mesh* mesh = std::any_cast<Mesh*>(resource);
         CHECK(mesh->makeBuffers(*processingData.app));

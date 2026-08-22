@@ -23,7 +23,7 @@ namespace HelloTriangleApplication::Geometry
         u32 mipLevels = 1;
         u32 numLayers = 1;
 
-        static Result<Texture, std::string> fromDescription(App& app, const Resources::TextureDescription& desc);
+        static Result<Texture, ErrorMessage> fromDescription(App& app, const Resources::TextureDescription& desc);
         
         static vk::SamplerCreateInfo defaultSamplerInfo(App& app);
 

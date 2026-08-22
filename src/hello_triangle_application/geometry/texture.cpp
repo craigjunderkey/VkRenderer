@@ -36,7 +36,7 @@ namespace HelloTriangleApplication::Geometry
         return samplerInfo;
     }
 
-    Result<Unit, std::string> generateMipmaps(App& app, vk::raii::CommandBuffer& commandBuffer, Texture& tex)
+    Result<Unit, ErrorMessage> generateMipmaps(App& app, vk::raii::CommandBuffer& commandBuffer, Texture& tex)
     {
         // check whether the image format supports blitting
         vk::FormatProperties formatProperties = app.physicalDevice.getFormatProperties(tex.format);
@@ -45,8 +45,11 @@ namespace HelloTriangleApplication::Geometry
         );
         if (!supportsLinearFiltering)
         {   
-            return Err<std::string>("Image format " + vk::to_string(tex.format)
-                + " does not support linear filtering, so mipmaps cannot be generated.");
+            return ErrorMessage(
+                { .channel = "vulkan" },
+                "Image format {} does not support linear filtering, so mipmaps cannot be generated.",
+                vk::to_string(tex.format)
+            );
         }
         
         // prepare image barrier with shared properties
@@ -131,7 +134,7 @@ namespace HelloTriangleApplication::Geometry
         return Ok();
     }
 
-    Result<FatBuffer, std::string> makeImageCopyBuffer(App& app, const TextureDescription& desc)
+    Result<FatBuffer, ErrorMessage> makeImageCopyBuffer(App& app, const TextureDescription& desc)
     {
         u32 numImages = 1 + desc.additionalImages.size();
         vk::DeviceSize imageSize = app.resources.get<ImageData>(desc.image).size();
@@ -166,7 +169,7 @@ namespace HelloTriangleApplication::Geometry
         return std::move(stagingBuffer);
     }
 
-    Result<Unit, std::string> addBufferToImageCopyCommand(App& app, vk::raii::CommandBuffer& cmdBuffer, FatBuffer& stagingBuffer,
+    Result<Unit, ErrorMessage> addBufferToImageCopyCommand(App& app, vk::raii::CommandBuffer& cmdBuffer, FatBuffer& stagingBuffer,
         const TextureDescription& desc, Texture& tex)
     {
         // prepare command buffer for copying
@@ -194,7 +197,7 @@ namespace HelloTriangleApplication::Geometry
         return Ok();
     }
 
-    Result<Texture, std::string> Texture::fromDescription(App& app, const Resources::TextureDescription& desc)
+    Result<Texture, ErrorMessage> Texture::fromDescription(App& app, const Resources::TextureDescription& desc)
     {
         CHECK(desc.check(app.resources.registry().getMap<ImageData>()));
 

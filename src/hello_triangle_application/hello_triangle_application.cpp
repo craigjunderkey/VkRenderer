@@ -51,11 +51,6 @@ namespace HelloTriangleApplication
         cleanup();
     }
 
-    Result<Unit, ErrorMessage> testFate()
-    {
-        return ErrorMessage({}, "I truly love my life");
-    }
-
     void App::initLogger()
     {
         auto logContext = std::make_shared<Log::LoggingContext>(

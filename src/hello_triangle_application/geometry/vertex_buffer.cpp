@@ -12,7 +12,7 @@ using namespace HelloTriangleApplication::Utilities;
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<FatBuffer, std::string> createStagingBuffer(App& app, void* sourceData, vk::DeviceSize size)
+    Result<FatBuffer, ErrorMessage> createStagingBuffer(App& app, void* sourceData, vk::DeviceSize size)
     {
         std::vector<u32> families = {
             app.graphicsQueue.familyIndex,
@@ -20,24 +20,18 @@ namespace HelloTriangleApplication::Geometry
         };
 
         // create the staging buffer
-        FatBuffer stagingBuffer;
-        TRY_ASSIGN(
-            stagingBuffer,
-            FatBuffer::create(
-                app,
-                size,
-                vk::BufferUsageFlagBits::eTransferSrc,
-                vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
-                std::move(families)
-            )
+        auto createResult = FatBuffer::create(
+            app, size, vk::BufferUsageFlagBits::eTransferSrc,
+            vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
+            std::move(families)
         );
+        CHECK_KEEP(createResult);
+        FatBuffer stagingBuffer = createResult.take();
 
         // fill it with the vertices
-        void* data;
-        TRY_ASSIGN(
-            data,
-            castVkResult(stagingBuffer.memory.mapMemory(0, size))
-        );
+        auto mapResult = castVkResult(stagingBuffer.memory.mapMemory(0, size));
+        CHECK_KEEP(mapResult);
+        void* data = mapResult.take();
 
         memcpy(data, sourceData, size);
 
@@ -46,13 +40,11 @@ namespace HelloTriangleApplication::Geometry
         return std::move(stagingBuffer);
     }
 
-    Result<Unit, std::string> copyBuffer(App& app, FatBuffer& src, FatBuffer& dst)
+    Result<Unit, ErrorMessage> copyBuffer(App& app, FatBuffer& src, FatBuffer& dst)
     {
-        vk::raii::CommandBuffer copyCommand = nullptr;
-        TRY_ASSIGN(
-            copyCommand,
-            beginSingleTimeCommands(app, app.transferQueue)
-        );
+        auto beginResult = beginSingleTimeCommands(app, app.transferQueue);
+        CHECK_KEEP(beginResult);
+        vk::raii::CommandBuffer copyCommand = beginResult.take();
 
         copyCommand.copyBuffer(*src.buffer, *dst.buffer, vk::BufferCopy { .size = src.size } ); 
         

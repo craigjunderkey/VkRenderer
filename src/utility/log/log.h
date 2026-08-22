@@ -1,7 +1,7 @@
 #pragma once
 #include "../types.h"
-#include "../string_id_map.h"
 #include "../object_pool.h"
+#include <unordered_map>
 #include <format>
 #include <memory>
 #include <initializer_list>
@@ -97,7 +97,7 @@ namespace Log
     {
     private:
         std::array<StringId, 64> channels_;
-        StringIdMap<u32> channelIndices_ { "log_channel_indices" };
+        std::unordered_map<StringId, u32> channelIndices_ = std::unordered_map<StringId, u32>();
         u32 numChannels_;
 
     public:
