@@ -71,6 +71,10 @@ namespace HelloTriangleApplication::Utilities
         pipelineBuilder.shaderStages.clear();
         pipelineBuilder.addShaderStages(shaderModule, shader.entryPoints);
 
+        // truncate vertex attributes (not using normals or texcoords)
+        pipelineBuilder.vertAttributeDescriptions.clear();
+        pipelineBuilder.vertAttributeDescriptions.emplace_back(VertexInfo::attributeDescriptions()[0]);
+
         // set depth test to <=
         pipelineBuilder.depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 
