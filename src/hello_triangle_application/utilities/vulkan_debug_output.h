@@ -13,5 +13,6 @@ namespace HelloTriangleApplication::Utilities
     );
 
     Result<Unit, ErrorMessage> createDebugMessenger(App& app);
-}
 
+    std::string_view viewVkMessageType(vk::DebugUtilsMessageTypeFlagsEXT type);
+}

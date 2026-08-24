@@ -12,15 +12,15 @@ namespace HelloTriangleApplication::Utilities
     {
         if (messageSeverity >= vk::DebugUtilsMessageSeverityFlagBitsEXT::eError)
         {
-            err({ .channel = "vulkan" }, "{}...  {}.", vk::to_string(messageTypes), pCallbackData->pMessage);
+            err({ .channel = "vulkan" }, "<{}>  {}", viewVkMessageType(messageTypes), pCallbackData->pMessage);
         }
         else if (messageSeverity >= vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning)
         {
-            warn({ .channel = "vulkan" }, "{}... {}.", vk::to_string(messageTypes), pCallbackData->pMessage);
+            warn({ .channel = "vulkan", .verbosity = 1 }, "<{}>  {}", viewVkMessageType(messageTypes), pCallbackData->pMessage);
         }
         else if (messageSeverity >= vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo)
         {
-            log({ .channel = "vulkan", .verbosity = 2 }, "{}... {}.", vk::to_string(messageTypes), pCallbackData->pMessage);
+            log({ .channel = "vulkan", .verbosity = 2 }, "<{}>  {}", viewVkMessageType(messageTypes), pCallbackData->pMessage);
         }
 
         return vk::False;
@@ -48,5 +48,58 @@ namespace HelloTriangleApplication::Utilities
         app.debugMessenger = createResult.take();
 
         return Ok();
+    }
+
+    std::string_view viewVkMessageType(vk::DebugUtilsMessageTypeFlagsEXT type)
+    {
+        // message type strings
+        constexpr std::string_view delimiter = " | ";
+        constexpr std::string_view general = "General";
+        constexpr std::string_view validation = "Validation";
+        constexpr std::string_view performance = "Performance";
+        constexpr std::string_view deviceAddressBinding = "DeviceAddressBinding";
+        
+        constexpr u32 maxSize = general.size() + delimiter.size() + validation.size() + delimiter.size()
+            + performance.size() + delimiter.size() + performance.size() + delimiter.size() + deviceAddressBinding.size();
+
+        // build message string
+        static std::array<char, maxSize> msgString;
+        auto pos = msgString.begin();
+
+        bool isFirst = true;
+        if (type & vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral)
+        {
+            pos = std::copy(general.begin(), general.end(), pos);
+            isFirst = false;
+        }
+        if (type & vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation)
+        {
+            if (!isFirst)
+            {
+                pos = std::copy(delimiter.begin(), delimiter.end(), pos);
+            }
+            pos = std::copy(validation.begin(), validation.end(), pos);
+            isFirst = false;
+        }
+        if (type & vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance)
+        {
+            if (!isFirst)
+            {
+                pos = std::copy(delimiter.begin(), delimiter.end(), pos);
+            }
+            pos = std::copy(performance.begin(), performance.end(), pos);
+            isFirst = false;
+        }
+        if (type & vk::DebugUtilsMessageTypeFlagBitsEXT::eDeviceAddressBinding)
+        {
+            if (!isFirst)
+            {
+                pos = std::copy(delimiter.begin(), delimiter.end(), pos);
+            }
+            pos = std::copy(deviceAddressBinding.begin(), deviceAddressBinding.end(), pos);
+            isFirst = false;
+        }
+
+        return std::string_view(msgString.data(), pos - msgString.begin());
     }
 }
