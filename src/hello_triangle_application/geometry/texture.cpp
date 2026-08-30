@@ -158,7 +158,7 @@ namespace HelloTriangleApplication::Geometry
         // create staging buffer
         auto bufferResult = FatBuffer::create(
             app, imageSize * numImages, vk::BufferUsageFlagBits::eTransferSrc,
-            vk::MemoryPropertyFlagBits::eHostCoherent | vk::MemoryPropertyFlagBits::eHostVisible
+            vk::MemoryPropertyFlagBits::eDeviceLocal | vk::MemoryPropertyFlagBits::eHostCoherent | vk::MemoryPropertyFlagBits::eHostVisible
         );
         CHECK_KEEP(bufferResult);
         FatBuffer stagingBuffer = bufferResult.take();
@@ -283,14 +283,14 @@ namespace HelloTriangleApplication::Geometry
 
         // allocate and bind image memory
         vk::MemoryRequirements memRequirements = texture.image.getMemoryRequirements();
-        vk::MemoryAllocateInfo allocInfo {
-            .allocationSize = memRequirements.size,
-            .memoryTypeIndex = findMemoryType(app, memRequirements.memoryTypeBits, desc.memoryProperties)
-        };
-        auto allocResult = castVkResult(app.device.allocateMemory(allocInfo));
+        auto allocResult = app.memoryHelper.allocate(
+            memRequirements.size,
+            desc.memoryProperties,
+            memRequirements
+        );
         CHECK_KEEP(allocResult);
         texture.memory = allocResult.take();
-        texture.image.bindMemory(texture.memory, 0);
+        CHECK(castVkResult(texture.image.bindMemory(*texture.memory, 0)));
 
         // create image view
         vk::ImageViewCreateInfo viewCreateInfo {

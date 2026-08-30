@@ -1,10 +1,8 @@
 #pragma once
 #include "../utilities/common.h"
 #include "../utilities/vulkan_common.h"
-#include "buffer.h"
+#include "../utilities/vulkan_memory_helper.h"
 #include "../resources/texture_description.h"
-
-#include <memory>
 
 namespace HelloTriangleApplication { class App; }
 
@@ -26,7 +24,7 @@ namespace HelloTriangleApplication::Geometry
         StringId name = StringId();
         vk::raii::Image image = nullptr;
         vk::raii::ImageView view = nullptr;
-        vk::raii::DeviceMemory memory = nullptr;
+        Utilities::DeviceMemoryObject memory = {};
         TextureInfo info;
 
         static Result<Texture, ErrorMessage> fromDescription(App& app, const Resources::TextureDescription& desc);

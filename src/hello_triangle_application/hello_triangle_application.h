@@ -12,6 +12,7 @@
 #include "input/input_manager.h"
 #include "utilities/queue.h"
 #include "utilities/pipeline_builder.h"
+#include "utilities/vulkan_memory_helper.h"
 #include "geometry/buffer.h"
 #include "geometry/texture.h"
 #include "geometry/mesh.h"
@@ -24,6 +25,7 @@
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Utilities::FatPipeline;
+using HelloTriangleApplication::Utilities::VulkanMemoryHelper;
 using HelloTriangleApplication::Geometry::FatBuffer;
 using HelloTriangleApplication::Geometry::MappedBuffer;
 using HelloTriangleApplication::Geometry::Texture;
@@ -52,6 +54,7 @@ namespace HelloTriangleApplication
         vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
         FatQueue graphicsQueue;
         FatQueue transferQueue;
+        VulkanMemoryHelper memoryHelper = VulkanMemoryHelper(this->physicalDevice, this->device);
 
         // presentation
         vk::raii::SurfaceKHR surface = nullptr;
