@@ -37,8 +37,12 @@ namespace HelloTriangleApplication::Geometry
         return samplerInfo;
     }
 
-    Result<Unit, ErrorMessage> generateMipmaps(App& app, vk::raii::CommandBuffer& commandBuffer, Texture& tex)
+    Result<ImageState, ErrorMessage> generateMipmaps(App& app, vk::raii::CommandBuffer& commandBuffer, Texture& tex, ImageState srcState)
     {
+        assert(srcState.layout == vk::ImageLayout::eTransferDstOptimal);
+        assert(srcState.stageMask == vk::PipelineStageFlagBits2::eTransfer);
+        assert(srcState.accessMask == vk::AccessFlagBits2::eTransferWrite);
+        
         // check whether the image format supports blitting
         vk::FormatProperties formatProperties = app.physicalDevice.getFormatProperties(tex.info.format);
         bool supportsLinearFiltering = static_cast<bool>(
@@ -53,31 +57,31 @@ namespace HelloTriangleApplication::Geometry
             );
         }
         
-        // prepare image barrier with shared properties
-        vk::ImageMemoryBarrier barrier {
-            .srcQueueFamilyIndex = vk::QueueFamilyIgnored,
-            .dstQueueFamilyIndex = vk::QueueFamilyIgnored,
-            .image = *tex.image,
-            .subresourceRange {
-                .aspectMask = tex.info.aspectFlags,
-                .levelCount = 1,
-                .layerCount = tex.info.numLayers,
-            }
+        // prepare image state
+        CommandBufferHelper cmdBuffer = CommandBufferHelper(app, commandBuffer);
+        ImageState regionState = srcState;
+        vk::ImageSubresourceRange subresourceRange {
+            .aspectMask = tex.info.aspectFlags,
+            .levelCount = 1,
+            .layerCount = tex.info.numLayers
         };
-
+        
         u32 mipWidth = tex.info.width;
         u32 mipHeight = tex.info.height;
         for (u32 i = 1; i < tex.info.mipLevels; i++)
         {
             // prepare image for copying previous mip
-            barrier.subresourceRange.baseMipLevel = i - 1;
-            barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-            barrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
-            barrier.oldLayout = vk::ImageLayout::eTransferDstOptimal;
-            barrier.newLayout = vk::ImageLayout::eTransferSrcOptimal;
-
-            commandBuffer.pipelineBarrier(
-                vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eTransfer, {}, {}, {}, barrier
+            subresourceRange.baseMipLevel = i - 1;
+            regionState = cmdBuffer.addImageBarrier(
+                tex,
+                regionState,
+                ImageState {
+                    .layout = vk::ImageLayout::eTransferSrcOptimal,
+                    .queueFamilyIndex = regionState.queueFamilyIndex,
+                    .accessMask = vk::AccessFlagBits2::eTransferRead,
+                    .stageMask = vk::PipelineStageFlagBits2::eTransfer
+                },
+                subresourceRange
             );
 
             // blit previous mip to current mip
@@ -103,36 +107,47 @@ namespace HelloTriangleApplication::Geometry
                     { (i32)nextMipWidth, (i32)nextMipHeight, 1 }
                 })
             };
-            commandBuffer.blitImage(*tex.image, vk::ImageLayout::eTransferSrcOptimal,
+            cmdBuffer->blitImage(*tex.image, regionState.layout,
                 *tex.image, vk::ImageLayout::eTransferDstOptimal,
                 blit, vk::Filter::eLinear);
             
             // prepare previous mip for being read by shaders
-            barrier.subresourceRange.baseMipLevel = i - 1;
-            barrier.srcAccessMask = vk::AccessFlagBits::eTransferRead;
-            barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-            barrier.oldLayout = vk::ImageLayout::eTransferSrcOptimal;
-            barrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-
-            commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer,
-                vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, barrier);
+            subresourceRange.baseMipLevel = i - 1;
+            regionState = cmdBuffer.addImageBarrier(
+                tex,
+                regionState,
+                ImageState {
+                    .layout = vk::ImageLayout::eShaderReadOnlyOptimal,
+                    .queueFamilyIndex = regionState.queueFamilyIndex,
+                    .accessMask = vk::AccessFlagBits2::eShaderRead,
+                    .stageMask = vk::PipelineStageFlagBits2::eFragmentShader
+                },
+                subresourceRange
+            );
 
             // update current mip dimensions
             mipWidth = nextMipWidth;
             mipHeight = nextMipHeight;
+
+            // reset region state
+            regionState = srcState;
         }
 
         // prepare final mip for being read by shaders, since we don't blit from it in the loop
-        barrier.subresourceRange.baseMipLevel = tex.info.mipLevels - 1;
-        barrier.oldLayout = vk::ImageLayout::eTransferDstOptimal;
-        barrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-        barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-        barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-
-        commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTransfer,
-            vk::PipelineStageFlagBits::eFragmentShader, {}, {}, {}, barrier);
+        subresourceRange.baseMipLevel = tex.info.mipLevels - 1;
+        regionState = cmdBuffer.addImageBarrier(
+            tex,
+            regionState,
+            ImageState {
+                .layout = vk::ImageLayout::eShaderReadOnlyOptimal,
+                .queueFamilyIndex = regionState.queueFamilyIndex,
+                .accessMask = vk::AccessFlagBits2::eShaderRead,
+                .stageMask = vk::PipelineStageFlagBits2::eFragmentShader
+            },
+            subresourceRange
+        );
         
-        return Ok();
+        return std::move(regionState);
     }
 
     Result<FatBuffer, ErrorMessage> makeImageCopyBuffer(App& app, const TextureDescription& desc)
@@ -332,7 +347,11 @@ namespace HelloTriangleApplication::Geometry
                     }
                 );
             }
-            CHECK(generateMipmaps(app, *cmdBuffer, texture));
+
+            auto mipMapResult = generateMipmaps(app, *cmdBuffer, texture, imageState);
+            CHECK_KEEP(mipMapResult);
+            imageState = mipMapResult.take();
+
         }
         else if (imageState.layout == vk::ImageLayout::eTransferDstOptimal)
         {
@@ -343,7 +362,7 @@ namespace HelloTriangleApplication::Geometry
                     .layout = vk::ImageLayout::eShaderReadOnlyOptimal,
                     .queueFamilyIndex = imageState.queueFamilyIndex,
                     .accessMask = vk::AccessFlagBits2::eShaderRead,
-                    .stageMask = vk::PipelineStageFlagBits2::eAllCommands
+                    .stageMask = vk::PipelineStageFlagBits2::eFragmentShader
                 }
             );
         }

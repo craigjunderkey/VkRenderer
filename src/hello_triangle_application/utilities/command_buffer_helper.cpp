@@ -76,28 +76,3 @@ namespace HelloTriangleApplication::Utilities
         return dst;
     }
 }
-
-/*
-vk::PipelineStageFlags sourceStage, destinationStage;
-
-if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eTransferDstOptimal)
-{
-    barrier.srcAccessMask = {};
-    barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
-
-    sourceStage      = vk::PipelineStageFlagBits::eTopOfPipe;
-    destinationStage = vk::PipelineStageFlagBits::eTransfer;
-}
-else if (oldLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal)
-{
-    barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-    barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-
-    sourceStage      = vk::PipelineStageFlagBits::eTransfer;
-    destinationStage = vk::PipelineStageFlagBits::eFragmentShader;
-}
-else
-{
-    return ErrorMessage({ .channel = "vulkan" }, "Unsupported layout transition.");
-}
-*/
