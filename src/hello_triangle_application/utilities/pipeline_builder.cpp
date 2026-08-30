@@ -59,7 +59,7 @@ namespace HelloTriangleApplication::Utilities
         };
         this->colorBlendLogicOp = {};
         this->colorAttachmentFormats = { app.swapChainFormat.format };
-        this->depthAttachmentFormat = app.depthTexture.format;
+        this->depthAttachmentFormat = app.depthTexture.info.format;
         this->stencilAttachmentFormat = vk::Format::eUndefined;
     }
 

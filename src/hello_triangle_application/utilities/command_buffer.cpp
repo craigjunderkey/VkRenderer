@@ -4,6 +4,7 @@
 #include "../geometry/mesh.h"
 #include "push_constants.h"
 #include "../render_loop/game_loop.h"
+#include "command_buffer_helper.h"
 
 #include <glm/gtx/string_cast.hpp>
 
@@ -13,49 +14,6 @@ using HelloTriangleApplication::App;
 
 namespace HelloTriangleApplication::Utilities
 {
-    void stageTransitionImageLayout(
-        App& app,
-        const vk::Image& image,
-        vk::raii::CommandBuffer& commandBuffer,
-        vk::ImageLayout oldLayout,
-        vk::ImageLayout newLayout,
-        vk::AccessFlags2 srcAccessMask,
-        vk::AccessFlags2 dstAccessMask,
-        vk::PipelineStageFlags2 srcStageMask,
-        vk::PipelineStageFlags2 dstStageMask,
-        vk::ImageAspectFlags imageAspectFlags,
-        u32 mipLevels,
-        u32 numLayers
-    )
-    {
-        vk::ImageMemoryBarrier2 barrier {
-            .srcStageMask = srcStageMask,
-            .srcAccessMask = srcAccessMask,
-            .dstStageMask = dstStageMask,
-            .dstAccessMask = dstAccessMask,
-            .oldLayout = oldLayout,
-            .newLayout = newLayout,
-            .srcQueueFamilyIndex = vk::QueueFamilyIgnored,
-            .dstQueueFamilyIndex = vk::QueueFamilyIgnored,
-            .image = image,
-            .subresourceRange = {
-                .aspectMask = imageAspectFlags,
-                .baseMipLevel = 0,
-                .levelCount = mipLevels,
-                .baseArrayLayer = 0,
-                .layerCount = numLayers
-            }
-        };
-
-        vk::DependencyInfo dependencyInfo {
-            .dependencyFlags = {},
-            .imageMemoryBarrierCount = 1,
-            .pImageMemoryBarriers = &barrier,
-        };
-
-        commandBuffer.pipelineBarrier2(dependencyInfo);
-    }
-    
     Result<Unit, ErrorMessage> createCommandBuffers(App& app)
     {
         vk::CommandBufferAllocateInfo allocInfo {
@@ -73,49 +31,64 @@ namespace HelloTriangleApplication::Utilities
 
     void beginRender(App& app, u32 imageIndex)
     {
-        const vk::raii::CommandBuffer& commandBuffer = app.graphicsQueue.commandBuffers[app.frameIndex];
+        CommandBufferHelper cmdBuffer = CommandBufferHelper(app, app.graphicsQueue.commandBuffers[app.frameIndex]);
         
-        commandBuffer.begin({});
+        cmdBuffer->begin({});
 
-        // before we start rendering, color attachment image to optimal layout
-        stageTransitionImageLayout(
-            app,
-            app.swapChainImages[imageIndex],
-            app.graphicsQueue.commandBuffers[app.frameIndex],
-            vk::ImageLayout::eUndefined,
-            vk::ImageLayout::eColorAttachmentOptimal,
-            {},
-            vk::AccessFlagBits2::eColorAttachmentWrite,
-            vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-            vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-            vk::ImageAspectFlagBits::eColor,
-            1, 1
-        );
+        // before we start rendering, transition resolve image to optimal layout
+        // TODO: make FatSwapchain
+        vk::ImageMemoryBarrier2 imageBarrier {
+            .srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+            .srcAccessMask = {}, // memory is already available; no writes to flush
+            .dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+            .dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+            .oldLayout = vk::ImageLayout::eUndefined,
+            .newLayout = vk::ImageLayout::eColorAttachmentOptimal,
+            .srcQueueFamilyIndex = app.graphicsQueue.familyIndex,
+            .dstQueueFamilyIndex = app.graphicsQueue.familyIndex,
+            .image = app.swapChainImages[imageIndex],
+            .subresourceRange = vk::ImageSubresourceRange {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1
+            }
+        };
+        cmdBuffer->pipelineBarrier2(vk::DependencyInfo { .imageMemoryBarrierCount = 1, .pImageMemoryBarriers = &imageBarrier });
 
-        // then transition multisampled color attachment image to optimal layout
-        stageTransitionImageLayout(
-            app, *app.colorTexture.image, app.graphicsQueue.commandBuffers[app.frameIndex],
-            vk::ImageLayout::eUndefined,
-            vk::ImageLayout::eColorAttachmentOptimal,
-            {},
-            vk::AccessFlagBits2::eColorAttachmentWrite,
-            vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-            vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-            vk::ImageAspectFlagBits::eColor,
-            app.colorTexture.mipLevels,
-            app.colorTexture.numLayers
+        // then transition color attachment image to optimal layout
+        cmdBuffer.addImageBarrier(
+            app.colorTexture,
+            ImageState {
+                .layout = vk::ImageLayout::eUndefined,
+                .queueFamilyIndex = app.graphicsQueue.familyIndex,
+                .accessMask = {},
+                .stageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput
+            },
+            ImageState {
+                .layout = vk::ImageLayout::eColorAttachmentOptimal,
+                .queueFamilyIndex = app.graphicsQueue.familyIndex,
+                .accessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+                .stageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput
+            }
         );
 
         // then transition depth image to optimal layout
-        stageTransitionImageLayout(
-            app, *app.depthTexture.image, app.graphicsQueue.commandBuffers[app.frameIndex],
-            vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthAttachmentOptimal,
-            vk::AccessFlagBits2::eDepthStencilAttachmentWrite, vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
-            vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
-            vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
-            vk::ImageAspectFlagBits::eDepth,
-            app.depthTexture.mipLevels,
-            app.depthTexture.numLayers
+        cmdBuffer.addImageBarrier(
+            app.depthTexture,
+            ImageState {
+                .layout = vk::ImageLayout::eUndefined,
+                .queueFamilyIndex = app.graphicsQueue.familyIndex,
+                .accessMask = vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
+                .stageMask = vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests
+            },
+            ImageState {
+                .layout = vk::ImageLayout::eDepthAttachmentOptimal,
+                .queueFamilyIndex = app.graphicsQueue.familyIndex,
+                .accessMask = vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
+                .stageMask = vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests
+            }
         );
 
         // set up the color attachment
@@ -169,18 +142,18 @@ namespace HelloTriangleApplication::Utilities
         };
 
         // begin rendering
-        commandBuffer.beginRendering(renderingInfo);
+        cmdBuffer->beginRendering(renderingInfo);
         FatPipeline& scenePipeline = app.pipelines.get("scene");
-        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **scenePipeline);
+        cmdBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, **scenePipeline);
 
         // viewport and scissor are dynamic, so we must set them here
-        commandBuffer.setViewport(0, vk::Viewport {
+        cmdBuffer->setViewport(0, vk::Viewport {
             .x = 0.0f, .y = 0.0f,
             .width = static_cast<f32>(app.swapChainExtent.width),
             .height = static_cast<f32>(app.swapChainExtent.height),
             .minDepth = 0.0f, .maxDepth = 1.0f
         });
-        commandBuffer.setScissor(
+        cmdBuffer->setScissor(
             0,
             vk::Rect2D {
                 .offset = vk::Offset2D {.x = 0, .y = 0},
@@ -189,7 +162,7 @@ namespace HelloTriangleApplication::Utilities
         );
 
         // bind our descriptor sets
-        commandBuffer.bindDescriptorSets(
+        cmdBuffer->bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics, *scenePipeline.layout, 0,
             {
                 *app.resources.bindless().getDescriptorSet(),
@@ -199,17 +172,11 @@ namespace HelloTriangleApplication::Utilities
         );
     }
 
-    void bindMesh(const vk::raii::CommandBuffer& commandBuffer, const Geometry::Mesh& mesh)
-    {
-        commandBuffer.bindVertexBuffers(0, *mesh.vertexBuffer.buffer, {0});
-        commandBuffer.bindIndexBuffer(*mesh.indexBuffer.buffer, 0, vk::IndexTypeValue<decltype(mesh.data.indices)::value_type>::value);
-    }
-
-    void drawPointLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
+    void drawPointLights(App& app, CommandBufferHelper& cmdBuffer)
     {
         // bind debug point light mesh
         const Geometry::Mesh& mesh = app.resources.get<Geometry::Mesh>("light_ball");
-        bindMesh(commandBuffer, mesh);
+        cmdBuffer.bindMesh(mesh);
         
         // draw each point light
         for (u32 i = 0; i < app.environment.numPointLights; i++)
@@ -219,20 +186,20 @@ namespace HelloTriangleApplication::Utilities
                 .mvp = app.projection * app.view * glm::translate(mat4(1.0f), light.posWorld),
                 .color = vec4(light.components.diffuse, 1.0f),
             };
-            commandBuffer.pushConstants(
+            cmdBuffer.pushConstants<DebugLightPushConstants>(
+                pushConstants,
                 *app.pipelines.get("debug_light").layout,
-                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-                0, sizeof(DebugLightPushConstants), &pushConstants
+                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
             );
-            commandBuffer.drawIndexed(mesh.data.numIndices, 1, 0, 0, 0);
+            cmdBuffer.drawMesh(mesh);
         }
     }
 
-    void drawSpotLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
+    void drawSpotLights(App& app, CommandBufferHelper& cmdBuffer)
     {
         // bind debug spot light mesh
         const Geometry::Mesh& mesh = app.resources.get<Geometry::Mesh>("light_cone");
-        bindMesh(commandBuffer, mesh);
+        cmdBuffer.bindMesh(mesh);
 
         // draw each spot light
         for (u32 i = 0; i < app.environment.numSpotLights; i++)
@@ -251,65 +218,71 @@ namespace HelloTriangleApplication::Utilities
                 .mvp = app.projection * app.view * model,
                 .color = vec4(light.components.diffuse, 1.0f)
             };
-            commandBuffer.pushConstants(
+            cmdBuffer.pushConstants<DebugLightPushConstants>(
+                pushConstants,
                 *app.pipelines.get("debug_light").layout,
-                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-                0, sizeof(DebugLightPushConstants), &pushConstants
+                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
             );
-            commandBuffer.drawIndexed(mesh.data.numIndices, 1, 0, 0, 0);
+            cmdBuffer.drawMesh(mesh);
         }
     }
 
-    void drawLights(App& app, const vk::raii::CommandBuffer& commandBuffer)
+    void drawLights(App& app, CommandBufferHelper& cmdBuffer)
     {
         // change to debug light pipeline
-        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **app.pipelines.get("debug_light"));
+        cmdBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, **app.pipelines.get("debug_light"));
         
         // draw each light
-        drawPointLights(app, commandBuffer);
-        drawSpotLights(app, commandBuffer);
+        drawPointLights(app, cmdBuffer);
+        drawSpotLights(app, cmdBuffer);
     }
 
-    void drawSkybox(App& app, const vk::raii::CommandBuffer& commandBuffer)
+    void drawSkybox(App& app, CommandBufferHelper& cmdBuffer)
     {
         // change to skybox pipeline
-        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, **app.pipelines.get("skybox"));
+        cmdBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, **app.pipelines.get("skybox"));
 
         // draw cube
         const Geometry::Mesh& cube = app.resources.get<Geometry::Mesh>("skybox");
-        bindMesh(commandBuffer, cube);
-        commandBuffer.drawIndexed(cube.data.numIndices, 1, 0, 0, 0);
+        cmdBuffer.bindMesh(cube);
+        cmdBuffer.drawMesh(cube);
     }
 
     void endRender(App& app, u32 imageIndex)
     {
-        const vk::raii::CommandBuffer& commandBuffer = app.graphicsQueue.commandBuffers[app.frameIndex];
+        CommandBufferHelper cmdBuffer = CommandBufferHelper(app, app.graphicsQueue.commandBuffers[app.frameIndex]);
 
         // draw the skybox
-        drawSkybox(app, commandBuffer);
+        drawSkybox(app, cmdBuffer);
         
         // draw all the lights
-        drawLights(app, commandBuffer);
+        drawLights(app, cmdBuffer);
 
         // stop rendering
-        commandBuffer.endRendering();
+        cmdBuffer->endRendering();
 
-        // after rendering, transition the image layout to one that can be presented
-        stageTransitionImageLayout(
-            app,
-            app.swapChainImages[imageIndex],
-            app.graphicsQueue.commandBuffers[app.frameIndex],
-            vk::ImageLayout::eColorAttachmentOptimal,
-            vk::ImageLayout::ePresentSrcKHR,
-            vk::AccessFlagBits2::eColorAttachmentWrite,
-            {},
-            vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-            vk::PipelineStageFlagBits2::eBottomOfPipe,
-            vk::ImageAspectFlagBits::eColor,
-            1, 1
-        );
-
-        commandBuffer.end();
+        // after rendering, transition the resolve image layout to one that can be presented
+        vk::ImageMemoryBarrier2 imageBarrier {
+            .srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+            .srcAccessMask = vk::AccessFlagBits2::eColorAttachmentRead, //vk::AccessFlagBits2::eColorAttachmentWrite
+            .dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+            .dstAccessMask = {},
+            .oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
+            .newLayout = vk::ImageLayout::ePresentSrcKHR,
+            .srcQueueFamilyIndex = app.graphicsQueue.familyIndex,
+            .dstQueueFamilyIndex = app.graphicsQueue.familyIndex,
+            .image = app.swapChainImages[imageIndex],
+            .subresourceRange = vk::ImageSubresourceRange {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1
+            }
+        };
+        cmdBuffer->pipelineBarrier2(vk::DependencyInfo { .imageMemoryBarrierCount = 1, .pImageMemoryBarriers = &imageBarrier });
+ 
+        cmdBuffer->end();
     }
 
     Result<vk::raii::CommandBuffer, ErrorMessage> beginSingleTimeCommands(App& app, FatQueue& queue)
@@ -341,52 +314,5 @@ namespace HelloTriangleApplication::Utilities
         };
         queue.queue.submit(submitInfo, nullptr);
         queue.queue.waitIdle();
-    }
-
-    Result<Unit, ErrorMessage> transitionImageLayout(vk::raii::CommandBuffer& commandBuffer, const vk::Image& image, vk::ImageLayout oldLayout,
-        vk::ImageLayout newLayout, u32 mipLevels, u32 numLayers, vk::ImageAspectFlags imageAspectFlags, u32 srcFamily, u32 dstFamily)
-    {
-        if (oldLayout == newLayout)
-            return Ok();
-        
-        vk::ImageMemoryBarrier barrier {
-            .oldLayout = oldLayout,
-            .newLayout = newLayout,
-            .srcQueueFamilyIndex = vk::QueueFamilyIgnored,
-            .dstQueueFamilyIndex = vk::QueueFamilyIgnored,
-            .image = image,
-            .subresourceRange = {
-                .aspectMask = vk::ImageAspectFlagBits::eColor,
-                .levelCount = mipLevels,
-                .layerCount = numLayers
-            }
-        };
-
-        vk::PipelineStageFlags sourceStage, destinationStage;
-
-        if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eTransferDstOptimal)
-        {
-            barrier.srcAccessMask = {};
-            barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
-
-            sourceStage      = vk::PipelineStageFlagBits::eTopOfPipe;
-            destinationStage = vk::PipelineStageFlagBits::eTransfer;
-        }
-        else if (oldLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal)
-        {
-            barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-            barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-
-            sourceStage      = vk::PipelineStageFlagBits::eTransfer;
-            destinationStage = vk::PipelineStageFlagBits::eFragmentShader;
-        }
-        else
-        {
-            return ErrorMessage({ .channel = "vulkan" }, "Unsupported layout transition.");
-        }
-
-        commandBuffer.pipelineBarrier(sourceStage, destinationStage, {}, {}, nullptr, barrier);
-
-        return Ok();
     }
 }

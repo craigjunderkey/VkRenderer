@@ -10,18 +10,24 @@ namespace HelloTriangleApplication { class App; }
 
 namespace HelloTriangleApplication::Geometry
 {
+    struct TextureInfo
+    {
+        vk::Format format;
+        vk::ImageAspectFlags aspectFlags = {};
+        u32 width = 0;
+        u32 height = 0;
+        u32 depth = 1;
+        u32 mipLevels = 1;
+        u32 numLayers = 1;
+    };
+
     struct Texture
     {
         StringId name = StringId();
         vk::raii::Image image = nullptr;
         vk::raii::ImageView view = nullptr;
         vk::raii::DeviceMemory memory = nullptr;
-        vk::Format format;
-        u32 width = 0;
-        u32 height = 0;
-        u32 depth = 1;
-        u32 mipLevels = 1;
-        u32 numLayers = 1;
+        TextureInfo info;
 
         static Result<Texture, ErrorMessage> fromDescription(App& app, const Resources::TextureDescription& desc);
         
