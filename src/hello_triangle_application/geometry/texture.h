@@ -24,7 +24,7 @@ namespace HelloTriangleApplication::Geometry
         StringId name = StringId();
         vk::raii::Image image = nullptr;
         vk::raii::ImageView view = nullptr;
-        Utilities::DeviceMemoryObject memory = {};
+        Utilities::DeviceMemoryBlock memory = {};
         TextureInfo info;
 
         static Result<Texture, ErrorMessage> fromDescription(App& app, const Resources::TextureDescription& desc);

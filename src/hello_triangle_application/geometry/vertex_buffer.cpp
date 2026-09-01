@@ -29,13 +29,11 @@ namespace HelloTriangleApplication::Geometry
         FatBuffer stagingBuffer = createResult.take();
 
         // fill it with the vertices
-        auto mapResult = castVkResult(stagingBuffer.memory.mapMemory(0, size));
+        auto mapResult = stagingBuffer.memory.map(0, size);
         CHECK_KEEP(mapResult);
-        void* data = mapResult.take();
+        HostMemoryMapping data = mapResult.take();
 
-        memcpy(data, sourceData, size);
-
-        stagingBuffer.memory.unmapMemory();
+        memcpy(*data, sourceData, size);
 
         return std::move(stagingBuffer);
     }

@@ -178,7 +178,7 @@ namespace HelloTriangleApplication::Resources
         CHECK(app.samplers.makeSamplers(app));
         
         // add material buffer
-        auto matBufferResult = MappedBuffer::fromFatBufferResult(
+        auto matBufferResult = MappedBuffer::fromBufferResult(
             FatBuffer::create(
                 app,
                 app.resources.bindless().getBindlessResource("material").virtualCount * sizeof(RenderLoop::MaterialUniformData),

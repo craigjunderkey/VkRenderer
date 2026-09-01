@@ -4,14 +4,14 @@ namespace HelloTriangleApplication::Utilities
 {
     HostMemoryMapping::~HostMemoryMapping()
     {
-        if (this->memory_)
+        if (this->memory_ && this->memory_->isHostMapped() && this->data_)
         {
             this->memory_->memory().unmapMemory();
             this->memory_->isHostMapped_ = false;
         }
     }
 
-    Result<HostMemoryMapping, ErrorMessage> DeviceMemoryObject::map(vk::DeviceSize regionOffset, Option<vk::DeviceSize> regionSize)
+    Result<HostMemoryMapping, ErrorMessage> DeviceMemoryBlock::map(vk::DeviceSize regionOffset, Option<vk::DeviceSize> regionSize)
     {
         assert(this->memory_ != nullptr);
         assert(!this->isHostMapped_);
@@ -47,7 +47,7 @@ namespace HelloTriangleApplication::Utilities
         return ErrorMessage({ .channel = "vulkan" }, "Failed to find suitable memory type.");
     }
 
-    Result<DeviceMemoryObject, ErrorMessage> VulkanMemoryHelper::allocate(vk::DeviceSize allocSize,
+    Result<DeviceMemoryBlock, ErrorMessage> VulkanMemoryHelper::allocate(vk::DeviceSize allocSize,
         vk::MemoryPropertyFlags properties, Option<vk::MemoryRequirements> requirements)
     {
         // get memory type
@@ -61,14 +61,25 @@ namespace HelloTriangleApplication::Utilities
         CHECK_KEEP(findMemResult);
         u32 memType = findMemResult.take();
 
+        // get allocation size
+        vk::DeviceSize trueAllocSize = allocSize;
+        if (requirements && requirements->size > allocSize)
+        {
+            trueAllocSize = requirements->size;
+            warn({ .channel = "vulkan", .verbosity = 1},
+                "Requested allocation of size {} bytes but {} bytes is required; increased allocation size to compensate.",
+                allocSize, trueAllocSize
+            );
+        }
+
         // allocate memory
         vk::MemoryAllocateInfo memAllocInfo {
-            .allocationSize = allocSize,
+            .allocationSize = trueAllocSize,
             .memoryTypeIndex = memType
         };
         
         auto allocResult = castVkResult(this->device_.allocateMemory(memAllocInfo));
         CHECK_KEEP(allocResult);
-        return DeviceMemoryObject(allocResult.take(), allocSize);
+        return DeviceMemoryBlock(allocResult.take(), trueAllocSize);
     }
 }

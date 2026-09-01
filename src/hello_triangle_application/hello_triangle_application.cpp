@@ -96,27 +96,49 @@ namespace HelloTriangleApplication
     {
         log({ .channel = "engine" }, "Initializing Vulkan");
 
+        log({ .channel = "vulkan", .verbosity = 2 }, "createInstance");
         createInstance(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createDebugMessenger");
         createDebugMessenger(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createSurface");
         createSurface(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "pickPhysicalDevice");
         pickPhysicalDevice(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createLogicalDevice");
         createLogicalDevice(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createSwapChain");
         createSwapChain(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createImageViews");
         createImageViews(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createDescriptorSetLayout");
         createDescriptorSetLayout(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createCommandPools");
         createCommandPools(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createCommandBuffers");
         createCommandBuffers(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "addBindlessResources");
         addBindlessResources(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "handlePrePipelineInitialization");
         handlePrePipelineInitialization(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createColorTexture");
         createColorTexture(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createDepthTexture");
         createDepthTexture(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createGraphicsPipeline");
         createGraphicsPipeline(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "handlePostLoadInitialization");
         handlePostLoadInitialization(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "loadAndSubmitBindlessResources");
         loadAndSubmitBindlessResources(*this).unwrap();
-        createUniformBuffers(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createPerFrameUbos");
+        createPerFrameUbos(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createDescriptorPool");
         createDescriptorPool(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createDescriptorSets");
         createDescriptorSets(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createSyncObjects");
         createSyncObjects(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2 }, "createProjectionTransform");
         createProjectionTransform(*this);
     }
 

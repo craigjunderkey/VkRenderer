@@ -4,11 +4,11 @@
 
 namespace HelloTriangleApplication::Geometry
 {
-    Result<Unit, ErrorMessage> createUniformBuffers(App& app)
+    Result<Unit, ErrorMessage> createPerFrameUbos(App& app)
     {
         for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
-            auto ubo = MappedBuffer::fromFatBufferResult(
+            auto ubo = MappedBuffer::fromBufferResult(
                 FatBuffer::create(
                     app,
                     sizeof(PerFrameInfo),
@@ -16,20 +16,22 @@ namespace HelloTriangleApplication::Geometry
                     vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
                 )
             );
-            CHECK_KEEP(ubo);            
+            CHECK_KEEP(ubo);
             app.uniformBuffers.emplace_back(ubo.take());
         }
         return Ok();
     }
 
-    void updateUniformBuffer(App& app, u32 frameIndex)
+    Result<Unit, ErrorMessage> updatePerFrameUbo(App& app, u32 frameIndex)
     {
         PerFrameInfo ubo {
             .view = app.view,
             .projection = app.projection,
             .env = app.environment
         };
-
-        memcpy(app.uniformBuffers[frameIndex].data, &ubo, sizeof(ubo));
+    
+        memcpy(*app.uniformBuffers[app.frameIndex].mapping, &ubo, sizeof(ubo));
+        
+        return Ok();
     }
 }

@@ -18,7 +18,7 @@ namespace HelloTriangleApplication::Utilities
         {
             warn({ .channel = "vulkan", .verbosity = 1 }, "<{}>  {}", viewVkMessageType(messageTypes), pCallbackData->pMessage);
         }
-        else if (messageSeverity >= vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo)
+        else
         {
             log({ .channel = "vulkan", .verbosity = 2 }, "<{}>  {}", viewVkMessageType(messageTypes), pCallbackData->pMessage);
         }
@@ -34,7 +34,8 @@ namespace HelloTriangleApplication::Utilities
         vk::DebugUtilsMessengerCreateInfoEXT createInfo {
             .messageSeverity = vk::DebugUtilsMessageSeverityFlagBitsEXT::eError |
                 vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
-                vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo,
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose,
             .messageType = vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
                 vk::DebugUtilsMessageTypeFlagBitsEXT::eDeviceAddressBinding |
                 vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |

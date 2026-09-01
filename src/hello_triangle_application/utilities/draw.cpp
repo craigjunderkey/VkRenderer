@@ -63,7 +63,7 @@ namespace HelloTriangleApplication::Utilities
         // since we have the index of the incoming image, prepare our command buffer for drawing to it
         app.graphicsQueue.commandBuffers[app.frameIndex].reset();
 
-        HelloTriangleApplication::Geometry::updateUniformBuffer(app, app.frameIndex);
+        HelloTriangleApplication::Geometry::updatePerFrameUbo(app, app.frameIndex);
         beginRender(app, imageIndex);
         loop.draw(app.graphicsQueue.commandBuffers[app.frameIndex]);
         endRender(app, imageIndex);

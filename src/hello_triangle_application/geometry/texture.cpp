@@ -164,9 +164,10 @@ namespace HelloTriangleApplication::Geometry
         FatBuffer stagingBuffer = bufferResult.take();
 
         // transfer image data to staging buffer
-        auto memoryMapResult = castVkResult(stagingBuffer.memory.mapMemory(0, imageSize * numImages));
+        auto memoryMapResult = stagingBuffer.memory.map(0, imageSize * numImages);
         CHECK_KEEP(memoryMapResult);
-        void* bufferData = memoryMapResult.take();
+        Utilities::HostMemoryMapping bufferData = memoryMapResult.take();
+
         for (u32 i = 0; i < numImages; i++)
         {
             // get image
@@ -178,10 +179,9 @@ namespace HelloTriangleApplication::Geometry
             
             // copy image data
             const ImageData& imageData = app.resources.get<ImageData>(image);
-            memcpy(static_cast<u8*>(bufferData) + i * imageSize, imageData.pixels, imageSize);
+            memcpy(static_cast<u8*>(*bufferData) + i * imageSize, imageData.pixels, imageSize);
         }
-        stagingBuffer.memory.unmapMemory();
-
+        
         return std::move(stagingBuffer);
     }
 

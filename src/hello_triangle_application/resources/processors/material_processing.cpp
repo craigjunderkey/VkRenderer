@@ -100,7 +100,7 @@ namespace HelloTriangleApplication::Resources
 
         // buffer the material uniform data
         Geometry::MappedBuffer& matBuffer = bindless.getBuffer("materials");
-        memcpy(matBuffer.data, matData.data(), matBuffer.buffer.size);
+        memcpy(*matBuffer.mapping, matData.data(), matBuffer.buffer.size);
 
         return Ok();
     }

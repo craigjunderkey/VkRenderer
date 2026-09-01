@@ -4,45 +4,7 @@
 using HelloTriangleApplication::App;
 
 namespace HelloTriangleApplication::Geometry
-{
-    Result<u32, ErrorMessage> findMemoryType(App& app, u32 typeFilter, vk::MemoryPropertyFlags properties)
-    {
-        vk::PhysicalDeviceMemoryProperties availableTypes = app.physicalDevice.getMemoryProperties();
-
-        for (u32 i = 0; i < availableTypes.memoryTypeCount; i++)
-        {
-            bool satisfiesTypeFilter = typeFilter & (1 << i);
-            bool hasRequiredFeatures = (availableTypes.memoryTypes[i].propertyFlags & properties) == properties;
-
-            if (satisfiesTypeFilter && hasRequiredFeatures)
-            {
-                return i;
-            }
-        }
-
-        return ErrorMessage({ .channel = "vulkan" }, "Failed to find suitable memory type.");
-    }
-
-    Result<vk::raii::DeviceMemory, ErrorMessage> allocateMemory(App& app, vk::raii::Buffer& buffer, vk::MemoryPropertyFlags properties)
-    {
-        vk::MemoryRequirements memRequirements = buffer.getMemoryRequirements();
-
-        Result<u32, ErrorMessage> memTypeIndex = findMemoryType(
-            app,
-            memRequirements.memoryTypeBits,
-            properties
-        );
-
-        CHECK_KEEP(memTypeIndex);
-
-        vk::MemoryAllocateInfo memAllocateInfo {
-            .allocationSize = memRequirements.size,
-            .memoryTypeIndex = memTypeIndex.take()
-        };
-
-        return std::move(castVkResult(app.device.allocateMemory(memAllocateInfo)));
-    }
-    
+{    
     Result<FatBuffer, ErrorMessage> FatBuffer::create(
         App& app,
         vk::DeviceSize size,
@@ -70,7 +32,8 @@ namespace HelloTriangleApplication::Geometry
         CHECK_KEEP(createBufferResult);
         buffer.buffer = createBufferResult.take();
         
-        auto allocMemoryResult = allocateMemory(app, buffer.buffer, properties);
+        vk::MemoryRequirements memRequirements = buffer.buffer.getMemoryRequirements();
+        auto allocMemoryResult = app.memoryHelper.allocate(memRequirements.size, properties, memRequirements);
         CHECK_KEEP(allocMemoryResult);
         buffer.memory = allocMemoryResult.take();
 
@@ -79,26 +42,25 @@ namespace HelloTriangleApplication::Geometry
         return std::move(buffer);
     }
 
-    Result<MappedBuffer, ErrorMessage> FatBuffer::makeMapped()
+    Result<MappedBuffer, ErrorMessage> MappedBuffer::fromBuffer(FatBuffer&& buffer)
     {
-        auto mapMemoryResult = castVkResult(this->memory.mapMemory(0, this->size));
-        CHECK_KEEP(mapMemoryResult);
-        
+        auto mappingResult = buffer.memory.map();
+        CHECK_KEEP(mappingResult);
         return MappedBuffer {
-            .buffer = std::move(*this),
-            .data = mapMemoryResult.take()
+            .buffer = std::move(buffer),
+            .mapping = mappingResult.take()
         };
     }
-
-    Result<MappedBuffer, ErrorMessage> MappedBuffer::fromFatBufferResult(Result<FatBuffer, ErrorMessage>&& fatBufferResult)
+    
+    Result<MappedBuffer, ErrorMessage> MappedBuffer::fromBufferResult(Result<FatBuffer, ErrorMessage>&& bufferResult)
     {
-        CHECK_KEEP(fatBufferResult);
-        return fatBufferResult.take().makeMapped();
+        CHECK_KEEP(bufferResult);
+        return std::move(MappedBuffer::fromBuffer(bufferResult.take()));
     }
 
     FatBuffer&& MappedBuffer::unmap()
     {
-        this->data = nullptr;
+        this->mapping = {};
         return std::move(this->buffer);
     }
 }

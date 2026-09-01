@@ -97,6 +97,8 @@ namespace HelloTriangleApplication::Resources
         template <typename T>
         Result<Unit, ErrorMessage> loadResources(StringId resourceName)
         {
+            log({ .channel = "resources", .verbosity = 2}, "Loading resource {}.", resourceName);
+            
             StringIdMap<T>& map = this->getMap<T>();
             const ResourceType& type = this->types_[this->typeMap_.get(resourceName)];
 
@@ -127,6 +129,8 @@ namespace HelloTriangleApplication::Resources
         template <typename T>
         Result<Unit, ErrorMessage> unloadResources(StringId resourceName)
         {
+            log({ .channel = "resources", .verbosity = 2}, "Unloading resource {}.", resourceName);
+
             StringIdMap<T>& map = this->getMap<T>();
             const ResourceType& type = this->types_[this->typeMap_.get(resourceName)];
 
@@ -155,6 +159,8 @@ namespace HelloTriangleApplication::Resources
         template <typename T>
         Result<Unit, ErrorMessage> postLoadInitialize(StringId resourceName)
         {
+            log({ .channel = "resources", .verbosity = 2}, "Post-load initializing resource {}.", resourceName);
+
             StringIdMap<T>& map = this->getMap<T>();
             const ResourceType& type = this->types_[this->typeMap_.get(resourceName)];
 
