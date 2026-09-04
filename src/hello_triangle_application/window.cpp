@@ -41,8 +41,15 @@ namespace HelloTriangleApplication
         status->isMinimized = isIconified == GLFW_TRUE;
     }
 
-    bool Window::shouldClose()
+    bool Window::shouldClose() const
     {
         return glfwWindowShouldClose(this->handle) || this->status.markedForClosure;
+    }
+
+    std::pair<u32, u32> Window::getDimensions() const
+    {
+        i32 width, height;
+        glfwGetWindowSize(this->handle, &width, &height);
+        return std::pair<u32, u32>(static_cast<u32>(width), static_cast<u32>(height));
     }
 }

@@ -32,7 +32,7 @@ namespace HelloTriangleApplication::Geometry
         vk::Format depthFormat = depthFormatResult.take();
 
         // create texture
-        TextureDescription desc = TextureDescription::screenTexture(app.swapChainExtent);
+        TextureDescription desc = TextureDescription::screenTexture(app.swapchain.getExtent());
         desc.format = depthFormat;
         desc.usageFlags = vk::ImageUsageFlagBits::eDepthStencilAttachment;
         desc.aspectFlags = vk::ImageAspectFlagBits::eDepth;

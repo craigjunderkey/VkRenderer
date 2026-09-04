@@ -108,8 +108,6 @@ namespace HelloTriangleApplication
         createLogicalDevice(*this).unwrap();
         log({ .channel = "vulkan", .verbosity = 2 }, "createSwapChain");
         createSwapChain(*this).unwrap();
-        log({ .channel = "vulkan", .verbosity = 2 }, "createImageViews");
-        createImageViews(*this).unwrap();
         log({ .channel = "vulkan", .verbosity = 2 }, "createDescriptorSetLayout");
         createDescriptorSetLayout(*this).unwrap();
         log({ .channel = "vulkan", .verbosity = 2 }, "createCommandPools");

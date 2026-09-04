@@ -59,7 +59,7 @@ namespace HelloTriangleApplication::RenderLoop
     {
         app.projection = glm::perspective(
             QUARTER_PI,
-            static_cast<f32>(app.swapChainExtent.width) / static_cast<f32>(app.swapChainExtent.height),
+            static_cast<f32>(app.swapchain.getExtent().width) / static_cast<f32>(app.swapchain.getExtent().height),
             0.1f, 10.0f
         );
         app.projection[1][1] *= -1;

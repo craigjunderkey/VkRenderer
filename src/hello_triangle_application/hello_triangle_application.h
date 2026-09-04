@@ -13,6 +13,7 @@
 #include "utilities/queue.h"
 #include "utilities/pipeline_builder.h"
 #include "utilities/vulkan_memory_helper.h"
+#include "utilities/fat_swapchain.h"
 #include "geometry/buffer.h"
 #include "geometry/texture.h"
 #include "geometry/mesh.h"
@@ -25,6 +26,7 @@
 
 using HelloTriangleApplication::Utilities::FatQueue;
 using HelloTriangleApplication::Utilities::FatPipeline;
+using HelloTriangleApplication::Utilities::FatSwapchain;
 using HelloTriangleApplication::Utilities::VulkanMemoryHelper;
 using HelloTriangleApplication::Geometry::FatBuffer;
 using HelloTriangleApplication::Geometry::MappedBuffer;
@@ -58,12 +60,7 @@ namespace HelloTriangleApplication
 
         // presentation
         vk::raii::SurfaceKHR surface = nullptr;
-        vk::raii::SwapchainKHR swapChain = nullptr; // TODO: make FatSwapchain
-        std::vector<vk::Image> swapChainImages;
-        std::vector<vk::raii::ImageView> swapChainImageViews;
-        vk::SurfaceFormatKHR swapChainFormat;
-        vk::Extent2D swapChainExtent;
-        std::vector<u32> swapChainFamilies;
+        FatSwapchain swapchain;
 
         // graphics pipeline
         vk::raii::DescriptorSetLayout descriptorSetLayout = nullptr;

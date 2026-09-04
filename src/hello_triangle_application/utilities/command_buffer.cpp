@@ -46,7 +46,7 @@ namespace HelloTriangleApplication::Utilities
             .newLayout = vk::ImageLayout::eColorAttachmentOptimal,
             .srcQueueFamilyIndex = app.graphicsQueue.familyIndex,
             .dstQueueFamilyIndex = app.graphicsQueue.familyIndex,
-            .image = app.swapChainImages[imageIndex],
+            .image = app.swapchain.getImages()[imageIndex],
             .subresourceRange = vk::ImageSubresourceRange {
                 .aspectMask = vk::ImageAspectFlagBits::eColor,
                 .baseMipLevel = 0,
@@ -98,7 +98,7 @@ namespace HelloTriangleApplication::Utilities
         if (App::CONFIG.graphics.antiAliasing == Setting::AntiAliasing::None)
         {
             colorAttachment = {
-                .imageView = app.swapChainImageViews[imageIndex],
+                .imageView = app.swapchain.getImageViews()[imageIndex],
                 .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
                 .loadOp = vk::AttachmentLoadOp::eClear,
                 .storeOp = vk::AttachmentStoreOp::eStore,
@@ -111,7 +111,7 @@ namespace HelloTriangleApplication::Utilities
                 .imageView = app.colorTexture.view,
                 .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
                 .resolveMode = vk::ResolveModeFlagBits::eAverage,
-                .resolveImageView = app.swapChainImageViews[imageIndex],
+                .resolveImageView = app.swapchain.getImageViews()[imageIndex],
                 .resolveImageLayout = vk::ImageLayout::eColorAttachmentOptimal,
                 .loadOp = vk::AttachmentLoadOp::eClear,
                 .storeOp = vk::AttachmentStoreOp::eDontCare,
@@ -133,7 +133,7 @@ namespace HelloTriangleApplication::Utilities
         vk::RenderingInfo renderingInfo {
             .renderArea = {
                 .offset = {0, 0},
-                .extent = app.swapChainExtent  
+                .extent = app.swapchain.getExtent()  
             },
             .layerCount = 1,
             .colorAttachmentCount = 1,
@@ -149,15 +149,15 @@ namespace HelloTriangleApplication::Utilities
         // viewport and scissor are dynamic, so we must set them here
         cmdBuffer->setViewport(0, vk::Viewport {
             .x = 0.0f, .y = 0.0f,
-            .width = static_cast<f32>(app.swapChainExtent.width),
-            .height = static_cast<f32>(app.swapChainExtent.height),
+            .width = static_cast<f32>(app.swapchain.getExtent().width),
+            .height = static_cast<f32>(app.swapchain.getExtent().height),
             .minDepth = 0.0f, .maxDepth = 1.0f
         });
         cmdBuffer->setScissor(
             0,
             vk::Rect2D {
                 .offset = vk::Offset2D {.x = 0, .y = 0},
-                .extent = app.swapChainExtent
+                .extent = app.swapchain.getExtent()
             }
         );
 
@@ -271,7 +271,7 @@ namespace HelloTriangleApplication::Utilities
             .newLayout = vk::ImageLayout::ePresentSrcKHR,
             .srcQueueFamilyIndex = app.graphicsQueue.familyIndex,
             .dstQueueFamilyIndex = app.graphicsQueue.familyIndex,
-            .image = app.swapChainImages[imageIndex],
+            .image = app.swapchain.getImages()[imageIndex],
             .subresourceRange = vk::ImageSubresourceRange {
                 .aspectMask = vk::ImageAspectFlagBits::eColor,
                 .baseMipLevel = 0,
