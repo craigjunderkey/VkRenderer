@@ -47,7 +47,7 @@ namespace HelloTriangleApplication::Utilities
         std::pair<u32, u32> windowDimensions = app.window.getFramebufferSize();
         CHECK(app.swapchain.recreate(
             SurfaceDescription { .surfaceWidth = windowDimensions.first, .surfaceHeight = windowDimensions.second })
-        );
+        );        
         CHECK(Geometry::createColorTexture(app));
         CHECK(Geometry::createDepthTexture(app));
         RenderLoop::createProjectionTransform(app);

@@ -281,7 +281,6 @@ namespace HelloTriangleApplication::Utilities
 
         // initialize the fat swapchain
         this->swapchain_ = std::move(swapchain);
-        this->cachedDesc_ = std::move(desc);
         this->extent_ = descExt.extent;
         this->format_ = descExt.format;
 
@@ -309,7 +308,7 @@ namespace HelloTriangleApplication::Utilities
         this->cachedDesc_.surfaceDesc.surfaceHeight = surfaceDesc.surfaceHeight;
         if (surfaceDesc.surface != VK_NULL_HANDLE)
             this->cachedDesc_.surfaceDesc.surface = surfaceDesc.surface;
-        
+   
         CHECK(this->initialize());
 
         // TODO: emit an event here

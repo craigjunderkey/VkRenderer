@@ -1,4 +1,5 @@
 #include "window.h"
+#include "utilities/common.h"
 
 namespace HelloTriangleApplication
 {
