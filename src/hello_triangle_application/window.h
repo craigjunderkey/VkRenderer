@@ -24,7 +24,8 @@ namespace HelloTriangleApplication
 
         GLFWwindow* operator*();
         void attachGlfwHandle(GLFWwindow* handle);
-        bool shouldClose();
+        bool shouldClose() const;
+        std::pair<u32, u32> getFramebufferSize() const;
 
     private:
         static void framebufferResizeCallback(GLFWwindow* handle, i32 width, i32 height);

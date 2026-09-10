@@ -15,7 +15,7 @@ struct NextImageResult
 NextImageResult nextImageInSwapChain(App& app)
 {
     vk::ResultValue<u32> image =
-        app.swapChain.acquireNextImage(
+        app.swapchain->acquireNextImage(
             DISABLE_TIMEOUT,
             *app.presentCompleteSemaphores[app.frameIndex],
             VK_NULL_HANDLE
@@ -89,7 +89,7 @@ namespace HelloTriangleApplication::Utilities
             .waitSemaphoreCount = 1,
             .pWaitSemaphores = &*app.renderFinishedSemaphores[imageIndex],
             .swapchainCount = 1,
-            .pSwapchains = &*app.swapChain,
+            .pSwapchains = &**app.swapchain,
             .pImageIndices = &imageIndex
         };
 

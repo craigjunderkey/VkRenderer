@@ -22,21 +22,4 @@ namespace HelloTriangleApplication::Utilities
         };
         return castVkResult(app.device.createImageView(viewInfo));
     }
-    
-    Result<Unit, ErrorMessage> createImageViews(App& app)
-    {
-        if (!app.swapChainImageViews.empty())
-            return ErrorMessage({ .channel = "vulkan" }, "Already swap chain image views present.");
-
-        app.swapChainImageViews.reserve(app.swapChainImages.size());
-
-        for (vk::Image& image : app.swapChainImages)
-        {
-            auto createResult = createImageView(app, image, app.swapChainFormat.format);
-            CHECK_KEEP(createResult);
-            app.swapChainImageViews.emplace_back(createResult.take());
-        }
-        
-        return Ok();
-    }
 }

@@ -7,8 +7,8 @@ namespace HelloTriangleApplication::Geometry
 {
     Result<Unit, ErrorMessage> createColorTexture(App& app)
     {
-        TextureDescription desc = TextureDescription::screenTexture(app.swapChainExtent);
-        desc.format = app.swapChainFormat.format;
+        TextureDescription desc = TextureDescription::screenTexture(app.swapchain.getExtent());
+        desc.format = app.swapchain.getFormat().format;
         desc.usageFlags = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransientAttachment;
         desc.aspectFlags = vk::ImageAspectFlagBits::eColor;
         

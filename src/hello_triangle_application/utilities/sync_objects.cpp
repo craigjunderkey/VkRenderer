@@ -12,7 +12,7 @@ namespace HelloTriangleApplication::Utilities
             && app.inFlightFences.empty());
             
         
-        for (u32 i = 0; i < app.swapChainImages.size(); i++)
+        for (u32 i = 0; i < app.swapchain.getImages().size(); i++)
         {
             auto semaphoreResult = castVkResult(app.device.createSemaphore(vk::SemaphoreCreateInfo()));
             CHECK_KEEP(semaphoreResult);

@@ -13,15 +13,15 @@ namespace HelloTriangleApplication::Utilities
         this->viewports = {
             vk::Viewport {
                 .x = 0.0f, .y = 0.0f,
-                .width = static_cast<f32>(app.swapChainExtent.width),
-                .height = static_cast<f32>(app.swapChainExtent.height),
+                .width = static_cast<f32>(app.swapchain.getExtent().width),
+                .height = static_cast<f32>(app.swapchain.getExtent().height),
                 .minDepth = 0.0f, .maxDepth = 1.0f
             }
         };
         this->scissors = {
             vk::Rect2D {
                 .offset = vk::Offset2D {0, 0},
-                .extent = app.swapChainExtent
+                .extent = app.swapchain.getExtent()
             }
         };
         this->rasterizationState = {
@@ -58,7 +58,7 @@ namespace HelloTriangleApplication::Utilities
             }
         };
         this->colorBlendLogicOp = {};
-        this->colorAttachmentFormats = { app.swapChainFormat.format };
+        this->colorAttachmentFormats = { app.swapchain.getFormat().format };
         this->depthAttachmentFormat = app.depthTexture.info.format;
         this->stencilAttachmentFormat = vk::Format::eUndefined;
     }
