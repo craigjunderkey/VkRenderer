@@ -6,7 +6,7 @@
 
 #include <slang.h>
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Result<Unit, ErrorMessage> castSlangResult(SlangResult result)
     {

@@ -5,9 +5,9 @@
 #include "../geometry/depth_resources.h"
 #include "../render_loop/transform.h"
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createSwapChain(App& app)
     {

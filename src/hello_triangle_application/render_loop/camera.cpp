@@ -3,7 +3,7 @@
 
 constexpr f32 X_LIMIT = (glm::pi<f32>() / 2.0f) - (10.0f * glm::epsilon<f32>());
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     mat4 Camera::view() const
     {

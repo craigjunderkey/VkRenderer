@@ -4,7 +4,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     struct Vertex
     {
@@ -23,9 +23,9 @@ namespace HelloTriangleApplication::Geometry
 
 namespace std
 {
-    template<> struct hash<HelloTriangleApplication::Geometry::Vertex>
+    template<> struct hash<VkRenderer::Geometry::Vertex>
     {
-        size_t operator()(const HelloTriangleApplication::Geometry::Vertex& vertex) const
+        size_t operator()(const VkRenderer::Geometry::Vertex& vertex) const
         {
             return ((hash<glm::vec3>()(vertex.pos) ^ (hash<glm::vec3>()(vertex.normal) << 1)) >> 1) ^ (hash<glm::vec2>()(vertex.texCoord) << 1);
         }

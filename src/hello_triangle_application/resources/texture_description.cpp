@@ -1,6 +1,6 @@
 #include "texture_description.h"
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Result<Unit, ErrorMessage> TextureDescription::check(const StringIdMap<ImageData>& images) const
     {

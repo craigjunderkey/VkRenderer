@@ -24,20 +24,20 @@
 #include "render_loop/sampler_manager.h"
 #include "resources/resource_manager.h"
 
-using HelloTriangleApplication::Utilities::FatQueue;
-using HelloTriangleApplication::Utilities::FatPipeline;
-using HelloTriangleApplication::Utilities::FatSwapchain;
-using HelloTriangleApplication::Utilities::VulkanMemoryHelper;
-using HelloTriangleApplication::Geometry::FatBuffer;
-using HelloTriangleApplication::Geometry::MappedBuffer;
-using HelloTriangleApplication::Geometry::Texture;
-using HelloTriangleApplication::RenderLoop::GameLoop;
-using HelloTriangleApplication::RenderLoop::CameraController;
-using HelloTriangleApplication::RenderLoop::SamplerManager;
-using HelloTriangleApplication::Input::InputManager;
-using HelloTriangleApplication::Resources::ResourceManager;
+using VkRenderer::Utilities::FatQueue;
+using VkRenderer::Utilities::FatPipeline;
+using VkRenderer::Utilities::FatSwapchain;
+using VkRenderer::Utilities::VulkanMemoryHelper;
+using VkRenderer::Geometry::FatBuffer;
+using VkRenderer::Geometry::MappedBuffer;
+using VkRenderer::Geometry::Texture;
+using VkRenderer::RenderLoop::GameLoop;
+using VkRenderer::RenderLoop::CameraController;
+using VkRenderer::RenderLoop::SamplerManager;
+using VkRenderer::Input::InputManager;
+using VkRenderer::Resources::ResourceManager;
 
-namespace HelloTriangleApplication
+namespace VkRenderer
 {
     class App
     {

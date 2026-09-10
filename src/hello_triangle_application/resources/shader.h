@@ -1,7 +1,7 @@
 #pragma once
 #include "../utilities/common.h"
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     constexpr u32 NUM_SHADER_STAGES = 7;
 

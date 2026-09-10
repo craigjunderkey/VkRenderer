@@ -3,7 +3,7 @@
 #include "../../utility/string_id_map.h"
 #include <chrono>
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Result<std::vector<std::filesystem::path>, ErrorMessage> AssetConditioningPipeline::findAssets(const ResourceType& resourceType)
     {

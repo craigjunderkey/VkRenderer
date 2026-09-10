@@ -4,13 +4,13 @@
 #include "buffer.h"
 #include "../utilities/command_buffer.h"
 
-using HelloTriangleApplication::App;
-using HelloTriangleApplication::Geometry::Vertex;
-using HelloTriangleApplication::Geometry::FatBuffer;
+using VkRenderer::App;
+using VkRenderer::Geometry::Vertex;
+using VkRenderer::Geometry::FatBuffer;
 
-using namespace HelloTriangleApplication::Utilities;
+using namespace VkRenderer::Utilities;
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     Result<FatBuffer, ErrorMessage> createStagingBuffer(App& app, void* sourceData, vk::DeviceSize size)
     {

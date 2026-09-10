@@ -1,10 +1,10 @@
 #pragma once
 #include "vulkan_common.h"
 
-namespace HelloTriangleApplication { class App; }
-namespace HelloTriangleApplication::Geometry { class Mesh; class Texture; }
+namespace VkRenderer { class App; }
+namespace VkRenderer::Geometry { class Mesh; class Texture; }
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     struct MemoryState
     {

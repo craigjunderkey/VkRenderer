@@ -2,9 +2,9 @@
 #include "depth_resources.h"
 #include "texture.h"
 
-using HelloTriangleApplication::Resources::TextureDescription;
+using VkRenderer::Resources::TextureDescription;
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     Result<vk::Format, ErrorMessage> findSupportedFormat(App& app, const std::vector<vk::Format>& candidates,
         vk::ImageTiling tiling, vk::FormatFeatureFlags features)

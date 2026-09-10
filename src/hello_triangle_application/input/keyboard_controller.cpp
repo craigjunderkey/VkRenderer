@@ -1,6 +1,6 @@
 #include "keyboard_controller.h"
 
-namespace HelloTriangleApplication::Input
+namespace VkRenderer::Input
 {
     bool KeyboardController::pressingInSet(const std::unordered_set<i32>& keys) const
     {

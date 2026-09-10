@@ -1,9 +1,9 @@
 #include "../hello_triangle_application.h"
 #include "shader_module.h"
 
-using HelloTriangleApplication::Resources::Shader;
+using VkRenderer::Resources::Shader;
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<vk::raii::ShaderModule, ErrorMessage> createShaderModule(App& app, const Resources::Shader& shader)
     {

@@ -3,9 +3,9 @@
 #include "../utilities/vulkan_common.h"
 #include "sampler_name.h"
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     class SamplerManager
     {

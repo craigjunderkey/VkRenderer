@@ -3,7 +3,7 @@
 #include "uniform_buffer.h"
 #include "../render_loop/cubemap.h"
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     Result<Unit, ErrorMessage> createDescriptorPool(App& app)
     {

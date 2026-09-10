@@ -6,11 +6,11 @@
 #include <iostream>
 #include <fstream>
 
-using HelloTriangleApplication::RenderLoop::Cubemap;
-using HelloTriangleApplication::RenderLoop::CubeSide;
-using HelloTriangleApplication::Geometry::Texture;
+using VkRenderer::RenderLoop::Cubemap;
+using VkRenderer::RenderLoop::CubeSide;
+using VkRenderer::Geometry::Texture;
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Result<Unit, ErrorMessage> CubemapExporter::exportResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
     {

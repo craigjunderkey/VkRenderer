@@ -1,9 +1,9 @@
 #include "../hello_triangle_application.h"
 #include "color_resources.h"
 
-using HelloTriangleApplication::Resources::TextureDescription;
+using VkRenderer::Resources::TextureDescription;
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     Result<Unit, ErrorMessage> createColorTexture(App& app)
     {

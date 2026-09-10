@@ -6,7 +6,7 @@ const auto vkFloat2 = vk::Format::eR32G32Sfloat;
 const auto vkFloat3 = vk::Format::eR32G32B32Sfloat;
 const auto vkFloat4 = vk::Format::eR32G32B32A32Sfloat;
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     vk::VertexInputBindingDescription VertexInfo::bindingDescription()
     {

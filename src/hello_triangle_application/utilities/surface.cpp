@@ -3,7 +3,7 @@
 #include <limits>
 #include <algorithm>
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
 Result<vk::raii::SurfaceKHR, ErrorMessage> makeGlfwSurface(App& app)
 {
@@ -17,7 +17,7 @@ Result<vk::raii::SurfaceKHR, ErrorMessage> makeGlfwSurface(App& app)
     return surface;
 }
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createSurface(App& app)
     {

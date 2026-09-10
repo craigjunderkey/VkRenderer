@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     struct TextData
     {

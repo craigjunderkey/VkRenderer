@@ -1,7 +1,7 @@
 #pragma once
 #include "../utility/types.h"
 
-namespace HelloTriangleApplication
+namespace VkRenderer
 {
     namespace Setting
     {

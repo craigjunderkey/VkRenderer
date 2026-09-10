@@ -1,6 +1,6 @@
 #include "vulkan_memory_helper.h"
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     HostMemoryMapping::~HostMemoryMapping()
     {

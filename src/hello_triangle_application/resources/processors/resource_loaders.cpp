@@ -5,7 +5,7 @@
 #include "../text_data.h"
 #include <nlohmann/json.hpp>
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Result<Unit, ErrorMessage> TextDataLoader::loadResource(const std::filesystem::path& path,
         std::any resource, RuntimeProcessingData& processingData)

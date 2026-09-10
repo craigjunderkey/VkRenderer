@@ -6,7 +6,7 @@
 
 #define MAX_FILE_EXTENSIONS 4
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     class ResourceExporter;
     class ResourceCompiler;

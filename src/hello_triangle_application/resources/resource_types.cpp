@@ -7,7 +7,7 @@
 #include "processors/shader_processing.h"
 #include "processors/cubemap_processing.h"
 
-namespace HelloTriangleApplication::Resources::Types
+namespace VkRenderer::Resources::Types
 {
     ResourceType textData()
     {

@@ -2,7 +2,7 @@
 #include "../resource_type.h"
 #include "../../geometry/vertex.h"
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     class MeshExporter : public ResourceExporter
     {

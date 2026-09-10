@@ -1,7 +1,7 @@
 #pragma once
 #include "../utilities/common.h"
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     struct ImageData
     {

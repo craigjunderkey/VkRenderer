@@ -5,9 +5,9 @@
 #include <iostream>
 #include <fstream>
 
-using namespace HelloTriangleApplication::RenderLoop;
+using namespace VkRenderer::RenderLoop;
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Material loadMaterialJson(const nlohmann::json& json)
     {

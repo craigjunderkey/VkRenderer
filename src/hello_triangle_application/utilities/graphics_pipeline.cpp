@@ -7,13 +7,13 @@
 #include "../render_loop/light.h"
 #include "../resources/shader.h"
 
-using HelloTriangleApplication::App;
-using HelloTriangleApplication::Geometry::Vertex;
-using HelloTriangleApplication::Geometry::VertexInfo;
-using HelloTriangleApplication::Resources::Shader;
-using HelloTriangleApplication::Resources::ShaderStage;
+using VkRenderer::App;
+using VkRenderer::Geometry::Vertex;
+using VkRenderer::Geometry::VertexInfo;
+using VkRenderer::Resources::Shader;
+using VkRenderer::Resources::ShaderStage;
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createScenePipeline(App& app, PipelineBuilder& pipelineBuilder)
     {

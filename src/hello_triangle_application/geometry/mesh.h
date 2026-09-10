@@ -3,9 +3,9 @@
 #include "vertex.h"
 #include "buffer.h"
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     struct MeshData
     {

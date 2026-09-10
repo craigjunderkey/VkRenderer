@@ -1,8 +1,8 @@
 #include "camera_controller.h"
 
-using HelloTriangleApplication::Input::InputManager;
+using VkRenderer::Input::InputManager;
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     CameraController::CameraController(Camera camera, InputManager& inputManager)
         : handle(camera), inputs_(inputManager)

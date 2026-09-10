@@ -2,7 +2,7 @@
 #include "../utilities/common.h"
 #include "sampler_manager.h"
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     struct Material
     {

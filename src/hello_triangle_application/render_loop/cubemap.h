@@ -2,7 +2,7 @@
 #include "../utilities/common.h"
 #include "../geometry/texture.h"
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     enum CubeSide
     {

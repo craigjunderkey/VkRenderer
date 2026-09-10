@@ -1,7 +1,7 @@
 #include "fat_swapchain.h"
 #include "GLFW/glfw3.h"
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     FatSwapchainDescription FatSwapchainDescription::makeDefault()
     {

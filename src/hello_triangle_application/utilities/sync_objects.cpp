@@ -1,9 +1,9 @@
 #include "../hello_triangle_application.h"
 #include "sync_objects.h"
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createSyncObjects(App& app)
     {

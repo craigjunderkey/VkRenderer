@@ -7,10 +7,10 @@
 #include "../resources/image_data.h"
 #include "../utilities/command_buffer_helper.h"
 
-using namespace HelloTriangleApplication::Utilities;
-using namespace HelloTriangleApplication::Resources;
+using namespace VkRenderer::Utilities;
+using namespace VkRenderer::Resources;
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     vk::SamplerCreateInfo Texture::defaultSamplerInfo(App& app)
     {

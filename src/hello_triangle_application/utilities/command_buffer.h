@@ -3,7 +3,7 @@
 #include "queue.h"
 #include "vulkan_common.h"
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createCommandBuffers(App& app);
     

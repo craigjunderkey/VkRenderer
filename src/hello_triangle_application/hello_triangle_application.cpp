@@ -28,13 +28,13 @@
 #include "../utility/log/log_output.h"
 #include "../utility/log/log_error.h"
 
-using namespace HelloTriangleApplication::Utilities;
-using namespace HelloTriangleApplication::Geometry;
-using namespace HelloTriangleApplication::RenderLoop;
-using namespace HelloTriangleApplication::Resources;
+using namespace VkRenderer::Utilities;
+using namespace VkRenderer::Geometry;
+using namespace VkRenderer::RenderLoop;
+using namespace VkRenderer::Resources;
 using namespace LogUtils;
 
-namespace HelloTriangleApplication
+namespace VkRenderer
 {
     Config App::CONFIG {};
     App::App(Config config)

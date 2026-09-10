@@ -1,9 +1,9 @@
 #include "../hello_triangle_application.h"
 #include "image_views.h"
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<vk::raii::ImageView, ErrorMessage> createImageView(App& app, const vk::Image& image,
         vk::Format format, vk::ImageAspectFlags aspectFlags, u32 mipLevels)

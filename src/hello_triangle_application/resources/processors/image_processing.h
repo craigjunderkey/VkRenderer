@@ -1,7 +1,7 @@
 #pragma once
 #include "../resource_type.h"
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     class ImageDataExporter : public ResourceExporter
     {

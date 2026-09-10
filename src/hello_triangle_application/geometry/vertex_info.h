@@ -2,7 +2,7 @@
 #include "../utilities/common.h"
 #include "../utilities/vulkan_common.h"
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     struct VertexInfo
     {

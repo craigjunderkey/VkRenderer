@@ -1,6 +1,6 @@
 #include "hello_triangle_application/hello_triangle_application.h"
 
-using namespace HelloTriangleApplication;
+using namespace VkRenderer;
 
 Config getConfig()
 {

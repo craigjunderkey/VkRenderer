@@ -2,7 +2,7 @@
 #include "../window.h"
 #include "../utilities/common.h"
 
-namespace HelloTriangleApplication::Input
+namespace VkRenderer::Input
 {
     enum MouseButton
     {
@@ -52,5 +52,5 @@ namespace HelloTriangleApplication::Input
     };
 }
 
-using HelloTriangleApplication::Input::MouseButton;
-using HelloTriangleApplication::Input::CursorMode;
+using VkRenderer::Input::MouseButton;
+using VkRenderer::Input::CursorMode;

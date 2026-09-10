@@ -2,7 +2,7 @@
 #include "physical_device.h"
 #include "msaa.h"
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
 Result<bool, ErrorMessage> isDeviceSuitable(const vk::raii::PhysicalDevice& device)
 {
@@ -53,7 +53,7 @@ Result<bool, ErrorMessage> isDeviceSuitable(const vk::raii::PhysicalDevice& devi
     return true;
 }
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> pickPhysicalDevice(App& app)
     {

@@ -2,9 +2,9 @@
 #include "pipeline_builder.h"
 #include "shader_module.h"
 
-using HelloTriangleApplication::Resources::ShaderStage;
+using VkRenderer::Resources::ShaderStage;
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     void PipelineBuilder::setDefaults(App& app)
     {

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-namespace HelloTriangleApplication::Input
+namespace VkRenderer::Input
 {
     class KeyboardController
     {

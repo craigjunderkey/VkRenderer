@@ -1,6 +1,6 @@
 #include "render_object.h"
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     void RenderObject::addChild(RenderObject child, bool parentTransform)
     {

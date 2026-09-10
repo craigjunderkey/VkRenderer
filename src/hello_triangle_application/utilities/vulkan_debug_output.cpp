@@ -1,7 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "vulkan_debug_output.h"
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     VKAPI_ATTR vk::Bool32 VKAPI_CALL vkDebugCallback(
         vk::DebugUtilsMessageSeverityFlagBitsEXT messageSeverity,

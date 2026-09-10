@@ -1,9 +1,9 @@
 #include "../hello_triangle_application.h"
 #include "buffer.h"
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {    
     Result<FatBuffer, ErrorMessage> FatBuffer::create(
         App& app,

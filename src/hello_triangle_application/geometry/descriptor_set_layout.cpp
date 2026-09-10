@@ -1,7 +1,7 @@
 #include "descriptor_set_layout.h"
 #include "../hello_triangle_application.h"
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     Result<Unit, ErrorMessage> createDescriptorSetLayout(App& app)
     {

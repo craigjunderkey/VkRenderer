@@ -9,7 +9,7 @@
 
 #include <chrono>
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Result<Unit, ErrorMessage> initializeResourceManager(App& app)
     {

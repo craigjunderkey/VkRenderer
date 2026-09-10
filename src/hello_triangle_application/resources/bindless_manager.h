@@ -6,10 +6,10 @@
 
 #include <variant>
 
-namespace HelloTriangleApplication { class App; }
-namespace HelloTriangleApplication::Geometry { class Texture; }
+namespace VkRenderer { class App; }
+namespace VkRenderer::Geometry { class Texture; }
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     struct BindlessResource
     {

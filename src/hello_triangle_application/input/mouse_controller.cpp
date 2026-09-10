@@ -1,6 +1,6 @@
 #include "mouse_controller.h"
 
-namespace HelloTriangleApplication::Input
+namespace VkRenderer::Input
 {
     vec2 MouseController::scrollDelta_ = vec2(0.0f, 0.0f);
 

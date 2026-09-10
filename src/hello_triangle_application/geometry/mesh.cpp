@@ -2,7 +2,7 @@
 #include "mesh.h"
 #include "vertex_buffer.h"
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     std::vector<u32> Mesh::queueFamilies(App& app)
     {

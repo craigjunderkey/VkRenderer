@@ -1,6 +1,6 @@
 #pragma once
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     enum SamplerName
     {

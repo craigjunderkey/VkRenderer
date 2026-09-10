@@ -1,7 +1,7 @@
 #pragma once
 #include "../utilities/common.h"
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     struct CameraTransform
     {

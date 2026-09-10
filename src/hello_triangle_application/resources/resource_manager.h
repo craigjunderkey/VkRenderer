@@ -5,9 +5,9 @@
 #include "bindless_manager.h"
 #include "../../utility/string_id_map.h"
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     class ResourceManager
     {

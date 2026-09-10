@@ -1,7 +1,7 @@
 #pragma once
 #include "common.h"
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createCommandPools(App& app);
 }

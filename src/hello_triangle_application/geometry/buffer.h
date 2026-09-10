@@ -3,9 +3,9 @@
 #include "../utilities/common.h"
 #include "../utilities/vulkan_memory_helper.h"
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     struct FatBuffer
     {

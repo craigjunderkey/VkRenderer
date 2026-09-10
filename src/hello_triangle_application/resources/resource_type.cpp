@@ -1,7 +1,7 @@
 #include "resource_type.h"
 #include "asset_conditioning_pipeline.h"
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Result<Unit, ErrorMessage> ResourceType::check()
     {

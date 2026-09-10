@@ -3,9 +3,9 @@
 #include "vulkan_common.h"
 #include "../resources/shader.h"
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     struct FatPipeline
     {

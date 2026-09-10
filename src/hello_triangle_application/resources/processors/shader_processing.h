@@ -5,7 +5,7 @@
 
 namespace slang { class IGlobalSession; class ISession; }
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     class ShaderExporter : public ResourceExporter
     {

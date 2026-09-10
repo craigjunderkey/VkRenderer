@@ -5,9 +5,9 @@
 #include "image_data.h"
 #include <filesystem>
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     struct TextureDescription
     {

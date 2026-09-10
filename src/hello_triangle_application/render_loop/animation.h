@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     struct AnimationResult;
     

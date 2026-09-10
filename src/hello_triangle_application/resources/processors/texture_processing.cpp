@@ -3,7 +3,7 @@
 #include "../../geometry/texture.h"
 #include "../io_helper.h"
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     void writeTexDesc(std::ofstream& out, const TextureDescription& desc)
     {

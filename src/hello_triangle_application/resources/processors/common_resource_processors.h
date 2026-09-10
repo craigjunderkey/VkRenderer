@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     class CopyExporter : public ResourceExporter
     {

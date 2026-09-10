@@ -1,7 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "bindless_manager.h"
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     const vk::DescriptorBufferInfo* BindlessDescriptorSubmission::tryGetBuffersInfo() const
     {

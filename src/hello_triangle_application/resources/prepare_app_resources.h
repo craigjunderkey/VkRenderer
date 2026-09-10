@@ -1,9 +1,9 @@
 #pragma once
 #include "../utilities/common.h"
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Result<Unit, ErrorMessage> initializeResourceManager(App& app);
     Result<Unit, ErrorMessage> loadAllResources(App& app);

@@ -7,7 +7,7 @@
 
 constexpr f32 QUARTER_PI = std::numbers::pi / 4.0f;
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     mat4 Trs::model() const
     {

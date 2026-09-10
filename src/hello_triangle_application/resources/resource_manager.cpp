@@ -2,7 +2,7 @@
 #include "resource_manager.h"
 #include <filesystem>
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     ResourceManager::ResourceManager(App& app) :
         types_({}),

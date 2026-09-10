@@ -23,7 +23,7 @@ public:                                                                         
         return resourceName##_;                                                             \
     }                                                                                       \
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     class ResourceRegistry
     {

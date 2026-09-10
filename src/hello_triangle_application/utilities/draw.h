@@ -1,9 +1,9 @@
 #pragma once
 #include "common.h"
 
-namespace HelloTriangleApplication::RenderLoop { class GameLoop; }
+namespace VkRenderer::RenderLoop { class GameLoop; }
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> drawFrame(App& app, RenderLoop::GameLoop& loop);
 }

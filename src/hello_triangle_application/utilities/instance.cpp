@@ -1,7 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "instance.h"
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
 Result<std::vector<const char*>, ErrorMessage> fetchExtensions(App& app)
 {
@@ -70,7 +70,7 @@ Result<std::vector<const char*>, ErrorMessage> fetchValidationLayers(App& app)
     return std::move(requiredLayers);
 }
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createInstance(App& app)
     {

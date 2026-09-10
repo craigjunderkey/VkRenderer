@@ -1,9 +1,9 @@
 #pragma once
 #include "../utilities/common.h"
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     Result<Unit, ErrorMessage> createDescriptorSetLayout(App& app);
 }

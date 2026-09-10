@@ -4,9 +4,9 @@
 #include "../utilities/vulkan_memory_helper.h"
 #include "../resources/texture_description.h"
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     struct TextureInfo
     {

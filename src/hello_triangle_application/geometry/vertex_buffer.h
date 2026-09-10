@@ -3,7 +3,7 @@
 #include "buffer.h"
 #include "../utilities/vulkan_common.h"
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     Result<FatBuffer, ErrorMessage> createStagingBuffer(App& app, void* sourceData, vk::DeviceSize size);
     Result<Unit, ErrorMessage> copyBuffer(App& app, FatBuffer& src, FatBuffer& dst);

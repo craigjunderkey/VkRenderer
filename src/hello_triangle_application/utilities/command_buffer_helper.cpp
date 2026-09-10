@@ -2,7 +2,7 @@
 #include "../geometry/mesh.h"
 #include "../geometry/texture.h"
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     void CommandBufferHelper::bindMesh(const Geometry::Mesh& mesh)
     {

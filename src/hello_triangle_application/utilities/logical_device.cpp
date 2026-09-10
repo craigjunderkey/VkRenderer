@@ -1,7 +1,7 @@
 #include "../hello_triangle_application.h"
 #include "logical_device.h"
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
 Result<u32, ErrorMessage> getGraphicsFamilyIndex(App& app, const std::vector<vk::QueueFamilyProperties>& families)
 {
@@ -51,7 +51,7 @@ Result<u32, ErrorMessage> getTransferFamilyIndex(App& app, const std::vector<vk:
     return (u32)index.value();
 }
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createLogicalDevice(App& app)
     {

@@ -6,7 +6,7 @@
 #include "animations/wobble.h"
 #include "light_helper.h"
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     void GameLoop::initialize()
     {

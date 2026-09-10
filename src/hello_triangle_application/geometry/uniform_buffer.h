@@ -2,9 +2,9 @@
 #include "../utilities/common.h"
 #include "../render_loop/light.h"
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     struct PerFrameInfo
     {

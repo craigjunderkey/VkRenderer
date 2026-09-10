@@ -2,7 +2,7 @@
 #include "sampler_manager.h"
 #include "../geometry/texture.h"
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     Result<Unit, ErrorMessage> SamplerManager::makeSamplers(App& app)
     {

@@ -8,11 +8,11 @@
 #include <fstream>
 #include <sstream>
 
-using HelloTriangleApplication::Geometry::Vertex;
-using HelloTriangleApplication::Geometry::Mesh;
-using HelloTriangleApplication::Geometry::MeshData;
+using VkRenderer::Geometry::Vertex;
+using VkRenderer::Geometry::Mesh;
+using VkRenderer::Geometry::MeshData;
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Result<Unit, ErrorMessage> MeshExporter::exportResource(
         const std::filesystem::path& path, OfflineProcessingData& processingData)

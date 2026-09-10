@@ -1,9 +1,9 @@
 #include "../hello_triangle_application.h"
 #include "msaa.h"
 
-using HelloTriangleApplication::Setting::AntiAliasing;
+using VkRenderer::Setting::AntiAliasing;
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     vk::SampleCountFlagBits getMaxUsableSampleCount(vk::raii::PhysicalDevice& device)
     {

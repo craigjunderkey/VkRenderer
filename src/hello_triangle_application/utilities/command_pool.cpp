@@ -2,7 +2,7 @@
 #include "command_pool.h"
 #include <memory>
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
 Result<Unit, ErrorMessage> createGraphicsCommandPool(App& app)
 {
@@ -34,7 +34,7 @@ Result<Unit, ErrorMessage> createTransferCommandPool(App& app)
     return Ok();
 }
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createCommandPools(App& app)
     {

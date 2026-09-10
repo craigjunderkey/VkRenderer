@@ -1,9 +1,9 @@
 #pragma once
 #include "vulkan_common.h"
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     VKAPI_ATTR vk::Bool32 VKAPI_CALL vkDebugCallback(
         vk::DebugUtilsMessageSeverityFlagBitsEXT messageSeverity,

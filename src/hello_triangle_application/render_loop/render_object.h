@@ -2,7 +2,7 @@
 #include "transform.h"
 #include "animation.h"
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     class RenderObject
     {

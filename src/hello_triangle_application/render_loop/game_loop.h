@@ -4,9 +4,9 @@
 #include "render_object.h"
 #include <vector>
 
-namespace HelloTriangleApplication { class App; }
+namespace VkRenderer { class App; }
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     class GameLoop
     {

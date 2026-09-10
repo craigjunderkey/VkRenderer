@@ -2,7 +2,7 @@
 #include "camera.h"
 #include "../input/input_manager.h"
 
-namespace HelloTriangleApplication::RenderLoop
+namespace VkRenderer::RenderLoop
 {
     struct CameraControlConfig
     {
@@ -17,7 +17,7 @@ namespace HelloTriangleApplication::RenderLoop
     class CameraController
     {
     private:
-        HelloTriangleApplication::Input::InputManager& inputs_;
+        VkRenderer::Input::InputManager& inputs_;
 
         void changeSpeed();
         void changeMode();
@@ -28,7 +28,7 @@ namespace HelloTriangleApplication::RenderLoop
         Camera handle;
         CameraControlConfig config;
         
-        CameraController(Camera camera, HelloTriangleApplication::Input::InputManager& inputManager);
+        CameraController(Camera camera, VkRenderer::Input::InputManager& inputManager);
 
         void registerControls();
         void update(f32 delta);

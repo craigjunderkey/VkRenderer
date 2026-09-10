@@ -8,7 +8,7 @@
 
 #include "../image_data.h"
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     Result<ImageData, ErrorMessage> loadImage(const std::filesystem::path& path)
     {

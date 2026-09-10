@@ -1,7 +1,7 @@
 #pragma once
 #include "vulkan_common.h"
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     struct SurfaceDescription
     {

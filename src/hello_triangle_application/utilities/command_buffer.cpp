@@ -8,11 +8,11 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-using HelloTriangleApplication::RenderLoop::GameLoop;
+using VkRenderer::RenderLoop::GameLoop;
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createCommandBuffers(App& app)
     {

@@ -2,7 +2,7 @@
 #include "uniform_buffer.h"
 #include "buffer.h"
 
-namespace HelloTriangleApplication::Geometry
+namespace VkRenderer::Geometry
 {
     Result<Unit, ErrorMessage> createPerFrameUbos(App& app)
     {

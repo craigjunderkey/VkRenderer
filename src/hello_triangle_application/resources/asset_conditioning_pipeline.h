@@ -2,7 +2,7 @@
 #include "../utilities/common.h"
 #include "resource_type.h"
 
-namespace HelloTriangleApplication::Resources
+namespace VkRenderer::Resources
 {
     class AssetConditioningPipeline
     {

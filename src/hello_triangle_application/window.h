@@ -3,7 +3,7 @@
 #include "../utility/types.h"
 #include "../utility/constants.h"
 
-namespace HelloTriangleApplication
+namespace VkRenderer
 {
     class Window
     {

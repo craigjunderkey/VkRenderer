@@ -1,7 +1,7 @@
 #include "window.h"
 #include "utilities/common.h"
 
-namespace HelloTriangleApplication
+namespace VkRenderer
 {
     Window::Window(GLFWwindow* handle)
     {

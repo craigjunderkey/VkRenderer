@@ -4,7 +4,7 @@
 #include "swap_chain.h"
 #include "../geometry/uniform_buffer.h"
 
-using HelloTriangleApplication::App;
+using VkRenderer::App;
 
 struct NextImageResult
 {
@@ -28,7 +28,7 @@ NextImageResult nextImageInSwapChain(App& app)
     }
     else if (returnCode == vk::Result::eErrorOutOfDateKHR)
     {
-        HelloTriangleApplication::Utilities::recreateSwapChain(app);
+        VkRenderer::Utilities::recreateSwapChain(app);
         return NextImageResult { .imageIndex = image.value, .recreatedSwapChain = true };
     }
     else
@@ -37,7 +37,7 @@ NextImageResult nextImageInSwapChain(App& app)
     }
 }
 
-namespace HelloTriangleApplication::Utilities
+namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> drawFrame(App& app, RenderLoop::GameLoop& loop)
     {
@@ -63,7 +63,7 @@ namespace HelloTriangleApplication::Utilities
         // since we have the index of the incoming image, prepare our command buffer for drawing to it
         app.graphicsQueue.commandBuffers[app.frameIndex].reset();
 
-        HelloTriangleApplication::Geometry::updatePerFrameUbo(app, app.frameIndex);
+        VkRenderer::Geometry::updatePerFrameUbo(app, app.frameIndex);
         beginRender(app, imageIndex);
         loop.draw(app.graphicsQueue.commandBuffers[app.frameIndex]);
         endRender(app, imageIndex);

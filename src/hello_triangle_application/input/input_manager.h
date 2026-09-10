@@ -3,7 +3,7 @@
 #include "mouse_controller.h"
 #include "../window.h"
 
-namespace HelloTriangleApplication::Input
+namespace VkRenderer::Input
 {
     class InputManager
     {

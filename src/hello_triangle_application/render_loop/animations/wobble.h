@@ -1,7 +1,7 @@
 #pragma once
 #include "../animation.h"
 
-namespace HelloTriangleApplication::RenderLoop::Animations
+namespace VkRenderer::RenderLoop::Animations
 {
     class Wobble : public Animation
     {
