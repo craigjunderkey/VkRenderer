@@ -67,7 +67,10 @@ namespace HelloTriangleApplication::Utilities
             {
                 if (presentMode == availablePresentMode)
                 {
+<<<<<<< HEAD
                     // FIXME: this isn't returning for resizes
+=======
+>>>>>>> refs/remotes/origin/vulkan-refactoring
                     return presentMode;
                 }
             }
@@ -223,7 +226,10 @@ namespace HelloTriangleApplication::Utilities
         CHECK_KEEP(getImagesResult);
         this->images_ = getImagesResult.take();
 
+<<<<<<< HEAD
         this->imageViews_.clear();
+=======
+>>>>>>> refs/remotes/origin/vulkan-refactoring
         for (u32 i = 0; i < this->images_.size(); i++)
         {
             vk::ImageViewCreateInfo viewInfo {
@@ -305,6 +311,10 @@ namespace HelloTriangleApplication::Utilities
     
     Result<Unit, ErrorMessage> FatSwapchain::recreate(SurfaceDescription surfaceDesc)
     {
+<<<<<<< HEAD
+=======
+        // TODO: recreate the swapchain
+>>>>>>> refs/remotes/origin/vulkan-refactoring
         this->cachedDesc_.surfaceDesc.surfaceWidth = surfaceDesc.surfaceWidth;
         this->cachedDesc_.surfaceDesc.surfaceHeight = surfaceDesc.surfaceHeight;
         if (surfaceDesc.surface != VK_NULL_HANDLE)
