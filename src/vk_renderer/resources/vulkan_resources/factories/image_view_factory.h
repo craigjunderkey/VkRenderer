@@ -6,12 +6,11 @@ namespace VkRenderer::Resources
     class ImageViewFactory : public VulkanResourceTypeFactory
     {
     public:
-        Result<vk::raii::ImageView, ErrorMessage> create(
-            vk::ImageViewCreateInfo& desc) const;
+        Result<vk::raii::ImageView, ErrorMessage> create(const vk::ImageViewCreateInfo& desc) const;
 
         /* leaves only the following fields undefined:
             - `image`
         */
-        static vk::ImageViewCreateInfo defaultDescription();
+        static constexpr vk::ImageViewCreateInfo defaultDescription();
     };
 }

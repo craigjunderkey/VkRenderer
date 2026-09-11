@@ -10,6 +10,18 @@ namespace VkRenderer::Resources
         const vk::raii::PhysicalDevice& physicalDevice;
     };
 
+    /* Overall design of a TFactory:
+    - struct TDescription
+        {
+            ...
+            vk::TCreateInfo toInfo()
+        }
+    - Result<T, ErrorMessage> TFactory::create(const vk::TCreateInfo& desc)
+    - Result<T, ErrorMessage> TFactory::create(const TDescription& desc)
+    - static TFactory::defaultDescription()
+        provides a default value for a field iff that will be the value in 90% of cases
+        advertise which values it *doesn't* set
+    */
     class VulkanResourceTypeFactory
     {
     private:

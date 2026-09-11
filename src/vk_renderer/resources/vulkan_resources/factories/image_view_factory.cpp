@@ -3,7 +3,7 @@
 namespace VkRenderer::Resources
 {
     Result<vk::raii::ImageView, ErrorMessage> ImageViewFactory::create(
-        vk::ImageViewCreateInfo& desc) const
+        const vk::ImageViewCreateInfo& desc) const
     {
         return castVkResult(getContext().device.createImageView(desc));
     }
@@ -11,9 +11,10 @@ namespace VkRenderer::Resources
     /* leaves only the following fields undefined:
         - `image`
     */
-    vk::ImageViewCreateInfo ImageViewFactory::defaultDescription()
+    constexpr vk::ImageViewCreateInfo ImageViewFactory::defaultDescription()
     {
         return vk::ImageViewCreateInfo {
+            .image = VK_NULL_HANDLE,
             .viewType = vk::ImageViewType::e2D,
             .format = vk::Format::eR8G8B8A8Srgb,
             .subresourceRange = vk::ImageSubresourceRange {

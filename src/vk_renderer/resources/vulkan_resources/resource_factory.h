@@ -2,6 +2,8 @@
 #include "resource_type_factory.h"
 #include <concepts>
 #include "factories/image_view_factory.h"
+#include "factories/semaphore_factory.h"
+#include "factories/fence_factory.h"
 
 #define REGISTER_FACTORY_TYPE(type)             \
     private:                                    \
@@ -32,5 +34,7 @@ namespace VkRenderer::Resources
         }
 
         REGISTER_FACTORY_TYPE(ImageViewFactory)
+        REGISTER_FACTORY_TYPE(SemaphoreFactory)
+        REGISTER_FACTORY_TYPE(FenceFactory)
     };
 }
