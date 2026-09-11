@@ -305,7 +305,7 @@ namespace VkRenderer::Geometry
                 .layerCount = desc.numLayers
             }
         };
-        auto viewCreateResult = castVkResult(app.device.createImageView(viewCreateInfo));
+        auto viewCreateResult = app.vkResFactory.get<ImageViewFactory>().create(viewCreateInfo);
         CHECK_KEEP(viewCreateResult);
         texture.view = viewCreateResult.take();
 

@@ -1,8 +1,8 @@
 #pragma once
-#include "../utilities/common.h"
-#include "../utilities/vulkan_common.h"
-#include "../../utility/string_id_map.h"
-#include "../geometry/buffer.h"
+#include "../../utilities/common.h"
+#include "../../utilities/vulkan_common.h"
+#include "../../../utility/string_id_map.h"
+#include "../../geometry/buffer.h"
 
 #include <variant>
 

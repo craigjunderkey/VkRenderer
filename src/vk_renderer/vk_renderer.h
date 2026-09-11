@@ -23,6 +23,7 @@
 #include "render_loop/light.h"
 #include "render_loop/sampler_manager.h"
 #include "resources/resource_manager.h"
+#include "resources/vulkan_resources/resource_factory.h"
 
 using VkRenderer::Utilities::FatQueue;
 using VkRenderer::Utilities::FatPipeline;
@@ -36,6 +37,7 @@ using VkRenderer::RenderLoop::CameraController;
 using VkRenderer::RenderLoop::SamplerManager;
 using VkRenderer::Input::InputManager;
 using VkRenderer::Resources::ResourceManager;
+using VkRenderer::Resources::VulkanResourceFactory;
 
 namespace VkRenderer
 {
@@ -57,6 +59,13 @@ namespace VkRenderer
         FatQueue graphicsQueue;
         FatQueue transferQueue;
         VulkanMemoryHelper memoryHelper = VulkanMemoryHelper(this->physicalDevice, this->device);
+        VulkanResourceFactory vkResFactory = VulkanResourceFactory(
+            VkRenderer::Resources::VulkanResourceContext {
+                .instance = this->instance,
+                .device = this->device,
+                .physicalDevice = this->physicalDevice
+            }
+        );
 
         // presentation
         vk::raii::SurfaceKHR surface = nullptr;

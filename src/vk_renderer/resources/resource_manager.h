@@ -2,7 +2,7 @@
 #include "resource_type.h"
 #include "asset_conditioning_pipeline.h"
 #include "resource_registry.h"
-#include "bindless_manager.h"
+#include "vulkan_resources/bindless_manager.h"
 #include "../../utility/string_id_map.h"
 
 namespace VkRenderer { class App; }
