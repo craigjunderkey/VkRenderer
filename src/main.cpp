@@ -1,4 +1,4 @@
-#include "hello_triangle_application/hello_triangle_application.h"
+#include "vk_renderer/vk_renderer.h"
 
 using namespace VkRenderer;
 
