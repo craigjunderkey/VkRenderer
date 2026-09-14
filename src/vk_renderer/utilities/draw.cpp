@@ -68,6 +68,10 @@ namespace VkRenderer::Utilities
         loop.draw(app.graphicsQueue.commandBuffers[app.frameIndex]);
         endRender(app, imageIndex);
 
+        // take a screenshot
+        if (app.frameRecorder.isFrameCaptureQueued())
+            app.frameRecorder.captureFrame();
+
         // submit draw call
         vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
         vk::SubmitInfo submitInfo {

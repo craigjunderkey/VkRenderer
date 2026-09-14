@@ -22,6 +22,7 @@
 #include "render_loop/camera_controller.h"
 #include "render_loop/light.h"
 #include "render_loop/sampler_manager.h"
+#include "render_loop/frame_recorder.h"
 #include "resources/resource_manager.h"
 #include "resources/vulkan_resources/resource_factory.h"
 
@@ -35,6 +36,7 @@ using VkRenderer::Geometry::Texture;
 using VkRenderer::RenderLoop::GameLoop;
 using VkRenderer::RenderLoop::CameraController;
 using VkRenderer::RenderLoop::SamplerManager;
+using VkRenderer::RenderLoop::FrameRecorder;
 using VkRenderer::Input::InputManager;
 using VkRenderer::Resources::ResourceManager;
 using VkRenderer::Resources::VulkanResourceFactory;
@@ -95,6 +97,7 @@ namespace VkRenderer
         GameLoop loop = GameLoop(*this);
         CameraController camera = CameraController(RenderLoop::Camera(), this->inputs);
         Environment environment = Environment();
+        FrameRecorder frameRecorder = FrameRecorder();
 
         // post-processing
         vk::SampleCountFlagBits msaaSamples = vk::SampleCountFlagBits::e1;

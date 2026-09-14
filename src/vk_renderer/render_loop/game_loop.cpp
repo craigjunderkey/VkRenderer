@@ -13,6 +13,7 @@ namespace VkRenderer::RenderLoop
         // input setup
         this->app_.inputs.keyboard().registerAction("quit", { GLFW_KEY_Q });
         this->app_.inputs.keyboard().registerAction("free_mouse", { GLFW_KEY_ESCAPE });
+        this->app_.inputs.keyboard().registerAction("screenshot", { GLFW_KEY_F2 });
 
         // camera setup
         this->app_.camera.handle.setTransform(
@@ -122,6 +123,8 @@ namespace VkRenderer::RenderLoop
             this->app_.inputs.mouse().setCursorMode(CursorMode::Default);
         if (this->app_.inputs.mouse().pressed(MouseButton::Left))
             this->app_.inputs.mouse().setCursorMode(CursorMode::Locked);
+        if (this->app_.inputs.keyboard().released("screenshot"))
+            this->app_.frameRecorder.enqueueFrameCapture();
         
         // animate each object in the scene
         for (RenderObject& obj : this->scene_)
