@@ -27,13 +27,14 @@ namespace VkRenderer::Utilities
         swapDesc.surfaceDesc = std::move(surfaceDesc);
         swapDesc.presentingQueueFamilyIndex = app.graphicsQueue.familyIndex;
         swapDesc.queueFamilyIndices = { app.graphicsQueue.familyIndex, app.transferQueue.familyIndex };
+        swapDesc.usageFlags |= vk::ImageUsageFlagBits::eTransferSrc;
 
         auto createResult = FatSwapchain::create(std::move(swapDesc));
         CHECK_KEEP(createResult);
         app.swapchain = createResult.take();
 
-        // create screenshot buffer
-        CHECK(app.frameRecorder.makeBuffer(app, app.swapchain.getExtent().width, app.swapchain.getExtent().height));
+        // initialize frame recorder
+        CHECK(app.frameRecorder.initialize(app, app.swapchain.getExtent().width, app.swapchain.getExtent().height));
 
         return Ok();
     }

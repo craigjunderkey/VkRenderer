@@ -42,9 +42,13 @@ namespace VkRenderer::Utilities
     Result<Unit, ErrorMessage> drawFrame(App& app, RenderLoop::GameLoop& loop)
     {
         // wait for draw fence to be signaled
-        vk::Result fenceResult = app.device.waitForFences(*app.inFlightFences[app.frameIndex], true, DISABLE_TIMEOUT);
+        vk::Result fenceResult = app.device.waitForFences(*app.renderFinishedFences[app.frameIndex], true, DISABLE_TIMEOUT);
         if (fenceResult != vk::Result::eSuccess)
             return ErrorMessage({ .channel = "vulkan" }, "Failed to wait for fence.");
+        
+        // save the render as a screenshot
+        if (app.frameRecorder.hasCapturedFrame((app.frameIndex - 1) % 2))
+            CHECK(app.frameRecorder.save((app.frameIndex - 1) % 2));
 
         // so, we now have that the previous frame is done being drawn to the screen
         // so, request the next image from the swap chain
@@ -58,7 +62,7 @@ namespace VkRenderer::Utilities
 
         // return the draw fence to being unsignaled, since we are now on track to submit work
         // that will lead to it being resignaled
-        app.device.resetFences(*app.inFlightFences[app.frameIndex]);
+        app.device.resetFences(*app.renderFinishedFences[app.frameIndex]);
 
         // since we have the index of the incoming image, prepare our command buffer for drawing to it
         app.graphicsQueue.commandBuffers[app.frameIndex].reset();
@@ -67,10 +71,6 @@ namespace VkRenderer::Utilities
         beginRender(app, imageIndex);
         loop.draw(app.graphicsQueue.commandBuffers[app.frameIndex]);
         endRender(app, imageIndex);
-
-        // take a screenshot
-        if (app.frameRecorder.isFrameCaptureQueued())
-            app.frameRecorder.captureFrame();
 
         // submit draw call
         vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
@@ -84,7 +84,7 @@ namespace VkRenderer::Utilities
             .pSignalSemaphores = &*app.renderFinishedSemaphores[imageIndex]
         };
 
-        vk::Result submitResult = app.graphicsQueue.queue.submit(submitInfo, *app.inFlightFences[app.frameIndex]);
+        vk::Result submitResult = app.graphicsQueue.queue.submit(submitInfo, *app.renderFinishedFences[app.frameIndex]);
         if (submitResult != vk::Result::eSuccess)
             return ErrorMessage({ .channel = "vulkan" }, "Failed to submit render request.");
 

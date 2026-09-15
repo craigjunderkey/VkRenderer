@@ -164,7 +164,7 @@ namespace VkRenderer::Geometry
         FatBuffer stagingBuffer = bufferResult.take();
 
         // transfer image data to staging buffer
-        auto memoryMapResult = stagingBuffer.memory.map(0, imageSize * numImages);
+        auto memoryMapResult = stagingBuffer.memory->map(0, imageSize * numImages);
         CHECK_KEEP(memoryMapResult);
         Utilities::HostMemoryMapping bufferData = memoryMapResult.take();
 
@@ -290,7 +290,7 @@ namespace VkRenderer::Geometry
         );
         CHECK_KEEP(allocResult);
         texture.memory = allocResult.take();
-        CHECK(castVkResult(texture.image.bindMemory(*texture.memory, 0)));
+        CHECK(castVkResult(texture.image.bindMemory(**texture.memory, 0)));
 
         // create image view
         vk::ImageViewCreateInfo viewCreateInfo {

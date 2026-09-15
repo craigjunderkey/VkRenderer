@@ -99,6 +99,8 @@ namespace VkRenderer::Utilities
         {
         }
 
+        ~DeviceMemoryBlock();
+
         // mapping memory is an expensive operator, so keep memory mapped as long as you need it
         Result<HostMemoryMapping, ErrorMessage> map(vk::DeviceSize regionOffset = 0, Option<vk::DeviceSize> regionSize = {});
 
@@ -161,7 +163,7 @@ namespace VkRenderer::Utilities
         {
         }
         
-        Result<DeviceMemoryBlock, ErrorMessage> allocate(vk::DeviceSize allocSize,
+        Result<std::unique_ptr<DeviceMemoryBlock>, ErrorMessage> allocate(vk::DeviceSize allocSize,
             vk::MemoryPropertyFlags properties, Option<vk::MemoryRequirements> requirements = {});
     };
 

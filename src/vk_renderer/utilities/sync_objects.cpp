@@ -9,7 +9,7 @@ namespace VkRenderer::Utilities
     {
         assert(app.presentCompleteSemaphores.empty()
             && app.renderFinishedSemaphores.empty()
-            && app.inFlightFences.empty());
+            && app.renderFinishedFences.empty());
             
         
         for (u32 i = 0; i < app.swapchain.getImages().size(); i++)
@@ -30,7 +30,7 @@ namespace VkRenderer::Utilities
             auto fenceResult = app.vkResFactory.get<Resources::FenceFactory>()
                 .create({ .startSignaled = true });
             CHECK_KEEP(fenceResult);
-            app.inFlightFences.emplace_back(std::move(fenceResult.take()));
+            app.renderFinishedFences.emplace_back(std::move(fenceResult.take()));
         }
 
         return Ok();

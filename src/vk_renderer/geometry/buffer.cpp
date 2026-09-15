@@ -37,14 +37,14 @@ namespace VkRenderer::Geometry
         CHECK_KEEP(allocMemoryResult);
         buffer.memory = allocMemoryResult.take();
 
-        buffer.buffer.bindMemory(*buffer.memory, 0);
+        buffer.buffer.bindMemory(**buffer.memory, 0);
 
         return std::move(buffer);
     }
 
     Result<MappedBuffer, ErrorMessage> MappedBuffer::fromBuffer(FatBuffer&& buffer)
     {
-        auto mappingResult = buffer.memory.map();
+        auto mappingResult = buffer.memory->map();
         CHECK_KEEP(mappingResult);
         return MappedBuffer {
             .buffer = std::move(buffer),

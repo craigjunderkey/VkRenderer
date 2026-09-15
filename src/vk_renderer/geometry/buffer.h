@@ -10,7 +10,7 @@ namespace VkRenderer::Geometry
     struct FatBuffer
     {
         vk::raii::Buffer buffer = nullptr;
-        Utilities::DeviceMemoryBlock memory = {};
+        std::unique_ptr<Utilities::DeviceMemoryBlock> memory = nullptr;
         vk::DeviceSize size = 0;
         std::unique_ptr<std::vector<u32>> families = nullptr;
 

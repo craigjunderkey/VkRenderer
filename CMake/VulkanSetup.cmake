@@ -61,7 +61,7 @@ else()
   add_library(Vulkan::cppm ALIAS VulkanCppModule)
   target_link_libraries(VulkanCppModule INTERFACE Vulkan::Vulkan)
   target_compile_definitions(VulkanCppModule
-    INTERFACE VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1 VULKAN_HPP_NO_STRUCT_CONSTRUCTORS=1
+    INTERFACE VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE=1 VULKAN_HPP_NO_STRUCT_CONSTRUCTORS=1
   )
 endif()
 

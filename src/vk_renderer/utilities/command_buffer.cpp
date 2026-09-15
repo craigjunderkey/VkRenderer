@@ -261,13 +261,38 @@ namespace VkRenderer::Utilities
         // stop rendering
         cmdBuffer->endRendering();
 
-        // after rendering, transition the resolve image layout to one that can be presented
-        vk::ImageMemoryBarrier2 imageBarrier {
+        // after rendering, transition the resolve image layout to one that can be transferred from
+        vk::ImageMemoryBarrier2 transferBarrier {
             .srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-            .srcAccessMask = vk::AccessFlagBits2::eColorAttachmentRead, //vk::AccessFlagBits2::eColorAttachmentWrite
+            .srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+            .dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+            .dstAccessMask = vk::AccessFlagBits2::eTransferRead,
+            .oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
+            .newLayout = vk::ImageLayout::eTransferSrcOptimal,
+            .srcQueueFamilyIndex = app.graphicsQueue.familyIndex,
+            .dstQueueFamilyIndex = app.graphicsQueue.familyIndex,
+            .image = app.swapchain.getImages()[imageIndex],
+            .subresourceRange = vk::ImageSubresourceRange {
+                .aspectMask = vk::ImageAspectFlagBits::eColor,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1
+            }
+        };
+        cmdBuffer->pipelineBarrier2(vk::DependencyInfo { .imageMemoryBarrierCount = 1, .pImageMemoryBarriers = &transferBarrier });
+
+        // record frame
+        if (app.frameRecorder.isFrameCaptureQueued())
+            app.frameRecorder.captureFrame(app, *cmdBuffer, app.swapchain.getImages()[imageIndex]);
+
+        // then transition it to one that can be presented
+        vk::ImageMemoryBarrier2 presentBarrier {
+            .srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+            .srcAccessMask = vk::AccessFlagBits2::eTransferRead, //vk::AccessFlagBits2::eColorAttachmentWrite
             .dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
             .dstAccessMask = {},
-            .oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
+            .oldLayout = vk::ImageLayout::eTransferSrcOptimal,
             .newLayout = vk::ImageLayout::ePresentSrcKHR,
             .srcQueueFamilyIndex = app.graphicsQueue.familyIndex,
             .dstQueueFamilyIndex = app.graphicsQueue.familyIndex,
@@ -280,8 +305,8 @@ namespace VkRenderer::Utilities
                 .layerCount = 1
             }
         };
-        cmdBuffer->pipelineBarrier2(vk::DependencyInfo { .imageMemoryBarrierCount = 1, .pImageMemoryBarriers = &imageBarrier });
- 
+        cmdBuffer->pipelineBarrier2(vk::DependencyInfo { .imageMemoryBarrierCount = 1, .pImageMemoryBarriers = &presentBarrier });
+
         cmdBuffer->end();
     }
 

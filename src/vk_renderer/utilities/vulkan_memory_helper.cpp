@@ -6,8 +6,22 @@ namespace VkRenderer::Utilities
     {
         if (this->memory_ && this->memory_->isHostMapped() && this->data_)
         {
-            this->memory_->memory().unmapMemory();
+            // log({}, "DESTROYING A HOST MEMORY MAPPING FOR BLOCK {}.", reinterpret_cast<u64>(this->memory_));
+            // this->memory_->memory().unmapMemory();
+            vkUnmapMemory(this->memory_->memory().getDevice(), *this->memory_->memory());
             this->memory_->isHostMapped_ = false;
+        }
+    }
+
+    DeviceMemoryBlock::~DeviceMemoryBlock()
+    {
+        // log({}, "A DEVICE MEMORY BLOCK ({}) WAS DESTROYED!", reinterpret_cast<u64>(this));
+        if (this->isHostMapped_)
+        {
+            warn({ .channel = "vulkan" }, "DeviceMemoryBlock destroyed while host-mapped.");
+            this->memory_.unmapMemory();
+            this->memory_ = nullptr;
+            this->isHostMapped_ = false;
         }
     }
 
@@ -47,7 +61,7 @@ namespace VkRenderer::Utilities
         return ErrorMessage({ .channel = "vulkan" }, "Failed to find suitable memory type.");
     }
 
-    Result<DeviceMemoryBlock, ErrorMessage> VulkanMemoryHelper::allocate(vk::DeviceSize allocSize,
+    Result<std::unique_ptr<DeviceMemoryBlock>, ErrorMessage> VulkanMemoryHelper::allocate(vk::DeviceSize allocSize,
         vk::MemoryPropertyFlags properties, Option<vk::MemoryRequirements> requirements)
     {
         // get memory type
@@ -80,6 +94,6 @@ namespace VkRenderer::Utilities
         
         auto allocResult = castVkResult(this->device_.allocateMemory(memAllocInfo));
         CHECK_KEEP(allocResult);
-        return DeviceMemoryBlock(allocResult.take(), trueAllocSize);
+        return std::make_unique<DeviceMemoryBlock>(DeviceMemoryBlock(allocResult.take(), trueAllocSize));
     }
 }

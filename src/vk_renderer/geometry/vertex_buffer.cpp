@@ -29,7 +29,7 @@ namespace VkRenderer::Geometry
         FatBuffer stagingBuffer = createResult.take();
 
         // fill it with the vertices
-        auto mapResult = stagingBuffer.memory.map(0, size);
+        auto mapResult = stagingBuffer.memory->map(0, size);
         CHECK_KEEP(mapResult);
         HostMemoryMapping data = mapResult.take();
 

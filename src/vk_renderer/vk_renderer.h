@@ -80,7 +80,7 @@ namespace VkRenderer
         // drawing
         std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
         std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
-        std::vector<vk::raii::Fence> inFlightFences;
+        std::vector<vk::raii::Fence> renderFinishedFences;
         u32 frameIndex = 0;
 
         // geometry

@@ -24,7 +24,7 @@ namespace VkRenderer::Geometry
         StringId name = StringId();
         vk::raii::Image image = nullptr;
         vk::raii::ImageView view = nullptr;
-        Utilities::DeviceMemoryBlock memory = {};
+        std::unique_ptr<Utilities::DeviceMemoryBlock> memory = nullptr;
         TextureInfo info;
 
         static Result<Texture, ErrorMessage> fromDescription(App& app, const Resources::TextureDescription& desc);
