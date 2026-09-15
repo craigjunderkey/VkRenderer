@@ -123,7 +123,7 @@ namespace VkRenderer::RenderLoop
             this->app_.inputs.mouse().setCursorMode(CursorMode::Default);
         if (this->app_.inputs.mouse().pressed(MouseButton::Left))
             this->app_.inputs.mouse().setCursorMode(CursorMode::Locked);
-        if (this->app_.inputs.keyboard().released("screenshot"))
+        if (this->app_.inputs.keyboard().pressed("screenshot"))
             this->app_.frameRecorder.enqueueFrameCapture();
         
         // animate each object in the scene

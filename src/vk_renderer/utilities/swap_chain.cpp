@@ -32,6 +32,9 @@ namespace VkRenderer::Utilities
         CHECK_KEEP(createResult);
         app.swapchain = createResult.take();
 
+        // create screenshot buffer
+        CHECK(app.frameRecorder.makeBuffer(app, app.swapchain.getExtent().width, app.swapchain.getExtent().height));
+
         return Ok();
     }
 

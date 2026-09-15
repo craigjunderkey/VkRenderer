@@ -6,7 +6,7 @@ namespace VkRenderer::Resources
     struct ImageData
     {
         StringId name;
-        u8* pixels; // ImageData owns the memory to which `pixels` points
+        u8* pixels;
         i32 width;
         i32 height;
         i32 numChannels;
