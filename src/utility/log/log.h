@@ -7,7 +7,7 @@
 #include <initializer_list>
 #include <source_location>
 
-#define LOG_BUFFER_SIZE 1024
+#define LOG_BUFFER_SIZE 2048
 
 namespace Log
 {

@@ -47,8 +47,8 @@ namespace VkRenderer::Utilities
             return ErrorMessage({ .channel = "vulkan" }, "Failed to wait for fence.");
         
         // save the render as a screenshot
-        if (app.frameRecorder.hasCapturedFrame((app.frameIndex - 1) % 2))
-            CHECK(app.frameRecorder.save((app.frameIndex - 1) % 2));
+        if (app.frameRecorder.hasCapturedFrame(app.frameIndex))
+            CHECK(app.frameRecorder.save(app.frameIndex));
 
         // so, we now have that the previous frame is done being drawn to the screen
         // so, request the next image from the swap chain

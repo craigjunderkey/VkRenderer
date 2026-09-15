@@ -1,6 +1,6 @@
 #include "../vk_renderer.h"
 #include "frame_recorder.h"
-#include <fstream>
+#include "../resources/processors/image_processing.h"
 
 using namespace VkRenderer::Geometry;
 
@@ -68,12 +68,14 @@ namespace VkRenderer::RenderLoop
         return Ok();
     }
 
-    Result<ScreenshotData, ErrorMessage> FrameRecorder::read(u32 frameIndex)
+    Result<Resources::ImageData, ErrorMessage> FrameRecorder::read(u32 frameIndex)
     {
-        return ScreenshotData {
-            .pixels = static_cast<const u8*>(this->buffers_[frameIndex].mapping.data()),
-            .width = this->width_,
-            .height = this->height_
+        return Resources::ImageData {
+            .name = "screenshot",
+            .pixels = static_cast<u8*>(this->buffers_[frameIndex].mapping.data()),
+            .width = static_cast<i32>(this->width_),
+            .height = static_cast<i32>(this->height_),
+            .numChannels = 4
         };
     }
 
@@ -84,15 +86,15 @@ namespace VkRenderer::RenderLoop
         // read screenshot data
         auto readResult = this->read(frameIndex);
         CHECK_KEEP(readResult);
-        ScreenshotData screenshot = readResult.take();
+        Resources::ImageData screenshot = readResult.take();
 
         // output it to the screenshot directory
         if (!std::filesystem::exists(this->outputDir_))
             std::filesystem::create_directory(this->outputDir_);
         std::filesystem::path path = this->outputDir_ / std::to_string(++this->screenshotNum_);
         path.replace_extension(".png");
-        // std::ofstream out(path);
-        // out.write(reinterpret_cast<const char*>(screenshot.pixels), screenshot.size());
+        // log({}, "{}", reinterpret_cast<u64>(screenshot.pixels));
+        CHECK(Resources::ImageDataExporter::writePng(path, screenshot));
 
         log({ .channel = "engine", .verbosity = 1}, "Saved screenshot {}.", path);
         this->hasCapturedFrame_[frameIndex] = false;

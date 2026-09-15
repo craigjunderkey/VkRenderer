@@ -93,7 +93,7 @@ namespace VkRenderer::Utilities
         CHECK_KEEP(validationLayersResult);
         std::vector<const char*> layers = validationLayersResult.take();
 
-        // create the instance
+        // configure the instance
         vk::InstanceCreateInfo createInfo {
             .pApplicationInfo = &appInfo,
             .enabledLayerCount = static_cast<u32>(layers.size()),
@@ -102,6 +102,15 @@ namespace VkRenderer::Utilities
             .ppEnabledExtensionNames = extensions.data()
         };
 
+        // enable sync validation layer
+        vk::ValidationFeatureEnableEXT syncValidation = vk::ValidationFeatureEnableEXT::eSynchronizationValidation;
+        vk::ValidationFeaturesEXT syncValidationLayer {
+            .enabledValidationFeatureCount = 1,
+            .pEnabledValidationFeatures = &syncValidation
+        };
+        createInfo.pNext = &syncValidationLayer;
+
+        // create the instance
         auto createResult = castVkResult(app.context.createInstance(createInfo));
         CHECK_KEEP(createResult);
         app.instance = createResult.take();

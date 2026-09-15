@@ -59,14 +59,24 @@ namespace VkRenderer::Resources
         // save it as a .png
         // TODO: replace this with a better png compression library
         std::filesystem::path dstPath = getExportPath("images", path, ".png");
-        stbi_write_png(
+        CHECK(ImageDataExporter::writePng(dstPath, image));
+
+        return Ok();
+    }
+
+    Result<Unit, ErrorMessage> ImageDataExporter::writePng(const std::filesystem::path& dstPath, const ImageData& imageData)
+    {
+        i32 writeResult = stbi_write_png(
             dstPath.c_str(),
-            image.width,
-            image.height,
-            image.numChannels, 
-            image.pixels,
-            image.width * image.numChannels
+            imageData.width,
+            imageData.height,
+            imageData.numChannels, 
+            imageData.pixels,
+            imageData.width * imageData.numChannels
         );
+        
+        if (!writeResult)
+            return ErrorMessage({ .channel = "resources" }, "Failed to write image {}.", imageData.name);
 
         return Ok();
     }

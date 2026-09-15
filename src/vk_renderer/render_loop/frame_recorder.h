@@ -1,21 +1,13 @@
 #pragma once
 #include "../utilities/common.h"
 #include "../geometry/buffer.h"
+#include "../resources/image_data.h"
 #include <filesystem>
 
 namespace VkRenderer { class App; }
 
 namespace VkRenderer::RenderLoop
 {
-    struct ScreenshotData
-    {
-        const u8* pixels;
-        u32 width;
-        u32 height;
-        
-        constexpr u32 size() const { return width * height * 4; }
-    };
-    
     class FrameRecorder
     {
     private:
@@ -33,7 +25,7 @@ namespace VkRenderer::RenderLoop
         Result<Unit, ErrorMessage> initialize(App& app, u32 width, u32 height);
         Result<Unit, ErrorMessage> captureFrame(App& app, vk::raii::CommandBuffer& cmdBuffer, vk::Image swapchainImage);
         Result<Unit, ErrorMessage> resizeBuffers(App& app, u32 width, u32 height);
-        Result<ScreenshotData, ErrorMessage> read(u32 frameIndex);
+        Result<Resources::ImageData, ErrorMessage> read(u32 frameIndex);
         Result<Unit, ErrorMessage> save(u32 frameIndex);
 
         void enqueueFrameCapture() { this->isFrameCaptureQueued_ = true; }

@@ -63,7 +63,7 @@ namespace VkRenderer::Utilities
             ImageState {
                 .layout = vk::ImageLayout::eUndefined,
                 .queueFamilyIndex = app.graphicsQueue.familyIndex,
-                .accessMask = {},
+                .accessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
                 .stageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput
             },
             ImageState {
