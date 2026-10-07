@@ -64,15 +64,18 @@ namespace VkRenderer::Resources
         return Ok();
     }
 
-    Result<Unit, ErrorMessage> ImageDataExporter::writePng(const std::filesystem::path& dstPath, const ImageData& imageData)
+    Result<Unit, ErrorMessage> ImageDataExporter::writePng(const std::filesystem::path& dstPath,
+        const ImageData& imageData, u32 compressionLevel)
     {
+        stbi_write_png_compression_level = static_cast<i32>(compressionLevel);
+
         i32 writeResult = stbi_write_png(
             dstPath.c_str(),
             imageData.width,
             imageData.height,
             imageData.numChannels, 
             imageData.pixels,
-            imageData.width * imageData.numChannels
+            0
         );
         
         if (!writeResult)

@@ -63,7 +63,7 @@ namespace VkRenderer::Utilities
         if (physicalDevices.empty())
             return ErrorMessage({ .channel = "vulkan" }, "Failed to find GPUs with Vulkan support.");
 
-        auto deviceIter = std::ranges::find_if(
+        auto deviceIter = std::views::filter(
             physicalDevices,
             [](const vk::raii::PhysicalDevice& physicalDevice) {
                 Result<bool, ErrorMessage> suitability = isDeviceSuitable(physicalDevice);
@@ -71,12 +71,27 @@ namespace VkRenderer::Utilities
             }
         );
 
-        if (deviceIter == physicalDevices.end())
+        if (deviceIter.empty())
         {
             return ErrorMessage({ .channel = "vulkan" }, "Failed to find a suitable GPU.");
         }
 
-        app.physicalDevice = *deviceIter;
+        // choose GPU
+        auto dGpu = std::ranges::find_if(deviceIter, [](const vk::raii::PhysicalDevice device) {
+            return device.getProperties().deviceType == vk::PhysicalDeviceType::eDiscreteGpu;
+        });
+        if (dGpu != deviceIter.end())
+        {
+            app.physicalDevice = *dGpu;
+            const char* name = dGpu->getProperties().deviceName;
+            log({ .channel = "vulkan", .verbosity = 0 }, "Found dGPU. Selecting {}.", name);
+        }
+        else
+        {
+            app.physicalDevice = deviceIter.front();
+            const char* name = deviceIter.front().getProperties().deviceName;
+            log({ .channel = "vulkan", .verbosity = 0 }, "Could not find dGPU. Selecting {}.", name);
+        }
         
         // store sample count for device
         auto sampleCountResult = getSampleCount(app);

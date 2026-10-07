@@ -94,7 +94,7 @@ namespace VkRenderer::RenderLoop
         std::filesystem::path path = this->outputDir_ / std::to_string(++this->screenshotNum_);
         path.replace_extension(".png");
         // log({}, "{}", reinterpret_cast<u64>(screenshot.pixels));
-        CHECK(Resources::ImageDataExporter::writePng(path, screenshot));
+        CHECK(Resources::ImageDataExporter::writePng(path, screenshot, 0));
 
         log({ .channel = "engine", .verbosity = 1}, "Saved screenshot {}.", path);
         this->hasCapturedFrame_[frameIndex] = false;

@@ -9,7 +9,8 @@ namespace VkRenderer::Resources
     public:
         Result<Unit, ErrorMessage> exportResource(
             const std::filesystem::path& path, OfflineProcessingData& processingData) override;
-        static Result<Unit, ErrorMessage> writePng(const std::filesystem::path& dstPath, const ImageData& imageData);
+        static Result<Unit, ErrorMessage> writePng(const std::filesystem::path& dstPath,
+            const ImageData& imageData, u32 compressionLevel = 8);
     };
 
     class ImageDataLoader : public ResourceLoader
