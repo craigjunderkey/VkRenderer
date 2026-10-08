@@ -11,6 +11,7 @@ Result<u32, ErrorMessage> getGraphicsFamilyIndex(App& app, const std::vector<vk:
     {
         const vk::QueueFamilyProperties& properties = families[i];
         bool supportsGraphics = static_cast<bool>(properties.queueFlags & vk::QueueFlagBits::eGraphics);
+        bool supportsCompute = static_cast<bool>(properties.queueFlags & vk::QueueFlagBits::eCompute);
 
         Result<u32, ErrorMessage> surfaceSupport = castVkResult(app.physicalDevice.getSurfaceSupportKHR(i, *app.surface));
         bool supportsSurfaces = surfaceSupport.isOk() && surfaceSupport.value() != 0;
@@ -23,7 +24,8 @@ Result<u32, ErrorMessage> getGraphicsFamilyIndex(App& app, const std::vector<vk:
     }
 
     if (!index)
-        return ErrorMessage({ .channel = "vulkan" }, "Failed to find a queue family that supports graphics and presenting.");
+        return ErrorMessage({ .channel = "vulkan" },
+            "Failed to find a queue family that supports graphics, compute, and presenting.");
 
     return (u32)index.value();
 }
