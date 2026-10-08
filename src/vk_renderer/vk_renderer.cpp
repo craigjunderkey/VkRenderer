@@ -22,6 +22,7 @@
 #include "render_loop/transform.h"
 #include "resources/prepare_app_resources.h"
 #include "resources/image_data.h"
+#include "particles/init_particles.h"
 
 #include "../utility/log/log.h"
 #include "../utility/log/log_utils.h"
@@ -32,6 +33,7 @@ using namespace VkRenderer::Utilities;
 using namespace VkRenderer::Geometry;
 using namespace VkRenderer::RenderLoop;
 using namespace VkRenderer::Resources;
+using namespace VkRenderer::Particles;
 using namespace LogUtils;
 
 namespace VkRenderer
@@ -128,6 +130,8 @@ namespace VkRenderer
         handlePostLoadInitialization(*this).unwrap();
         log({ .channel = "vulkan", .verbosity = 2 }, "loadAndSubmitBindlessResources");
         loadAndSubmitBindlessResources(*this).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2}, "createParticleSystem");
+        particleSystem = createParticleSystem(*this, 1000).unwrap();
         log({ .channel = "vulkan", .verbosity = 2 }, "createPerFrameUbos");
         createPerFrameUbos(*this).unwrap();
         log({ .channel = "vulkan", .verbosity = 2 }, "createDescriptorPool");

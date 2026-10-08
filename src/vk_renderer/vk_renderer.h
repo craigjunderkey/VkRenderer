@@ -25,6 +25,7 @@
 #include "render_loop/frame_recorder.h"
 #include "resources/resource_manager.h"
 #include "resources/vulkan_resources/resource_factory.h"
+#include "particles/particle_system.h"
 
 using VkRenderer::Utilities::FatQueue;
 using VkRenderer::Utilities::FatPipeline;
@@ -98,6 +99,7 @@ namespace VkRenderer
         CameraController camera = CameraController(RenderLoop::Camera(), this->inputs);
         Environment environment = Environment();
         FrameRecorder frameRecorder = FrameRecorder();
+        Particles::ParticleSystem particleSystem = {};
 
         // post-processing
         vk::SampleCountFlagBits msaaSamples = vk::SampleCountFlagBits::e1;
