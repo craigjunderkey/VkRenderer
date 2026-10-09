@@ -7,5 +7,6 @@ namespace VkRenderer::Particles
     struct ParticleSystem
     {
         std::vector<Geometry::FatBuffer> buffers = {};
+        u32 numParticles = 0;
     };
 }

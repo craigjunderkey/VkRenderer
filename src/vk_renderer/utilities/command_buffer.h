@@ -7,6 +7,10 @@ namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createCommandBuffers(App& app);
     
+    /// @brief Begins a compute comand buffer, dispatches, then submits to the graphics queue.
+    /// @post pipeline is particle-compute
+    Result<Unit, ErrorMessage> dispatchCompute(App& app);
+    
     void beginRender(App& app, u32 imageIndex);
     void endRender(App& app, u32 imageIndex);
 

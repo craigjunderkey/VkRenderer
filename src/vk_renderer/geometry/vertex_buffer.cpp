@@ -37,20 +37,6 @@ namespace VkRenderer::Geometry
 
         return std::move(stagingBuffer);
     }
-
-    Result<Unit, ErrorMessage> copyBuffer(App& app, FatBuffer& src, FatBuffer& dst)
-    {
-        auto beginResult = beginSingleTimeCommands(app, app.transferQueue);
-        CHECK_KEEP(beginResult);
-        vk::raii::CommandBuffer copyCommand = beginResult.take();
-
-        copyCommand.copyBuffer(*src.buffer, *dst.buffer, vk::BufferCopy { .size = src.size } ); 
-        
-        endSingleTimeCommands(std::move(copyCommand), app.transferQueue);
-
-        return Ok();
-    }
-
     void copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, const vk::raii::Buffer& buffer,
         vk::raii::Image& image, u32 width, u32 height)
     {

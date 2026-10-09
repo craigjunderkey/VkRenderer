@@ -9,8 +9,10 @@ namespace VkRenderer::Utilities
     {
         assert(app.presentCompleteSemaphores.empty()
             && app.renderFinishedSemaphores.empty()
-            && app.renderFinishedFences.empty());
-            
+            && app.renderFinishedFences.empty()
+            && app.computeFinishedSemaphores.empty()
+            && app.computeFinishedFences.empty()
+        );   
         
         for (u32 i = 0; i < app.swapchain.getImages().size(); i++)
         {
@@ -19,18 +21,28 @@ namespace VkRenderer::Utilities
             app.renderFinishedSemaphores.emplace_back(std::move(semaphoreResult.take()));
         }
 
+        // render sync objects
         for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
-            // add semaphore
             auto semaphoreResult = app.vkResFactory.get<Resources::SemaphoreFactory>().create({});
             CHECK_KEEP(semaphoreResult);
             app.presentCompleteSemaphores.emplace_back(std::move(semaphoreResult.take()));
             
-            // add fence
-            auto fenceResult = app.vkResFactory.get<Resources::FenceFactory>()
-                .create({ .startSignaled = true });
+            auto fenceResult = app.vkResFactory.get<Resources::FenceFactory>().create({ .startSignaled = true });
             CHECK_KEEP(fenceResult);
             app.renderFinishedFences.emplace_back(std::move(fenceResult.take()));
+        }
+
+        // compute sync objects
+        for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+            auto semaphoreResult = app.vkResFactory.get<Resources::SemaphoreFactory>().create({});
+            CHECK_KEEP(semaphoreResult);
+            app.computeFinishedSemaphores.emplace_back(semaphoreResult.take());
+
+            auto fenceResult = app.vkResFactory.get<Resources::FenceFactory>().create({ .startSignaled = true});
+            CHECK_KEEP(fenceResult);
+            app.computeFinishedFences.emplace_back(fenceResult.take());
         }
 
         return Ok();

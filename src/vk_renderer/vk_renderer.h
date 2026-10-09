@@ -70,6 +70,8 @@ namespace VkRenderer
             }
         );
         std::vector<vk::raii::CommandBuffer> computeCmdBuffers;
+        std::vector<vk::raii::Semaphore> computeFinishedSemaphores;
+        std::vector<vk::raii::Fence> computeFinishedFences;
 
         // presentation
         vk::raii::SurfaceKHR surface = nullptr;

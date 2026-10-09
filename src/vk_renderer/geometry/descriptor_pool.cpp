@@ -85,7 +85,7 @@ namespace VkRenderer::Geometry
                 },
                 vk::WriteDescriptorSet {
                     .dstSet = *app.descriptorSets[i],
-                    .dstBinding = 1,
+                    .dstBinding = 2,
                     .dstArrayElement = 0,
                     .descriptorCount = 1,
                     .descriptorType = vk::DescriptorType::eStorageBuffer,

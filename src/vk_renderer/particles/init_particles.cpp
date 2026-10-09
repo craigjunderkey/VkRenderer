@@ -11,7 +11,7 @@ namespace VkRenderer::Particles
 
     Result<ParticleSystem, ErrorMessage> createParticleSystem(App& app, u32 numParticles)
     {
-        ParticleSystem particleSystem = {};
+        ParticleSystem particleSystem = { .numParticles = numParticles };
         
         // create particle buffers
         auto bufferCreateResult = [&app, numParticles] -> Result<std::vector<FatBuffer>, ErrorMessage>

@@ -60,6 +60,10 @@ namespace VkRenderer::Utilities
         
         u32 imageIndex = nextImage.imageIndex.value();
 
+        // dispatch compute before rendering
+        VkRenderer::Geometry::updatePerFrameUbo(app, app.frameIndex);
+        CHECK(dispatchCompute(app));
+
         // return the draw fence to being unsignaled, since we are now on track to submit work
         // that will lead to it being resignaled
         app.device.resetFences(*app.renderFinishedFences[app.frameIndex]);
@@ -67,17 +71,25 @@ namespace VkRenderer::Utilities
         // since we have the index of the incoming image, prepare our command buffer for drawing to it
         app.graphicsQueue.commandBuffers[app.frameIndex].reset();
 
-        VkRenderer::Geometry::updatePerFrameUbo(app, app.frameIndex);
         beginRender(app, imageIndex);
         loop.draw(app.graphicsQueue.commandBuffers[app.frameIndex]);
         endRender(app, imageIndex);
 
         // submit draw call
+        std::array<vk::Semaphore, 2> waitSemaphores {
+            *app.presentCompleteSemaphores[app.frameIndex],
+            *app.computeFinishedSemaphores[app.frameIndex]
+        };
+        std::array<vk::PipelineStageFlags, 2> waitMasks {
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            vk::PipelineStageFlagBits::eVertexInput
+        };
+        
         vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
         vk::SubmitInfo submitInfo {
-            .waitSemaphoreCount = 1,
-            .pWaitSemaphores = &*app.presentCompleteSemaphores[app.frameIndex],
-            .pWaitDstStageMask = &waitDestinationStageMask,
+            .waitSemaphoreCount = static_cast<u32>(waitSemaphores.size()),
+            .pWaitSemaphores = waitSemaphores.data(),
+            .pWaitDstStageMask = waitMasks.data(),
             .commandBufferCount = 1,
             .pCommandBuffers = &*app.graphicsQueue.commandBuffers[app.frameIndex],
             .signalSemaphoreCount = 1,

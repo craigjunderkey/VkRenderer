@@ -12,6 +12,8 @@ using VkRenderer::RenderLoop::GameLoop;
 
 using VkRenderer::App;
 
+#define PARTICLES_PER_WORKGROUP 256
+
 namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createCommandBuffers(App& app)
@@ -58,10 +60,56 @@ namespace VkRenderer::Utilities
         return Ok();
     }
 
+    Result<Unit, ErrorMessage> dispatchCompute(App& app)
+    {
+        CommandBufferHelper cmdBuffer = CommandBufferHelper(app, app.computeCmdBuffers[app.frameIndex]);
+
+        // 1. wait until this frame's render is completed
+        auto waitResult = app.device.waitForFences(*app.renderFinishedFences[app.frameIndex], true, DISABLE_TIMEOUT);
+        CHECK(castVkResult(waitResult));
+
+        // 2. prepare resources for the new frame
+        app.device.resetFences(*app.computeFinishedFences[app.frameIndex]);
+        cmdBuffer->reset();
+        cmdBuffer->begin({});
+
+        // 3. bind compute pipeline
+        cmdBuffer->bindPipeline(vk::PipelineBindPoint::eCompute, *app.pipelines.get("particle_compute"));
+
+        // 4. update per-frame descriptor set
+        cmdBuffer->bindDescriptorSets(
+            vk::PipelineBindPoint::eCompute,
+            **app.pipelines.get("particle_compute").layout,
+            0,
+            {
+                *app.descriptorSets[app.frameIndex]
+            },
+            {}
+        );
+
+        // 5. dispatch compute
+        cmdBuffer->dispatch(app.particleSystem.numParticles / PARTICLES_PER_WORKGROUP, 1, 1);
+
+        // 6. end command buffer
+        cmdBuffer->end();
+        
+        // 7. submit to graphics queue
+        vk::SubmitInfo submitInfo {
+            .commandBufferCount = 1,
+            .pCommandBuffers = &**cmdBuffer,
+            .signalSemaphoreCount = 1,
+            .pSignalSemaphores = &*app.computeFinishedSemaphores[app.frameIndex]
+        };
+
+        app.graphicsQueue.queue.submit(submitInfo, app.computeFinishedFences[app.frameIndex]);
+
+        return Ok();
+    }
+
     void beginRender(App& app, u32 imageIndex)
     {
         CommandBufferHelper cmdBuffer = CommandBufferHelper(app, app.graphicsQueue.commandBuffers[app.frameIndex]);
-        
+
         cmdBuffer->begin({});
 
         // before we start rendering, transition resolve image to optimal layout
