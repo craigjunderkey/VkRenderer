@@ -132,6 +132,8 @@ namespace VkRenderer
         loadAndSubmitBindlessResources(*this).unwrap();
         log({ .channel = "vulkan", .verbosity = 2}, "createParticleSystem");
         particleSystem = createParticleSystem(*this, 1000).unwrap();
+        log({ .channel = "vulkan", .verbosity = 2}, "createParticleComputePipeline");
+        pipelines.add("particle_compute", createParticleComputePipeline(*this).unwrap());
         log({ .channel = "vulkan", .verbosity = 2 }, "createPerFrameUbos");
         createPerFrameUbos(*this).unwrap();
         log({ .channel = "vulkan", .verbosity = 2 }, "createDescriptorPool");

@@ -2,6 +2,7 @@
 #include "../geometry/buffer.h"
 #include "particle.h"
 #include "../utilities/staged_copy.h"
+#include "../resources/shader.h"
 
 namespace VkRenderer::Particles
 {
@@ -59,10 +60,68 @@ namespace VkRenderer::Particles
                 copy.addDst(*buffer);
             }
             CHECK(copy.end());
+            
             return Ok();
         }();
         CHECK(copyResult);
 
         return particleSystem;
+    }
+
+    Result<Utilities::FatPipeline, ErrorMessage> createParticleComputePipeline(App& app)
+    {
+        // create pipeline layout
+        auto layoutResult = [&descriptorSet = app.descriptorSetLayout, &device = app.device]
+            -> Result<std::shared_ptr<vk::raii::PipelineLayout>, ErrorMessage>
+        {
+            vk::PipelineLayoutCreateInfo layoutCreateInfo {
+                .setLayoutCount = 1,
+                .pSetLayouts = &*descriptorSet
+            };
+            auto layoutResult = castVkResult(device.createPipelineLayout(layoutCreateInfo));
+            CHECK_KEEP(layoutResult);
+
+            return std::make_shared<vk::raii::PipelineLayout>(layoutResult.take());
+        }();
+        CHECK_KEEP(layoutResult);
+        std::shared_ptr<vk::raii::PipelineLayout> layout = layoutResult.take();
+
+        // create shader module
+        Resources::Shader& shader = app.resources.get<Resources::Shader>("particle");
+
+        auto moduleResult = [&device = app.device, &shader] -> Result<vk::raii::ShaderModule, ErrorMessage>
+        {
+            vk::ShaderModuleCreateInfo moduleInfo {
+                .codeSize = shader.code.size(),
+                .pCode = reinterpret_cast<const u32*>(shader.code.data())
+            };
+            auto moduleResult = castVkResult(device.createShaderModule(moduleInfo));
+            CHECK_KEEP(moduleResult);
+            
+            return moduleResult.take();
+        }();
+        CHECK_KEEP(moduleResult);
+        vk::raii::ShaderModule shaderModule = moduleResult.take();
+
+        // create compute shader pipeline
+        vk::PipelineShaderStageCreateInfo stageInfo {
+            .stage = vk::ShaderStageFlagBits::eCompute,
+            .module = *shaderModule,
+            .pName = shader.getEntryPoint(Resources::ShaderStage::Compute).functionName.c_str()
+        };
+        
+        vk::ComputePipelineCreateInfo pipelineCreateInfo {
+            .stage = stageInfo,
+            .layout = **layout
+        };
+
+        auto pipelineResult = castVkResult(app.device.createComputePipeline(nullptr, pipelineCreateInfo));
+        CHECK_KEEP(pipelineResult);
+        vk::raii::Pipeline pipeline = pipelineResult.take();
+
+        return Utilities::FatPipeline {
+            .pipeline = std::move(pipeline),
+            .layout = std::move(layout)
+        };
     }
 }
