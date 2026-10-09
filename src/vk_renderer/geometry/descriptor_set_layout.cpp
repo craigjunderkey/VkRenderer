@@ -5,7 +5,7 @@ namespace VkRenderer::Geometry
 {
     Result<Unit, ErrorMessage> createDescriptorSetLayout(App& app)
     {
-        std::array<vk::DescriptorSetLayoutBinding, 2> bindings {
+        std::array<vk::DescriptorSetLayoutBinding, 3> bindings {
             vk::DescriptorSetLayoutBinding {
                 .binding = 0,
                 .descriptorType = vk::DescriptorType::eUniformBuffer,
@@ -17,6 +17,12 @@ namespace VkRenderer::Geometry
                 .descriptorType = vk::DescriptorType::eSampledImage,
                 .descriptorCount = 1,
                 .stageFlags = vk::ShaderStageFlagBits::eFragment
+            },
+            vk::DescriptorSetLayoutBinding {
+                .binding = 2,
+                .descriptorType = vk::DescriptorType::eStorageBuffer,
+                .descriptorCount = 2,
+                .stageFlags = vk::ShaderStageFlagBits::eCompute
             }
         };
 

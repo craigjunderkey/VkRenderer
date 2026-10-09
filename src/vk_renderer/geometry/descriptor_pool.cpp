@@ -7,7 +7,7 @@ namespace VkRenderer::Geometry
 {
     Result<Unit, ErrorMessage> createDescriptorPool(App& app)
     {
-        std::array<vk::DescriptorPoolSize, 2> poolSizes {
+        std::array<vk::DescriptorPoolSize, 3> poolSizes {
             vk::DescriptorPoolSize {
                 .type = vk::DescriptorType::eUniformBuffer,
                 .descriptorCount = MAX_FRAMES_IN_FLIGHT
@@ -15,6 +15,10 @@ namespace VkRenderer::Geometry
             vk::DescriptorPoolSize {
                 .type = vk::DescriptorType::eSampledImage,
                 .descriptorCount = MAX_FRAMES_IN_FLIGHT
+            },
+            vk::DescriptorPoolSize {
+                .type = vk::DescriptorType::eStorageBuffer,
+                .descriptorCount = 2 * MAX_FRAMES_IN_FLIGHT
             }
         };
 
@@ -60,7 +64,20 @@ namespace VkRenderer::Geometry
                 .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
             };
 
-            std::array<vk::WriteDescriptorSet, 2> descriptorWrites {
+            std::array<vk::DescriptorBufferInfo, 2> particleBufferInfo {
+                vk::DescriptorBufferInfo {
+                    .buffer = *app.particleSystem.buffers[(i - 1) % MAX_FRAMES_IN_FLIGHT],
+                    .offset = 0,
+                    .range = vk::WholeSize
+                },
+                vk::DescriptorBufferInfo {
+                    .buffer = *app.particleSystem.buffers[i],
+                    .offset = 0,
+                    .range = vk::WholeSize
+                }
+            };
+
+            std::array<vk::WriteDescriptorSet, 3> descriptorWrites {
                 vk::WriteDescriptorSet {
                     .dstSet = *app.descriptorSets[i],
                     .dstBinding = 0,
@@ -76,6 +93,14 @@ namespace VkRenderer::Geometry
                     .descriptorCount = 1,
                     .descriptorType = vk::DescriptorType::eSampledImage,
                     .pImageInfo = &imageInfo
+                },
+                vk::WriteDescriptorSet {
+                    .dstSet = *app.descriptorSets[i],
+                    .dstBinding = 2,
+                    .dstArrayElement = 0,
+                    .descriptorCount = static_cast<u32>(particleBufferInfo.size()),
+                    .descriptorType = vk::DescriptorType::eStorageBuffer,
+                    .pBufferInfo = particleBufferInfo.data()
                 }
             };
 

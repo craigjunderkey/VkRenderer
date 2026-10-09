@@ -44,7 +44,6 @@ namespace VkRenderer::Particles
                 particles[i].posRadius.x = spawnRadius * glm::cos(i * inc);
                 particles[i].posRadius.y = 2.0f;
                 particles[i].posRadius.z = spawnRadius * glm::sin(i * inc);
-                particles[i].velocity = vec4(0.0f, -9.8f, 0.0f, 0.0f);
             }
 
             return particles;

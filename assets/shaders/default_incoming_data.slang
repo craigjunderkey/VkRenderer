@@ -21,4 +21,6 @@ struct PerFrame
     float4x4 view;
     float4x4 projection;
     Environment env;
+    StructuredBuffer<Particle> currParticles;
+    RWStructuredBuffer<Particle> prevParticles;
 };
