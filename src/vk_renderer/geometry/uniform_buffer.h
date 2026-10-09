@@ -11,6 +11,7 @@ namespace VkRenderer::Geometry
         mat4 view       alignas(16);
         mat4 projection alignas(16);
         Environment env;
+        float dt;
     };
 
     Result<Unit, ErrorMessage> createPerFrameUbos(App& app);

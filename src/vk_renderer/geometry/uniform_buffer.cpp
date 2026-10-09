@@ -27,7 +27,8 @@ namespace VkRenderer::Geometry
         PerFrameInfo ubo {
             .view = app.view,
             .projection = app.projection,
-            .env = app.environment
+            .env = app.environment,
+            .dt = FRAME_TIME_SEC
         };
     
         memcpy(*app.uniformBuffers[app.frameIndex].mapping, &ubo, sizeof(ubo));
