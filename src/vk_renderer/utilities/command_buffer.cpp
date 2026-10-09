@@ -325,6 +325,27 @@ namespace VkRenderer::Utilities
         cmdBuffer.drawMesh(cube);
     }
 
+    void drawParticles(App& app, CommandBufferHelper& cmdBuffer)
+    {
+        // change to particle render pipeline
+        cmdBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, **app.pipelines.get("particle_render"));
+
+        // rebind descriptor sets
+        // TODO: rearrange pipelines so we don't have to do this
+        cmdBuffer->bindDescriptorSets(
+            vk::PipelineBindPoint::eGraphics, *app.pipelines.get("particle_render").layout, 0,
+            {
+                *app.resources.bindless().getDescriptorSet(),
+                *app.descriptorSets[app.frameIndex]
+            },
+            nullptr
+        );
+
+        // draw points
+        cmdBuffer->bindVertexBuffers(0, **app.particleSystem.buffers[app.frameIndex], { 0 });
+        cmdBuffer->draw(app.particleSystem.numParticles, 1, 0, 0);
+    }
+
     void endRender(App& app, u32 imageIndex)
     {
         CommandBufferHelper cmdBuffer = CommandBufferHelper(app, app.graphicsQueue.commandBuffers[app.frameIndex]);
@@ -334,6 +355,9 @@ namespace VkRenderer::Utilities
         
         // draw all the lights
         drawLights(app, cmdBuffer);
+
+        // draw particles
+        drawParticles(app, cmdBuffer);
 
         // stop rendering
         cmdBuffer->endRendering();

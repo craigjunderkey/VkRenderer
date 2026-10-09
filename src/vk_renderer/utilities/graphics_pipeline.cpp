@@ -6,6 +6,7 @@
 #include "shader_module.h"
 #include "../render_loop/light.h"
 #include "../resources/shader.h"
+#include "../particles/particle_vertex_info.h"
 
 using VkRenderer::App;
 using VkRenderer::Geometry::Vertex;
@@ -123,12 +124,63 @@ namespace VkRenderer::Utilities
         return Ok();
     }
 
+    Result<Unit, ErrorMessage> createParticleRenderPipeline(App& app, PipelineBuilder& pipelineBuilder)
+    {
+        // make programmable stages
+        Shader& shader = app.resources.get<Shader>("particle");
+        auto moduleResult = createShaderModule(app, shader);
+        CHECK_KEEP(moduleResult);
+        vk::raii::ShaderModule shaderModule = moduleResult.take();
+
+        pipelineBuilder.shaderStages.clear();
+        pipelineBuilder.addShaderStage(
+            vk::ShaderStageFlagBits::eVertex,
+            shaderModule,
+            shader.getEntryPoint(Resources::ShaderStage::Vertex).functionName.c_str()
+        );
+        pipelineBuilder.addShaderStage(
+            vk::ShaderStageFlagBits::eFragment,
+            shaderModule,
+            shader.getEntryPoint(Resources::ShaderStage::Fragment).functionName.c_str()
+        );
+
+        // pipeline layout
+        PipelineLayoutBuilder layoutBuilder;
+        layoutBuilder.descriptorSetLayouts = {
+            *app.resources.bindless().getDescriptorSetLayout(),
+            *app.descriptorSetLayout
+        };
+        layoutBuilder.pushConstantRanges = {};
+        auto layoutResult = layoutBuilder.build(app);
+        CHECK_KEEP(layoutResult);
+        pipelineBuilder.layout = layoutResult.take();
+
+        // vertex input
+        pipelineBuilder.vertBindingDescriptions = { Particles::getParticleVertexBinding() };
+        pipelineBuilder.vertAttributeDescriptions.clear();
+        for (const auto& desc : Particles::getParticleVertexAttributes())
+        {
+            pipelineBuilder.vertAttributeDescriptions.emplace_back(desc);            
+        }
+
+        // topology
+        pipelineBuilder.inputAssembly.topology = vk::PrimitiveTopology::ePointList;
+
+        // build pipeline
+        auto pipelineBuildResult = pipelineBuilder.build(app);
+        CHECK_KEEP(pipelineBuildResult);
+        app.pipelines.add("particle_render", pipelineBuildResult.take());
+        
+        return Ok();
+    }
+
     Result<Unit, ErrorMessage> createGraphicsPipeline(App& app)
     {
         PipelineBuilder pipelineBuilder;
         CHECK(createScenePipeline(app, pipelineBuilder));
         CHECK(createSkyboxPipeline(app, pipelineBuilder));
         CHECK(createLightDebugPipeline(app, pipelineBuilder));
+        CHECK(createParticleRenderPipeline(app, pipelineBuilder));
         return Ok();
     }
 }

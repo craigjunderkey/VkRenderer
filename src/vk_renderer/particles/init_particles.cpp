@@ -22,7 +22,9 @@ namespace VkRenderer::Particles
                 auto buffer = FatBuffer::create(
                     app,
                     sizeof(Particle) * numParticles,
-                    vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eStorageBuffer,
+                    vk::BufferUsageFlagBits::eTransferDst
+                        | vk::BufferUsageFlagBits::eStorageBuffer
+                        | vk::BufferUsageFlagBits::eVertexBuffer,
                     vk::MemoryPropertyFlagBits::eDeviceLocal
                 );
                 CHECK_KEEP(buffer);
@@ -39,9 +41,10 @@ namespace VkRenderer::Particles
             std::vector<Particle> particles(numParticles);
             
             f32 inc = 2.0 * glm::pi<f32>() / numParticles;
-            f32 spawnRadius = 10.0f;
+            f32 spawnRadius = 1.0f;
             for (u32 i = 0; i < numParticles; i++)
             {
+                particles[i] = Particle();
                 particles[i].posRadius.x = spawnRadius * glm::cos(i * inc);
                 particles[i].posRadius.y = 2.0f;
                 particles[i].posRadius.z = spawnRadius * glm::sin(i * inc);
@@ -122,6 +125,18 @@ namespace VkRenderer::Particles
         return Utilities::FatPipeline {
             .pipeline = std::move(pipeline),
             .layout = std::move(layout)
+        };
+    }
+
+    std::array<vk::VertexInputAttributeDescription, 1> getParticleVertexDescription()
+    {
+        return std::array<vk::VertexInputAttributeDescription, 1> {
+            vk::VertexInputAttributeDescription {
+                .location = 0,
+                .binding = 0,
+                .format = vk::Format::eR32G32B32A32Sfloat,
+                .offset = offsetof(Particle, posRadius)
+            }
         };
     }
 }
