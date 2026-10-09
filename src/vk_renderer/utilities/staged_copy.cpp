@@ -52,7 +52,7 @@ namespace VkRenderer::Utilities
         this->cmdBuffer_ = std::move(cmdBufferResult.take().front());
 
         // begin recording
-        this->cmdBuffer_.begin({});
+        this->cmdBuffer_.begin({ .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit });
 
         return *this;
     }
