@@ -10,18 +10,20 @@ namespace VkRenderer::Geometry
                 .binding = 0,
                 .descriptorType = vk::DescriptorType::eUniformBuffer,
                 .descriptorCount = 1,
-                .stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
+                .stageFlags = vk::ShaderStageFlagBits::eVertex
+                    | vk::ShaderStageFlagBits::eFragment
+                    | vk::ShaderStageFlagBits::eCompute
             },
             vk::DescriptorSetLayoutBinding {
                 .binding = 1,
-                .descriptorType = vk::DescriptorType::eSampledImage,
+                .descriptorType = vk::DescriptorType::eStorageBuffer,
                 .descriptorCount = 1,
-                .stageFlags = vk::ShaderStageFlagBits::eFragment
+                .stageFlags = vk::ShaderStageFlagBits::eCompute
             },
             vk::DescriptorSetLayoutBinding {
                 .binding = 2,
                 .descriptorType = vk::DescriptorType::eStorageBuffer,
-                .descriptorCount = 2,
+                .descriptorCount = 1,
                 .stageFlags = vk::ShaderStageFlagBits::eCompute
             }
         };

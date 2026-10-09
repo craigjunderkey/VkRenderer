@@ -16,15 +16,44 @@ namespace VkRenderer::Utilities
 {
     Result<Unit, ErrorMessage> createCommandBuffers(App& app)
     {
-        vk::CommandBufferAllocateInfo allocInfo {
-            .commandPool = **app.graphicsQueue.commandPool,
-            .level = vk::CommandBufferLevel::ePrimary,
-            .commandBufferCount = MAX_FRAMES_IN_FLIGHT
-        };
+        // graphics queue
+        {
+            vk::CommandBufferAllocateInfo allocInfo {
+                .commandPool = **app.graphicsQueue.commandPool,
+                .level = vk::CommandBufferLevel::ePrimary,
+                .commandBufferCount = MAX_FRAMES_IN_FLIGHT
+            };
 
-        auto allocResult = castVkResult(app.device.allocateCommandBuffers(allocInfo));
-        CHECK_KEEP(allocResult);
-        app.graphicsQueue.commandBuffers = allocResult.take();
+            auto allocResult = castVkResult(app.device.allocateCommandBuffers(allocInfo));
+            CHECK_KEEP(allocResult);
+            app.graphicsQueue.commandBuffers = allocResult.take();
+        }
+
+        // transfer queue
+        {
+            vk::CommandBufferAllocateInfo allocInfo {
+                .commandPool = **app.transferQueue.commandPool,
+                .level = vk::CommandBufferLevel::ePrimary,
+                .commandBufferCount = MAX_FRAMES_IN_FLIGHT
+            };
+
+            auto allocResult = castVkResult(app.device.allocateCommandBuffers(allocInfo));
+            CHECK_KEEP(allocResult);
+            app.transferQueue.commandBuffers = allocResult.take();
+        }
+
+        // compute command buffers
+        {
+            vk::CommandBufferAllocateInfo allocInfo {
+                .commandPool = **app.graphicsQueue.commandPool,
+                .level = vk::CommandBufferLevel::ePrimary,
+                .commandBufferCount = MAX_FRAMES_IN_FLIGHT
+            };
+
+            auto allocResult = castVkResult(app.device.allocateCommandBuffers(allocInfo));
+            CHECK_KEEP(allocResult);
+            app.computeCmdBuffers = allocResult.take();
+        }
 
         return Ok();
     }

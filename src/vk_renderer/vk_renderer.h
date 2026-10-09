@@ -69,6 +69,7 @@ namespace VkRenderer
                 .physicalDevice = this->physicalDevice
             }
         );
+        std::vector<vk::raii::CommandBuffer> computeCmdBuffers;
 
         // presentation
         vk::raii::SurfaceKHR surface = nullptr;
@@ -99,11 +100,13 @@ namespace VkRenderer
         CameraController camera = CameraController(RenderLoop::Camera(), this->inputs);
         Environment environment = Environment();
         FrameRecorder frameRecorder = FrameRecorder();
-        Particles::ParticleSystem particleSystem = {};
 
         // post-processing
         vk::SampleCountFlagBits msaaSamples = vk::SampleCountFlagBits::e1;
         Texture colorTexture;
+
+        // particles
+        Particles::ParticleSystem particleSystem = {};
 
     private:
         void initLogger();

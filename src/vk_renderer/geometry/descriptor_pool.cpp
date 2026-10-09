@@ -7,13 +7,9 @@ namespace VkRenderer::Geometry
 {
     Result<Unit, ErrorMessage> createDescriptorPool(App& app)
     {
-        std::array<vk::DescriptorPoolSize, 3> poolSizes {
+        std::array<vk::DescriptorPoolSize, 2> poolSizes {
             vk::DescriptorPoolSize {
                 .type = vk::DescriptorType::eUniformBuffer,
-                .descriptorCount = MAX_FRAMES_IN_FLIGHT
-            },
-            vk::DescriptorPoolSize {
-                .type = vk::DescriptorType::eSampledImage,
                 .descriptorCount = MAX_FRAMES_IN_FLIGHT
             },
             vk::DescriptorPoolSize {
@@ -52,29 +48,22 @@ namespace VkRenderer::Geometry
 
         for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
-            vk::DescriptorBufferInfo bufferInfo {
+            vk::DescriptorBufferInfo uboInfo {
                 .buffer = *app.uniformBuffers[i].buffer.buffer,
                 .offset = 0,
                 .range = vk::WholeSize
             };
 
-            vk::DescriptorImageInfo imageInfo {
-                .sampler = nullptr,
-                .imageView = *app.resources.get<RenderLoop::Cubemap>("skybox").texArray.view,
-                .imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
+            vk::DescriptorBufferInfo currParticles {
+                .buffer = *app.particleSystem.buffers[i],
+                .offset = 0,
+                .range = vk::WholeSize
             };
-
-            std::array<vk::DescriptorBufferInfo, 2> particleBufferInfo {
-                vk::DescriptorBufferInfo {
-                    .buffer = *app.particleSystem.buffers[(i - 1) % MAX_FRAMES_IN_FLIGHT],
-                    .offset = 0,
-                    .range = vk::WholeSize
-                },
-                vk::DescriptorBufferInfo {
-                    .buffer = *app.particleSystem.buffers[i],
-                    .offset = 0,
-                    .range = vk::WholeSize
-                }
+            
+            vk::DescriptorBufferInfo prevParticles {
+                .buffer = *app.particleSystem.buffers[(i - 1) % MAX_FRAMES_IN_FLIGHT],
+                .offset = 0,
+                .range = vk::WholeSize
             };
 
             std::array<vk::WriteDescriptorSet, 3> descriptorWrites {
@@ -84,23 +73,23 @@ namespace VkRenderer::Geometry
                     .dstArrayElement = 0,
                     .descriptorCount = 1,
                     .descriptorType = vk::DescriptorType::eUniformBuffer,
-                    .pBufferInfo = &bufferInfo
+                    .pBufferInfo = &uboInfo
                 },
                 vk::WriteDescriptorSet {
                     .dstSet = *app.descriptorSets[i],
                     .dstBinding = 1,
                     .dstArrayElement = 0,
                     .descriptorCount = 1,
-                    .descriptorType = vk::DescriptorType::eSampledImage,
-                    .pImageInfo = &imageInfo
+                    .descriptorType = vk::DescriptorType::eStorageBuffer,
+                    .pBufferInfo = &currParticles,
                 },
                 vk::WriteDescriptorSet {
                     .dstSet = *app.descriptorSets[i],
-                    .dstBinding = 2,
+                    .dstBinding = 1,
                     .dstArrayElement = 0,
-                    .descriptorCount = static_cast<u32>(particleBufferInfo.size()),
+                    .descriptorCount = 1,
                     .descriptorType = vk::DescriptorType::eStorageBuffer,
-                    .pBufferInfo = particleBufferInfo.data()
+                    .pBufferInfo = &prevParticles,
                 }
             };
 
