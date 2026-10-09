@@ -36,6 +36,17 @@ namespace VkRenderer::Particles
         std::vector<Particle> initialParticleData = [numParticles]
         {
             std::vector<Particle> particles(numParticles);
+            
+            f32 inc = 2.0 * glm::pi<f32>() / numParticles;
+            f32 spawnRadius = 10.0f;
+            for (u32 i = 0; i < numParticles; i++)
+            {
+                particles[i].posRadius.x = spawnRadius * glm::cos(i * inc);
+                particles[i].posRadius.y = 2.0f;
+                particles[i].posRadius.z = spawnRadius * glm::sin(i * inc);
+                particles[i].velocity = vec4(0.0f, -9.8f, 0.0f, 0.0f);
+            }
+
             return particles;
         }();
 
