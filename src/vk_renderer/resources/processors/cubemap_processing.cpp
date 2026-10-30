@@ -29,7 +29,7 @@ namespace VkRenderer::Resources
         foundAllSides = foundAllSides && json.trySetProperty("-z", sides[CubeSide::NegZ]);
 
         if (!foundAllSides)
-            return ErrorMessage({ .channel = "resources" }, "Cubemap {} does not specify all sides.", path.stem().c_str());
+            return ErrorMessage({ .channel = "resources" }, "Cubemap {} does not specify all sides.", path.stem().generic_string());
         
         // write the sides
         std::ofstream out(getExportPath("cubemaps", path));

@@ -57,14 +57,14 @@ namespace VkRenderer::Utilities
             return this->data_;
         }
         
-        const void* data() const {
+        constexpr void* data() const {
             assert(this->data_ != nullptr);
             return this->data_;
         }
         
-        constexpr void* operator*() { return this->data(); }
-        constexpr const void* operator*() const { return this->data(); }
-        constexpr void* operator->() { return this->data(); }
+        void* operator*() { return this->data(); }
+        const void* operator*() const { return this->data(); }
+        void* operator->() { return this->data(); }
         
         constexpr DeviceMemoryBlock& memoryObject()
         {
@@ -104,13 +104,13 @@ namespace VkRenderer::Utilities
         // mapping memory is an expensive operator, so keep memory mapped as long as you need it
         Result<HostMemoryMapping, ErrorMessage> map(vk::DeviceSize regionOffset = 0, Option<vk::DeviceSize> regionSize = {});
 
-        constexpr vk::raii::DeviceMemory& memory()
+        vk::raii::DeviceMemory& memory()
         {
             assert(this->memory_ != nullptr);
             return this->memory_;
         }
 
-        constexpr const vk::raii::DeviceMemory& memory() const
+        const vk::raii::DeviceMemory& memory() const
         {
             assert(this->memory_ != nullptr);
             return this->memory_;
@@ -141,11 +141,11 @@ namespace VkRenderer::Utilities
             return *this;
         }
 
-        constexpr vk::raii::DeviceMemory& operator*() { return this->memory(); }
-        constexpr const vk::raii::DeviceMemory& operator*() const { return this->memory(); }
-        constexpr vk::raii::DeviceMemory* operator->() { return &this->memory(); }
+        vk::raii::DeviceMemory& operator*() { return this->memory(); }
+        const vk::raii::DeviceMemory& operator*() const { return this->memory(); }
+        vk::raii::DeviceMemory* operator->() { return &this->memory(); }
 
-        constexpr vk::DeviceSize size() { return this->size_; }
+        constexpr vk::DeviceSize size() const { return this->size_; }
         constexpr bool isHostMapped() const { return this->isHostMapped_; }
     };
 

@@ -7,8 +7,6 @@ namespace VkRenderer::Resources
     {
         if (resourceName == nullptr)
             return ErrorMessage({ .channel = "resources" }, "Resource type missing a name.");
-        if (resourceDirectory == nullptr)
-            return ErrorMessage({ .channel = "resources" }, "Resource type {} missing a directory.", resourceName);
         if (inFileExtensions[0] == nullptr)
             return ErrorMessage({ .channel = "resources" }, "Resource type {} is missing a first input file extension.", resourceName);
         if (offline.exporter.has_value() && offline.exporter.value() == nullptr)
@@ -31,17 +29,17 @@ namespace VkRenderer::Resources
         return Ok();
     }
     
-    std::filesystem::path getResDir(const char* resourceDirectory)
+    static std::filesystem::path getResDir(const std::filesystem::path& resourceDirectory)
     {
-        return std::move(RES_EXPORT_DIR / resourceDirectory);
+        return RES_EXPORT_DIR / resourceDirectory;
     }
     
-    std::filesystem::path ResourceExporter::getExportDirectory(const char* resourceDirectory)
+    std::filesystem::path ResourceExporter::getExportDirectory(const std::filesystem::path& resourceDirectory)
     {
-        return std::move(getResDir(resourceDirectory));
+        return getResDir(resourceDirectory);
     }
 
-    std::filesystem::path ResourceExporter::getExportPath(const char* resourceDirectory,
+    std::filesystem::path ResourceExporter::getExportPath(const std::filesystem::path& resourceDirectory,
         const std::filesystem::path& assetPath, Option<const char*> newFileExtension)
     {
         // get file extension
@@ -59,13 +57,13 @@ namespace VkRenderer::Resources
         return RES_EXPORT_DIR / resourceDirectory / name;
     }
 
-    std::filesystem::path ResourceCompiler::getResourceDirectory(const char* resourceDirectory)
+    std::filesystem::path ResourceCompiler::getResourceDirectory(const std::filesystem::path& resourceDirectory)
     {
-        return std::move(getResDir(resourceDirectory));
+        return getResDir(resourceDirectory);
     }
 
-    std::filesystem::path ResourceLinker::getResourceDirectory(const char* resourceDirectory)
+    std::filesystem::path ResourceLinker::getResourceDirectory(const std::filesystem::path& resourceDirectory)
     {
-        return std::move(getResDir(resourceDirectory));
+        return getResDir(resourceDirectory);
     }
 }

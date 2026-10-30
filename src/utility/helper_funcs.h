@@ -2,6 +2,7 @@
 #include "types.h"
 #include <vector>
 #include <unordered_map>
+#include <filesystem>
 #include <format>
 
 // ostream overloads
@@ -35,7 +36,8 @@ namespace std
 
         auto format(const filesystem::path& path, auto& ctx) const
         {
-            return std::format_to(ctx.out(), "{}", path.c_str());
+            // TODO(tonyb): remove dynamic allocation
+            return std::format_to(ctx.out(), "{}", path.generic_string());
         }
     };
 }

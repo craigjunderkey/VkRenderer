@@ -22,7 +22,7 @@ namespace VkRenderer::Resources
         // get importer depending on file extension
         ObjImporter objImporter;
         std::filesystem::path extension = path.extension();
-        if (strcmp(extension.c_str(), ".obj") == 0)
+        if (extension == ".obj")
         {
             importer = &objImporter;
         }
@@ -130,8 +130,9 @@ namespace VkRenderer::Resources
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
         std::string warnText, errText;
+        std::string pathStr = path.generic_string();
 
-        bool success = tinyobj::LoadObj(&attributes, &shapes, &materials, &warnText, &errText, path.c_str());
+        bool success = tinyobj::LoadObj(&attributes, &shapes, &materials, &warnText, &errText, pathStr.c_str());
         
         if (!warnText.empty())
             warn({ .channel = "resources" }, warnText);

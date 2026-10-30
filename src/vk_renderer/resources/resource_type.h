@@ -4,7 +4,7 @@
 #include <any>
 #include "processing_data.h"
 
-#define MAX_FILE_EXTENSIONS 4
+constexpr u32 MAX_FILE_EXTENSIONS = 4;
 
 namespace VkRenderer::Resources
 {
@@ -44,8 +44,8 @@ namespace VkRenderer::Resources
     struct ResourceType
     {
         const char* resourceName;
-        const char* resourceDirectory;                      // name of the export sub-directory
-        const char* inFileExtensions[MAX_FILE_EXTENSIONS];  // file extensions must begin with `.`
+        std::filesystem::path resourceDirectory;                      // name of the export sub-directory
+        const char* inFileExtensions[MAX_FILE_EXTENSIONS];            // file extensions must begin with `.`
         OfflineResourceProcessors offline;
         RuntimeResourceProcessors runtime;
 
@@ -65,11 +65,11 @@ namespace VkRenderer::Resources
     
     protected:
         // resourceDirectory is the `resourceDirectory` field of the resource's ResourceType
-        std::filesystem::path getExportDirectory(const char* resourceDirectory);
+        std::filesystem::path getExportDirectory(const std::filesystem::path& resourceDirectory);
 
         // resourceDirectory is the `resourceDirectory` field of the resource's ResourceType
         // assetPath is the path supplied to `exportResource`
-        std::filesystem::path getExportPath(const char* resourceDirectory,
+        std::filesystem::path getExportPath(const std::filesystem::path& resourceDirectory,
             const std::filesystem::path& assetPath, Option<const char*> newFileExtension = {});
     };
 
@@ -84,7 +84,7 @@ namespace VkRenderer::Resources
         virtual ~ResourceCompiler() = default;
     
     protected:
-        std::filesystem::path getResourceDirectory(const char* resourceDirectory);
+        std::filesystem::path getResourceDirectory(const std::filesystem::path& resourceDirectory);
     };
 
     class ResourceLinker
@@ -98,7 +98,7 @@ namespace VkRenderer::Resources
         virtual ~ResourceLinker() = default;
     
     protected:
-        std::filesystem::path getResourceDirectory(const char* resourceDirectory);
+        std::filesystem::path getResourceDirectory(const std::filesystem::path& resourceDirectory);
     };
 
     class OfflineResourceTasks

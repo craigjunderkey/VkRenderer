@@ -115,7 +115,7 @@ public:
 
     constexpr bool operator==(const PoolPtr<T>& other) const
     {
-        return this->ptr_ == other.ptr;
+        return this->ptr_ == other.ptr_;
     }
 
     // converts this into a raw pointer

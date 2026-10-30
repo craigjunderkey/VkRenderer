@@ -46,6 +46,8 @@ namespace VkRenderer::Resources
                     return "domain";
                 case ShaderStage::RayGeneration:
                     return "raygeneration";
+                default:
+                    return nullptr; // not possible
             }
         }
 

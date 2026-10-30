@@ -44,9 +44,9 @@ namespace LogUtils
             Result<T, ErrorMessage> result = Err<ErrorMessage>(
                 ErrorMessage(std::move(this->message_))
             );
-            return std::move(result);
+            return result;
         }
 
-        constexpr operator std::string_view() const { return this->message_.getText(); }
+        operator std::string_view() const { return this->message_.getText(); }
     };
 }

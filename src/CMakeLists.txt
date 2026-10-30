@@ -13,13 +13,16 @@ set(JSON_INCLUDEDIR ${nlohmann_json_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${JSON_INCLUDEDIR})
 
 # include slang compilation API
-set(${CMAKE_CURRENT_LIST_DIR} "${CMAKE_CURRENT_LIST_DIR}/..")
-include(../CMake/slang/slangConfig.cmake)
+if (LINUX)
+    set(${CMAKE_CURRENT_LIST_DIR} "${CMAKE_CURRENT_LIST_DIR}/..")
+    include(../CMake/slang/slangConfig.cmake)
+    include(../CMake/slang/slangTargets.cmake)
+    set(SLANG_INCLUDEDIR "$ENV{VULKAN_SDK}/include/slang")
+    target_include_directories(${PROJECT_NAME} PRIVATE ${SLANG_INCLUDEDIR})
+endif()
+
 find_package(slang REQUIRED)
-include(../CMake/slang/slangTargets.cmake)
 target_link_libraries(${PROJECT_NAME} slang::slang)
-set(SLANG_INCLUDEDIR "$ENV{VULKAN_SDK}/include/slang")
-target_include_directories(${PROJECT_NAME} PRIVATE ${SLANG_INCLUDEDIR})
 
 # precompile heavy headers
 target_precompile_headers(
@@ -39,4 +42,12 @@ target_precompile_headers(
         <vulkan/vulkan_raii.hpp>
         <vulkan/vulkan_to_string.hpp>
         <slang.h>
+)
+
+# copy resources
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/../assets"
+    "${CMAKE_CURRENT_BINARY_DIR}/../${PROJECT_NAME}/assets"
 )

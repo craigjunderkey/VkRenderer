@@ -52,7 +52,7 @@ namespace VkRenderer::Resources
     private:
         App& app_;
 
-        std::vector<BindlessResource> resources_;
+        std::vector<BindlessResource> resources_ {};
     
         StringIdMap<StringIdMap<u32>> indexTables_ { "bindless_index_tables" };
         StringIdMap<u32> resourceMap_ { "bindless_resource_map" };

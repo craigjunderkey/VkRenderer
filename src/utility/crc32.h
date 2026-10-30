@@ -92,7 +92,7 @@ public:
 
     static std::array<u32, 256> generateLookupTable()
     {
-        std::array<u32, 256> table;
+        std::array<u32, 256> table {};
         table.fill(0);
 
         u32 crc = 1;
@@ -118,7 +118,7 @@ public:
             i >>= 1;
         }
 
-        return std::move(table);
+        return table;
     }
 
     static constexpr u32 hash(const u8* data, u32 size)

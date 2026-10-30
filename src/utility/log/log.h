@@ -7,7 +7,7 @@
 #include <initializer_list>
 #include <source_location>
 
-#define LOG_BUFFER_SIZE 2048
+constexpr u32 LOG_BUFFER_SIZE = 2048;
 
 namespace Log
 {
@@ -88,7 +88,7 @@ namespace Log
         BufferedLogMessage&& setText(std::string_view text);
 
         std::string_view getText() const;
-        constexpr operator std::string_view() const { return this->getText(); }
+        operator std::string_view() const { return this->getText(); }
     };
 
     using Message = BufferedLogMessage;

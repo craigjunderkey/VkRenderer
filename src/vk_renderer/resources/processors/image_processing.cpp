@@ -1,5 +1,6 @@
 #include "image_processing.h"
 
+#define STBI_FAILURE_USERMSG
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -10,11 +11,12 @@
 
 namespace VkRenderer::Resources
 {
-    Result<ImageData, ErrorMessage> loadImage(const std::filesystem::path& path)
+    static Result<ImageData, ErrorMessage> loadImage(const std::filesystem::path& path)
     {
         ImageData image;
+        std::string pathStr = path.generic_string();
         image.pixels = stbi_load(
-            path.c_str(),
+            pathStr.c_str(),
             &image.width,
             &image.height,
             &image.numChannels,
@@ -22,7 +24,8 @@ namespace VkRenderer::Resources
         );
 
         if (!image.pixels)
-            return ErrorMessage({ .channel = "resources" }, "Failed to load image {}.", path);
+            return ErrorMessage({ .channel = "resources" }, "Failed to load image {}. Reason: {}.",
+                path, stbi_failure_reason());
 
         return std::move(image);
     }
@@ -68,9 +71,10 @@ namespace VkRenderer::Resources
         const ImageData& imageData, u32 compressionLevel)
     {
         stbi_write_png_compression_level = static_cast<i32>(compressionLevel);
+        std::string pathStr = dstPath.generic_string();
 
         i32 writeResult = stbi_write_png(
-            dstPath.c_str(),
+            pathStr.c_str(),
             imageData.width,
             imageData.height,
             imageData.numChannels, 

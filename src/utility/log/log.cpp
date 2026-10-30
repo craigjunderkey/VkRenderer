@@ -105,7 +105,7 @@ namespace Log
             Option<u32> index = context.getChannelIndex(id);
             if (!index)
                 panic(std::format({"{} not in logging  context channels."}, id));
-            u64 channelMask = 0x1 << index.value();
+            u64 channelMask = 0x1ULL << index.value();
             idsMask |= channelMask;
         }
         this->mask = idsMask;
@@ -118,7 +118,7 @@ namespace Log
         Option<u32> index = context.getChannelIndex(id);
         if (!index)
             panic(std::format("{} not in logging context channels.", id));
-        u64 channelMask = 0x1 << index.value();
+        u64 channelMask = 0x1ULL << index.value();
         return static_cast<bool>(this->mask & channelMask);
     }
 

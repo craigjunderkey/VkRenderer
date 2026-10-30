@@ -48,26 +48,29 @@ Result<std::vector<const char*>, ErrorMessage> fetchExtensions(App& app)
 Result<std::vector<const char*>, ErrorMessage> fetchValidationLayers(App& app)
 {
     // get the required layers
-    std::vector<const char*> requiredLayers;
+    std::vector<const char*> needLayers;
     if (VALIDATION_LAYERS_ENABLED)
-        requiredLayers.assign(VALIDATION_LAYERS.begin(), VALIDATION_LAYERS.end());
+        needLayers.assign(VALIDATION_LAYERS.begin(), VALIDATION_LAYERS.end());
 
     // check that all the required layers are supported
     auto layerPropertiesResult = castVkResult(app.context.enumerateInstanceLayerProperties());
     CHECK_KEEP(layerPropertiesResult);
-    std::vector<vk::LayerProperties> layerProperties = layerPropertiesResult.take();
+    std::vector<vk::LayerProperties> haveLayers = layerPropertiesResult.take();
 
-    auto unsupportedLayerIt = std::ranges::find_if(
-        layerProperties,
-        [requiredLayers] (vk::LayerProperties layer) {
-            return std::ranges::contains(requiredLayers, (const char*)layer.layerName);
+    for (const char* needLayer : needLayers)
+    {
+        bool foundIt = false;
+        for (vk::LayerProperties haveLayer : haveLayers)
+        {
+            foundIt |= strncmp(needLayer, haveLayer.layerName, 256) == 0;
         }
-    );
-
-    if (unsupportedLayerIt != layerProperties.end())
-        return ErrorMessage({ .channel = "vulkan" }, "Required validation layer not supported: {}.", unsupportedLayerIt->layerName);
+        if (!foundIt)
+        {
+            return ErrorMessage({ .channel = "vulkan" }, "Required validation layer not supported: {}.", needLayer);
+        }
+    }
     
-    return std::move(requiredLayers);
+    return std::move(needLayers);
 }
 
 namespace VkRenderer::Utilities

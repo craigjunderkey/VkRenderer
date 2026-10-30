@@ -8,7 +8,7 @@
 
 namespace VkRenderer::Resources
 {
-    Result<Unit, ErrorMessage> castSlangResult(SlangResult result)
+    static Result<Unit, ErrorMessage> castSlangResult(SlangResult result)
     {
         if (SLANG_SUCCEEDED(result))
         {
@@ -90,7 +90,8 @@ namespace VkRenderer::Resources
         
         // configure session
         std::filesystem::path searchPath = getResourceDirectory("shaders") / "src";
-        const char* searchPathCStr = searchPath.c_str();
+        auto searchPathStr = searchPath.generic_string();
+        const char* searchPathCStr = searchPathStr.c_str();
         slang::SessionDesc desc {
             .targets = &target,
             .targetCount = 1,
@@ -125,10 +126,9 @@ namespace VkRenderer::Resources
     Result<Unit, ErrorMessage> ShaderLinker::linkResource(const std::filesystem::path& path, OfflineProcessingData& processingData)
     {
         // load shader code
-        std::filesystem::path moduleName = path.stem();
-        const char* moduleNameCStr = moduleName.c_str();
+        std::string moduleName = path.stem().generic_string();
         Slang::ComPtr<slang::IBlob> diagnostics;
-        Slang::ComPtr<slang::IModule> shaderModule(this->session_->loadModule(moduleNameCStr, diagnostics.writeRef()));
+        Slang::ComPtr<slang::IModule> shaderModule(this->session_->loadModule(moduleName.c_str(), diagnostics.writeRef()));
         if (diagnostics)
             return ErrorMessage({ .channel = "resources" }, reinterpret_cast<const char*>(diagnostics->getBufferPointer()));
         

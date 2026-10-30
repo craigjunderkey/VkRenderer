@@ -74,18 +74,18 @@ namespace VkRenderer::Utilities
         constexpr vk::Extent2D getExtent() const { return this->extent_; }
         constexpr vk::SurfaceFormatKHR getFormat() const { return this->format_; }
 
-        constexpr vk::raii::SwapchainKHR& getSwapchain()
+        vk::raii::SwapchainKHR& getSwapchain()
         {
             assert(this->swapchain_ != nullptr);
             return this->swapchain_;
         }
-        constexpr const vk::raii::SwapchainKHR& getSwapchain() const
+        const vk::raii::SwapchainKHR& getSwapchain() const
         {
             assert(this->swapchain_ != nullptr);
             return this->swapchain_;
         }
-        constexpr vk::raii::SwapchainKHR& operator*() { return this->getSwapchain(); }
-        constexpr const vk::raii::SwapchainKHR& operator*() const { return this->getSwapchain(); }
-        constexpr vk::raii::SwapchainKHR* operator->() { return &this->getSwapchain(); }
+        vk::raii::SwapchainKHR& operator*() { return this->getSwapchain(); }
+        const vk::raii::SwapchainKHR& operator*() const { return this->getSwapchain(); }
+        vk::raii::SwapchainKHR* operator->() { return &this->getSwapchain(); }
     };
 }

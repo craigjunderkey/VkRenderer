@@ -218,7 +218,7 @@ namespace VkRenderer::Geometry
 
         cmdBuffer->copyBufferToImage(**stagingBuffer, *tex.image, dstState.layout, copyRegion);
 
-        return std::move(dstState);
+        return dstState;
     }
 
     Result<Texture, ErrorMessage> Texture::fromDescription(App& app, const Resources::TextureDescription& desc)
@@ -239,7 +239,7 @@ namespace VkRenderer::Geometry
         {
             layerDims = desc.dimensions.value();
         }
-        
+
         // get mip levels and samples
         u32 mipLevels = 1;
         if (desc.doMipmapping)
@@ -344,7 +344,8 @@ namespace VkRenderer::Geometry
                         .queueFamilyIndex = imageState.queueFamilyIndex,
                         .accessMask = vk::AccessFlagBits2::eTransferRead | vk::AccessFlagBits2::eTransferWrite,
                         .stageMask = vk::PipelineStageFlagBits2::eTransfer
-                    }
+                    },
+                    {}
                 );
             }
 

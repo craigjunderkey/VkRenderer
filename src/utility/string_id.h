@@ -5,6 +5,12 @@
 #include <format>
 #include "crc32.h"
 
+#ifndef NDEBUG
+    #define CONSTEXPR_RELEASE
+#else
+    #define CONSTEXPR_RELEASE constexpr
+#endif
+
 struct StringId
 {
     friend std::hash<StringId>;
@@ -25,7 +31,7 @@ public:
     constexpr StringId() : id(NONE) {};
     constexpr StringId(u32 id) : id(id) {};
 
-    constexpr StringId(std::string_view string)
+    CONSTEXPR_RELEASE StringId(std::string_view string)
         : id(Crc32::hash(string.data(), string.length()))
     {
     #ifndef NDEBUG
@@ -33,7 +39,7 @@ public:
     #endif
     }
 
-    constexpr StringId(const char* string)
+    CONSTEXPR_RELEASE StringId(const char* string)
         : id(Crc32::hash(string))
     {
     #ifndef NDEBUG
@@ -41,7 +47,7 @@ public:
     #endif
     }
 
-    constexpr StringId(const std::string& string)
+    CONSTEXPR_RELEASE StringId(const std::string& string)
         : id(Crc32::hash(string.data(), string.length()))
     {
     #ifndef NDEBUG

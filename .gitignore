@@ -5,3 +5,7 @@ assets_export
 log
 !src/utility/log
 screenshots
+
+# visual studio
+.vs/*
+cpp.hint

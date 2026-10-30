@@ -10,12 +10,10 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../CMake")
 
-find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
+find_package(glfw3 REQUIRED)
 find_package(Vulkan 1.4.335 REQUIRED)
 find_package(tinyobjloader REQUIRED)
-#!find_package(tinygltf REQUIRED)
-#!find_package(KTX REQUIRED)
 
 # Set up Vulkan C++ module only if enabled
 if(ENABLE_CPP20_MODULE)
@@ -75,7 +73,9 @@ set(TEMPLATE_DIR ${CMAKE_BINARY_DIR}/${TEMPLATE_NAME})
 add_executable (${TEMPLATE_NAME} ${SOURCES})
 set_target_properties (${TEMPLATE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TEMPLATE_DIR})
 set_target_properties (${TEMPLATE_NAME} PROPERTIES CXX_STANDARD 23)
+
 target_link_libraries (${TEMPLATE_NAME} Vulkan::cppm glfw)
+
 target_include_directories (${TEMPLATE_NAME} PRIVATE ${STB_INCLUDEDIR})
 
 # Add compile definition if C++ 20 module is enabled

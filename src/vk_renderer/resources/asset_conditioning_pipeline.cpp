@@ -1,6 +1,7 @@
 #include "asset_conditioning_pipeline.h"
 #include "processors/common_resource_processors.h"
 #include "../../utility/string_id_map.h"
+#include "../../utility/file_handling.h"
 #include <chrono>
 
 namespace VkRenderer::Resources
@@ -22,7 +23,7 @@ namespace VkRenderer::Resources
             bool found = false;
             while (!found && resourceType.inFileExtensions[i] != nullptr && i < MAX_FILE_EXTENSIONS)
             {
-                if (strcmp(resourceType.inFileExtensions[i], extension.c_str()) == 0)
+                if (resourceType.inFileExtensions[i] == extension)
                 {
                     paths.emplace_back(std::move(path));
                     found = true;
@@ -37,14 +38,14 @@ namespace VkRenderer::Resources
     Result<Unit, ErrorMessage> AssetConditioningPipeline::prepareExportDirectory()
     {
         // clear the export directory
-        std::filesystem::remove_all(RES_EXPORT_DIR);
-        std::filesystem::create_directory(RES_EXPORT_DIR);
+        CHECK(FileHandling::deleteRecursive(RES_EXPORT_DIR));
+        CHECK(FileHandling::createDirectory(RES_EXPORT_DIR));
 
         // create resource output directories
         for (const ResourceType& type : this->types_)
         {
             std::filesystem::path dir = RES_EXPORT_DIR / type.resourceDirectory;
-            std::filesystem::create_directory(dir);
+            CHECK(FileHandling::createDirectory(dir));
         }
 
         return Ok();
@@ -57,7 +58,7 @@ namespace VkRenderer::Resources
         std::chrono::milliseconds linkTime;
     };
 
-    void updateResourceCount(const ResourceType& type, OfflineProcessingData& data)
+    static void updateResourceCount(const ResourceType& type, OfflineProcessingData& data)
     {
         // get number of resources of this type
         u32 numResources = 0;

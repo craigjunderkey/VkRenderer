@@ -9,8 +9,10 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # for whatever reason the default standard library that CMake uses is wrong
 # so, switch it to this one
-add_compile_options("-stdlib=libc++")
-add_link_options("-stdlib=libc++")
+if(LINUX)
+    add_compile_options("-stdlib=libc++")
+    add_link_options("-stdlib=libc++")
+endif()
 
 # get sources
 file(GLOB_RECURSE SOURCES

@@ -111,9 +111,9 @@ namespace VkRenderer::Resources
             for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(dir))
             {
                 std::filesystem::path path = file.path();
-                T res;
+                T res = {};
                 CHECK(loader->loadResource(path, &res, this->processingData_));
-                CHECK(map.tryAdd(StringId(path.stem()), std::move(res)));
+                CHECK(map.tryAdd(StringId(path.stem().generic_string()), std::move(res)));
             }
             CHECK(loader->end(this->processingData_));
 

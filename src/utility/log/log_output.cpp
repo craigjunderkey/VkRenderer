@@ -1,11 +1,12 @@
 #include "log_output.h"
 #include <chrono>
+#include "../file_handling.h"
 
 namespace Log
 {
     std::ostream& displayChannel(std::ostream& out, StringId channel)
     {
-        if (channel != StringId::NONE)
+        if (channel)
         {
             out << "(" << channel.string() << ") ";
         }
@@ -41,8 +42,8 @@ namespace Log
     void FileOutput::init(LoggingContext& context)
     {
         // clear log directory
-        std::filesystem::remove_all(this->logDirectory_);
-        std::filesystem::create_directory(this->logDirectory_);
+        FileHandling::deleteRecursive(this->logDirectory_).unwrap();
+        FileHandling::createDirectory(this->logDirectory_).unwrap();
 
         // create log files
         this->globalLogFile_ = std::ofstream(this->logDirectory_ / "_all.log");
@@ -102,7 +103,7 @@ namespace Log
         
         // log the message with time included
         fileLog(this->globalLogFile_, details, message, time, true);
-        if (details.channel != StringId::NONE)
+        if (details.channel)
         {
             fileLog(this->logFiles_.get(details.channel), details, message, time, false);
         }

@@ -17,8 +17,8 @@ namespace VkRenderer::Resources
         Result<Unit, ErrorMessage> exportResource(const std::filesystem::path& srcPath, OfflineProcessingData& processingData) override
         {
             std::filesystem::path dstPath = getExportPath(this->type_->resourceDirectory, srcPath);
-            std::ifstream src = std::ifstream(srcPath);
-            std::ofstream dst = std::ofstream(dstPath);
+            std::ifstream src = std::ifstream(srcPath, std::ios::binary);
+            std::ofstream dst = std::ofstream(dstPath, std::ios::binary);
             dst << src.rdbuf();
             return Ok();
         }

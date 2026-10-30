@@ -14,12 +14,12 @@ namespace VkRenderer::Geometry
         vk::DeviceSize size = 0;
         std::unique_ptr<std::vector<u32>> families = nullptr;
 
-        constexpr vk::raii::Buffer& operator*()
+        vk::raii::Buffer& operator*()
         {
             assert(this->buffer != nullptr);
             return this->buffer;
         }
-        constexpr const vk::raii::Buffer& operator*() const
+        const vk::raii::Buffer& operator*() const
         {
             assert(this->buffer != nullptr);
             return this->buffer;

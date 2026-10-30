@@ -2,7 +2,7 @@
 #include "vulkan_common.h"
 
 namespace VkRenderer { class App; }
-namespace VkRenderer::Geometry { class Mesh; class Texture; }
+namespace VkRenderer::Geometry { struct Mesh; struct Texture; }
 
 namespace VkRenderer::Utilities
 {

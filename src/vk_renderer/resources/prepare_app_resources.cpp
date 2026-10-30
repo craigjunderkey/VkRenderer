@@ -105,11 +105,12 @@ namespace VkRenderer::Resources
         
         // material
         std::vector<StringId> matIdVec = app.resources.registry().getMap<RenderLoop::Material>().makeIdVec();
+        u32 numMaterials = matIdVec.size();
         std::sort(matIdVec.begin(), matIdVec.end());
         bindless.addBindlessResource(
             BindlessResource {
                 .name = "material",
-                .virtualCount = static_cast<u32>(matIdVec.size()),
+                .virtualCount = numMaterials,
                 .descriptorCount = 1,
                 .descriptorType = vk::DescriptorType::eUniformBuffer,
                 .stages = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
@@ -119,12 +120,13 @@ namespace VkRenderer::Resources
         
         // texture
         std::vector<StringId> texIdVec = app.resources.registry().getMap<Geometry::Texture>().makeIdVec();
+        u32 numTextures = texIdVec.size();
         std::sort(texIdVec.begin(), texIdVec.end());
         bindless.addBindlessResource(
             BindlessResource {
                 .name = "texture",
-                .virtualCount = static_cast<u32>(texIdVec.size()),
-                .descriptorCount = static_cast<u32>(texIdVec.size()),
+                .virtualCount = numTextures,
+                .descriptorCount = numTextures,
                 .descriptorType = vk::DescriptorType::eSampledImage,
                 .stages = vk::ShaderStageFlagBits::eFragment
             },
@@ -133,12 +135,13 @@ namespace VkRenderer::Resources
 
         // cubemap
         std::vector<StringId> cubeIdVec = app.resources.registry().getMap<RenderLoop::Cubemap>().makeIdVec();
+        u32 numCubes = cubeIdVec.size();
         std::sort(cubeIdVec.begin(), cubeIdVec.end());
         bindless.addBindlessResource(
             BindlessResource {
                 .name = "cubemap",
-                .virtualCount = static_cast<u32>(cubeIdVec.size()),
-                .descriptorCount = static_cast<u32>(cubeIdVec.size()),
+                .virtualCount = numCubes,
+                .descriptorCount = numCubes,
                 .descriptorType = vk::DescriptorType::eSampledImage,
                 .stages = vk::ShaderStageFlagBits::eFragment
             },
@@ -147,11 +150,12 @@ namespace VkRenderer::Resources
 
         // sampler
         std::vector<StringId> samplerIdVec = { "repeat", "mirrored_repeat", "clamped" }; // TODO: replace this when samplers become a resource
+        u32 numSamplers = samplerIdVec.size();
         bindless.addBindlessResource(
             BindlessResource {
                 .name = "sampler",
-                .virtualCount = static_cast<u32>(samplerIdVec.size()),
-                .descriptorCount = static_cast<u32>(samplerIdVec.size()),
+                .virtualCount = numSamplers,
+                .descriptorCount = numSamplers,
                 .stages = vk::ShaderStageFlagBits::eFragment
             },
             std::move(samplerIdVec)

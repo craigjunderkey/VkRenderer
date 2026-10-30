@@ -1,0 +1,15 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "windows",
+            "inherits": "vcpkg",
+            "environment": {
+                "VCPKG_ROOT": "C:/Repos/vcpkg"
+            },
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-windows" 
+            }
+        }
+    ]
+}
