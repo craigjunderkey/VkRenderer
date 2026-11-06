@@ -16,6 +16,19 @@ namespace VkRenderer::Geometry
         CHECK_KEEP(texResult);
         app.colorTexture = texResult.take();
 
+        // set debug name
+        auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
+            vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
+        
+        VkDebugUtilsObjectNameInfoEXT objInfo {
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+            .objectType = VK_OBJECT_TYPE_IMAGE,
+            .objectHandle = (u64)(VkImage)(*app.colorTexture.image),
+            .pObjectName = "Image_ColorRenderTarget"
+        };
+
+        CHECK(castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo)));
+
         return Ok();
     }
 }

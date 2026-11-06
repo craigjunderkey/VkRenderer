@@ -15,10 +15,9 @@ Result<std::vector<const char*>, ErrorMessage> fetchExtensions(App& app)
     {
         extensions.push_back(glfwExtensions[i]);
     }
-    if (VALIDATION_LAYERS_ENABLED)
-        extensions.push_back(vk::EXTDebugUtilsExtensionName);
     
-    extensions.push_back("VK_KHR_get_surface_capabilities2");
+    extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    extensions.push_back(VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME);
 
     // check if all the required GLFW extensions are supported
     std::vector<vk::ExtensionProperties> extensionProperties;
