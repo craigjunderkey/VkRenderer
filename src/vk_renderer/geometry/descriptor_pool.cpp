@@ -2,6 +2,9 @@
 #include "descriptor_pool.h"
 #include "uniform_buffer.h"
 #include "../render_loop/cubemap.h"
+#include "../utilities/vulkan_debug.h"
+
+using namespace VkRenderer::Utilities;
 
 namespace VkRenderer::Geometry
 {
@@ -29,6 +32,8 @@ namespace VkRenderer::Geometry
         CHECK_KEEP(poolResult);
         app.descriptorPool = poolResult.take();
 
+        CHECK(setDebugName(app, *app.descriptorPool, "DescriptorPool_PerFrameUbo"));
+
         return Ok();
     }
 
@@ -45,6 +50,15 @@ namespace VkRenderer::Geometry
         auto allocSetsResult = castVkResult(app.device.allocateDescriptorSets(allocInfo));
         CHECK_KEEP(allocSetsResult);
         app.descriptorSets = allocSetsResult.take();
+
+#ifndef NDEBUG
+        for (u32 i = 0; i < app.descriptorSets.size(); i++)
+        {
+            std::string* debugName = new std::string();
+            *debugName = std::format("DescriptorSet_PerFrameUbo{}", i);
+            CHECK(setDebugName(app, *app.descriptorSets[i], debugName->c_str()));
+        }
+#endif
 
         for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {

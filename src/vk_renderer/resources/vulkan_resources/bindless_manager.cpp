@@ -1,5 +1,8 @@
 #include "../../vk_renderer.h"
 #include "bindless_manager.h"
+#include "../../utilities/vulkan_debug.h"
+
+using namespace VkRenderer::Utilities;
 
 namespace VkRenderer::Resources
 {
@@ -97,6 +100,8 @@ resource's virtual count is {}.", resName, orderedIds.size(), resource.virtualCo
             auto poolResult = castVkResult(this->app_.device.createDescriptorPool(poolInfo));
             CHECK_KEEP(poolResult);
             this->pool_ = poolResult.take();
+
+            CHECK(setDebugName(this->app_, *this->pool_, "DescriptorPool_Bindless"));
         }
 
         // create layout
@@ -123,6 +128,8 @@ resource's virtual count is {}.", resName, orderedIds.size(), resource.virtualCo
             auto layoutResult = castVkResult(this->app_.device.createDescriptorSetLayout(layoutInfo));
             CHECK_KEEP(layoutResult);
             this->layout_ = layoutResult.take();
+
+            CHECK(setDebugName(this->app_, this->layout_, "DescriptorSetLayout_Bindless"));
         }
 
         // create descriptor set
@@ -136,6 +143,8 @@ resource's virtual count is {}.", resName, orderedIds.size(), resource.virtualCo
             auto allocResult = castVkResult(this->app_.device.allocateDescriptorSets(allocInfo));
             CHECK_KEEP(allocResult);
             this->set_ = std::move(allocResult.take().front());
+
+            CHECK(setDebugName(this->app_, this->set_, "DescriptorSet_Bindless"));
         }
 
         return Ok();

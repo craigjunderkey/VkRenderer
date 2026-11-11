@@ -30,8 +30,8 @@ namespace VkRenderer::Utilities
     {
         if (!VALIDATION_LAYERS_ENABLED)
             return Ok();
-        
-        vk::DebugUtilsMessengerCreateInfoEXT createInfo {
+
+        vk::DebugUtilsMessengerCreateInfoEXT createInfo{
             .messageSeverity = vk::DebugUtilsMessageSeverityFlagBitsEXT::eError |
                 vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
                 vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
@@ -42,7 +42,7 @@ namespace VkRenderer::Utilities
                 vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
             .pfnUserCallback = vkDebugCallback
         };
-        
+
         // create debug messenger
         auto createResult = castVkResult(app.instance.createDebugUtilsMessengerEXT(createInfo));
         CHECK_KEEP(createResult);
@@ -59,7 +59,7 @@ namespace VkRenderer::Utilities
         constexpr std::string_view validation = "Validation";
         constexpr std::string_view performance = "Performance";
         constexpr std::string_view deviceAddressBinding = "DeviceAddressBinding";
-        
+
         constexpr u32 maxSize = general.size() + delimiter.size() + validation.size() + delimiter.size()
             + performance.size() + delimiter.size() + performance.size() + delimiter.size() + deviceAddressBinding.size();
 
@@ -104,63 +104,53 @@ namespace VkRenderer::Utilities
         return std::string_view(msgString.data(), pos - msgString.begin());
     }
 
-    Result<Unit, ErrorMessage> setDebugName(App& app, vk::Image image, const char* name)
+    static Result<Unit, ErrorMessage> setDebugName(App& app, VkObjectType objType, u64 handle, const char* name)
     {
         auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
             vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
 
         VkDebugUtilsObjectNameInfoEXT objInfo{
             .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
-            .objectType = VK_OBJECT_TYPE_IMAGE,
-            .objectHandle = (u64)(VkImage)(image),
+            .objectType = objType,
+            .objectHandle = handle,
             .pObjectName = name
         };
 
         return castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo));
+    }
+
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::Image image, const char* name)
+    {
+        return setDebugName(app, VK_OBJECT_TYPE_IMAGE, (u64)(VkImage)image, name);
     }
 
     Result<Unit, ErrorMessage> setDebugName(App& app, vk::ImageView imageView, const char* name)
     {
-        auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
-            vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
-
-        VkDebugUtilsObjectNameInfoEXT objInfo{
-            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
-            .objectType = VK_OBJECT_TYPE_IMAGE_VIEW,
-            .objectHandle = (u64)(VkImageView)(imageView),
-            .pObjectName = name
-        };
-
-        return castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo));
+        return setDebugName(app, VK_OBJECT_TYPE_IMAGE_VIEW, (u64)(VkImageView)imageView, name);
     }
 
     Result<Unit, ErrorMessage> setDebugName(App& app, vk::Buffer buffer, const char* name)
     {
-        auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
-            vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
-
-        VkDebugUtilsObjectNameInfoEXT objInfo{
-            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
-            .objectType = VK_OBJECT_TYPE_BUFFER,
-            .objectHandle = (u64)(VkBuffer)(buffer),
-            .pObjectName = name
-        };
-
-        return castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo));
+        return setDebugName(app, VK_OBJECT_TYPE_BUFFER, (u64)(VkBuffer)buffer, name);
     }
 
     Result<Unit, ErrorMessage> setDebugName(App& app, vk::ShaderModule shader, const char* name)
     {
-        auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
-            vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
+        return setDebugName(app, VK_OBJECT_TYPE_SHADER_MODULE, (u64)(VkShaderModule)shader, name);
+    }
 
-        VkDebugUtilsObjectNameInfoEXT objInfo{
-            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
-            .objectType = VK_OBJECT_TYPE_SHADER_MODULE,
-            .objectHandle = (u64)(VkShaderModule)(shader),
-            .pObjectName = name
-        };
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::DescriptorSetLayout layout, const char* name)
+    {
+        return setDebugName(app, VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT, (u64)(VkDescriptorSetLayout)layout, name);
+    }
 
-        return castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo));
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::DescriptorSet set, const char* name)
+    {
+        return setDebugName(app, VK_OBJECT_TYPE_DESCRIPTOR_SET, (u64)(VkDescriptorSet)set, name);
+    }
+
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::DescriptorPool pool, const char* name)
+    {
+        return setDebugName(app, VK_OBJECT_TYPE_DESCRIPTOR_POOL, (u64)(VkDescriptorPool)pool, name);
     }
 }

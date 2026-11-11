@@ -23,7 +23,13 @@ namespace VkRenderer::Utilities
             return *this;
         }
         this->stagingBuffer_ = stagingBufferCreateResult.take();
-        setDebugName(this->app_, **this->stagingBuffer_, "Buffer_StagedCopy");
+        
+        // set debug name
+        auto debugNameResult = setDebugName(this->app_, **this->stagingBuffer_, "Buffer_StagedCopy");
+        if (!debugNameResult)
+        {
+            this->result_ = debugNameResult.takeError();
+        }
 
         // map its memory
         auto mapResult = this->stagingBuffer_.memory->map();

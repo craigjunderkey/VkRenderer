@@ -331,11 +331,9 @@ namespace VkRenderer::Utilities
         cmdBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, **app.pipelines.get("particle_render"));
 
         // rebind descriptor sets
-        // TODO: rearrange pipelines so we don't have to do this
         cmdBuffer->bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics, *app.pipelines.get("particle_render").layout, 0,
             {
-                *app.resources.bindless().getDescriptorSet(),
                 *app.descriptorSets[app.frameIndex]
             },
             nullptr

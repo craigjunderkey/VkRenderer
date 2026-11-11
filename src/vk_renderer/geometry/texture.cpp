@@ -163,7 +163,7 @@ namespace VkRenderer::Geometry
         );
         CHECK_KEEP(bufferResult);
         FatBuffer stagingBuffer = bufferResult.take();
-        setDebugName(app, **stagingBuffer, "Buffer_Staging_ImageCopy");
+        CHECK(setDebugName(app, **stagingBuffer, "Buffer_Staging_ImageCopy"));
 
         // transfer image data to staging buffer
         auto memoryMapResult = stagingBuffer.memory->map(0, imageSize * numImages);

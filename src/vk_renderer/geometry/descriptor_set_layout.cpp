@@ -1,5 +1,8 @@
 #include "descriptor_set_layout.h"
 #include "../vk_renderer.h"
+#include "../utilities/vulkan_debug.h"
+
+using namespace VkRenderer::Utilities;
 
 namespace VkRenderer::Geometry
 {
@@ -36,6 +39,8 @@ namespace VkRenderer::Geometry
         auto layoutResult = castVkResult(app.device.createDescriptorSetLayout(layoutInfo));
         CHECK_KEEP(layoutResult);
         app.descriptorSetLayout = layoutResult.take();
+
+        CHECK(setDebugName(app, *app.descriptorSetLayout, "DescriptorSetLayout_PerFrameUbo"));
 
         return Ok();
     }

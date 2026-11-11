@@ -29,7 +29,7 @@ namespace VkRenderer::Geometry
         CHECK_KEEP(createResult);
         FatBuffer stagingBuffer = createResult.take();
 
-        setDebugName(app, **stagingBuffer, "Buffer_Staging_createStagingBuffer");
+        CHECK(setDebugName(app, **stagingBuffer, "Buffer_Staging_createStagingBuffer"));
 
         // fill it with the vertices
         auto mapResult = stagingBuffer.memory->map(0, size);

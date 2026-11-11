@@ -21,7 +21,7 @@ namespace VkRenderer::Utilities
 #ifndef NDEBUG
         std::string* debugName = new std::string();
         *debugName = std::format("Shader_{}", StringId::getString(shader.name));
-        setDebugName(app, *shaderModule, debugName->c_str());
+        CHECK(setDebugName(app, *shaderModule, debugName->c_str()));
 #endif
 
         return shaderModule;

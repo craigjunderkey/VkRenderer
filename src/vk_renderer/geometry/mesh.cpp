@@ -43,7 +43,7 @@ namespace VkRenderer::Geometry
         {
             std::string* debugName = new std::string();
             *debugName = std::format("Buffer_Vertex_{}", StringId::getString(this->name));
-            setDebugName(app, **this->vertexBuffer, debugName->c_str());
+            CHECK(setDebugName(app, **this->vertexBuffer, debugName->c_str()));
         }
 #endif
 
@@ -77,7 +77,7 @@ namespace VkRenderer::Geometry
         {
             std::string* debugName = new std::string();
             *debugName = std::format("Buffer_Index_{}", StringId::getString(this->name));
-            setDebugName(app, **this->indexBuffer, debugName->c_str());
+            CHECK(setDebugName(app, **this->indexBuffer, debugName->c_str()));
         }
 #endif
 

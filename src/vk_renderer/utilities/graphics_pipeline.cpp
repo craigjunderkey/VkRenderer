@@ -147,7 +147,6 @@ namespace VkRenderer::Utilities
         // pipeline layout
         PipelineLayoutBuilder layoutBuilder;
         layoutBuilder.descriptorSetLayouts = {
-            *app.resources.bindless().getDescriptorSetLayout(),
             *app.descriptorSetLayout
         };
         layoutBuilder.pushConstantRanges = {};
