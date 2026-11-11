@@ -1,5 +1,6 @@
 #include "../vk_renderer.h"
 #include "shader_module.h"
+#include "vulkan_debug.h"
 
 using VkRenderer::Resources::Shader;
 
@@ -14,6 +15,15 @@ namespace VkRenderer::Utilities
 
         auto createResult = castVkResult(app.device.createShaderModule(shaderModuleCreateInfo));
         CHECK_KEEP(createResult);
-        return createResult.take();
+
+        vk::raii::ShaderModule shaderModule = createResult.take();
+
+#ifndef NDEBUG
+        std::string* debugName = new std::string();
+        *debugName = std::format("Shader_{}", StringId::getString(shader.name));
+        setDebugName(app, *shaderModule, debugName->c_str());
+#endif
+
+        return shaderModule;
     }
 }

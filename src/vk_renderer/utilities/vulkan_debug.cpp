@@ -148,4 +148,19 @@ namespace VkRenderer::Utilities
 
         return castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo));
     }
+
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::ShaderModule shader, const char* name)
+    {
+        auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
+            vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
+
+        VkDebugUtilsObjectNameInfoEXT objInfo{
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+            .objectType = VK_OBJECT_TYPE_SHADER_MODULE,
+            .objectHandle = (u64)(VkShaderModule)(shader),
+            .pObjectName = name
+        };
+
+        return castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo));
+    }
 }

@@ -19,4 +19,5 @@ namespace VkRenderer::Utilities
     Result<Unit, ErrorMessage> setDebugName(App& app, vk::Image image, const char* name);
     Result<Unit, ErrorMessage> setDebugName(App& app, vk::ImageView imageView, const char* name);
     Result<Unit, ErrorMessage> setDebugName(App& app, vk::Buffer buffer, const char* name);
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::ShaderModule shader, const char* name);
 }
