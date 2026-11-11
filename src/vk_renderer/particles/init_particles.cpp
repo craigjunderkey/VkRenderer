@@ -3,11 +3,12 @@
 #include "particle.h"
 #include "../utilities/staged_copy.h"
 #include "../resources/shader.h"
+#include "../utilities/vulkan_debug.h"
 
 namespace VkRenderer::Particles
 {
     using Geometry::FatBuffer;
-    using Utilities::StagedCopy;
+    using namespace Utilities;
 
     Result<ParticleSystem, ErrorMessage> createParticleSystem(App& app, u32 numParticles)
     {
@@ -29,6 +30,12 @@ namespace VkRenderer::Particles
                 );
                 CHECK_KEEP(buffer);
                 buffers.emplace_back(buffer.take());
+
+#ifndef NDEBUG
+                std::string *debugName = new std::string();
+                *debugName = std::format("Buffer_Particles{}", i);
+                CHECK(setDebugName(app, **buffers.back(), debugName->c_str()));
+#endif
             }
             return buffers;
         }();

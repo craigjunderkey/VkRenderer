@@ -1,10 +1,13 @@
 #include "../vk_renderer.h"
 #include "color_resources.h"
+#include "../utilities/vulkan_debug.h"
 
 using VkRenderer::Resources::TextureDescription;
 
 namespace VkRenderer::Geometry
 {
+    using namespace Utilities;
+
     Result<Unit, ErrorMessage> createColorTexture(App& app)
     {
         TextureDescription desc = TextureDescription::screenTexture(app.swapchain.getExtent());
@@ -16,18 +19,8 @@ namespace VkRenderer::Geometry
         CHECK_KEEP(texResult);
         app.colorTexture = texResult.take();
 
-        // set debug name
-        auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
-            vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
-        
-        VkDebugUtilsObjectNameInfoEXT objInfo {
-            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
-            .objectType = VK_OBJECT_TYPE_IMAGE,
-            .objectHandle = (u64)(VkImage)(*app.colorTexture.image),
-            .pObjectName = "Image_ColorRenderTarget"
-        };
-
-        CHECK(castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo)));
+        CHECK(setDebugName(app, *app.colorTexture.image, "Image_ColorRenderTarget"));
+        CHECK(setDebugName(app, *app.colorTexture.view, "ImageView_ColorRenderTarget"));
 
         return Ok();
     }

@@ -1,5 +1,6 @@
 #include "../vk_renderer.h"
 #include "staged_copy.h"
+#include "vulkan_debug.h"
 
 namespace VkRenderer::Utilities
 {
@@ -22,6 +23,7 @@ namespace VkRenderer::Utilities
             return *this;
         }
         this->stagingBuffer_ = stagingBufferCreateResult.take();
+        setDebugName(this->app_, **this->stagingBuffer_, "Buffer_StagedCopy");
 
         // map its memory
         auto mapResult = this->stagingBuffer_.memory->map();

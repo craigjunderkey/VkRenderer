@@ -6,8 +6,11 @@
 #include "../geometry/mesh.h"
 #include "../render_loop/material.h"
 #include "../render_loop/cubemap.h"
+#include "../utilities/vulkan_debug.h"
 
 #include <chrono>
+
+using namespace VkRenderer::Utilities;
 
 namespace VkRenderer::Resources
 {
@@ -192,6 +195,7 @@ namespace VkRenderer::Resources
         );
         CHECK_KEEP(matBufferResult);
         MappedBuffer matBuffer = matBufferResult.take();
+        CHECK(setDebugName(app, **matBuffer, "Buffer_Materials"));
         app.resources.bindless().addBuffer("materials", std::move(matBuffer));
 
         // build bindless manager layout

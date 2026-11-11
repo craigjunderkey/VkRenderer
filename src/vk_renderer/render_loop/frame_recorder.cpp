@@ -1,8 +1,10 @@
 #include "../vk_renderer.h"
 #include "frame_recorder.h"
 #include "../resources/processors/image_processing.h"
+#include "../utilities/vulkan_debug.h"
 
 using namespace VkRenderer::Geometry;
+using namespace VkRenderer::Utilities;
 
 namespace VkRenderer::RenderLoop
 {
@@ -64,6 +66,12 @@ namespace VkRenderer::RenderLoop
             );
             CHECK_KEEP(bufferResult);
             this->buffers_.emplace_back(bufferResult.take());
+            
+#ifndef NDEBUG
+            std::string* debugName = new std::string();
+            *debugName = std::format("Buffer_Screenshot{}", i);
+            CHECK(setDebugName(app, **this->buffers_.back(), debugName->c_str()));
+#endif
         }
         return Ok();
     }

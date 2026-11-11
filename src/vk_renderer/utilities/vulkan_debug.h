@@ -15,4 +15,8 @@ namespace VkRenderer::Utilities
     Result<Unit, ErrorMessage> createDebugMessenger(App& app);
 
     std::string_view viewVkMessageType(vk::DebugUtilsMessageTypeFlagsEXT type);
+
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::Image image, const char* name);
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::ImageView imageView, const char* name);
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::Buffer buffer, const char* name);
 }

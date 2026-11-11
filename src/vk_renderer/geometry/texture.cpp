@@ -6,6 +6,7 @@
 #include "../utilities/image_views.h"
 #include "../resources/image_data.h"
 #include "../utilities/command_buffer_helper.h"
+#include "../utilities/vulkan_debug.h"
 
 using namespace VkRenderer::Utilities;
 using namespace VkRenderer::Resources;
@@ -162,6 +163,7 @@ namespace VkRenderer::Geometry
         );
         CHECK_KEEP(bufferResult);
         FatBuffer stagingBuffer = bufferResult.take();
+        setDebugName(app, **stagingBuffer, "Buffer_Staging_ImageCopy");
 
         // transfer image data to staging buffer
         auto memoryMapResult = stagingBuffer.memory->map(0, imageSize * numImages);
@@ -281,30 +283,6 @@ namespace VkRenderer::Geometry
         CHECK_KEEP(imageCreateResult);
         texture.image = imageCreateResult.take();
 
-        // assign debug name to image
-#ifndef NDEBUG
-        if (desc.image)
-        {
-            auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
-                vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
-
-            // TODO(craigj): This is fine for now, since this is basically static memory.
-            //  But... we probably should allocate a big chunk of memory for debug strings.
-            //  The logger, error messages, and StringId string table could use this memory.
-            std::string* debugName = new std::string();
-            *debugName = std::format("Image_{}", StringId::getString(desc.image));
-            
-            VkDebugUtilsObjectNameInfoEXT info {
-                .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
-                .objectType = VK_OBJECT_TYPE_IMAGE,
-                .objectHandle = (u64)(VkImage)(*texture.image),
-                .pObjectName = debugName->c_str()
-            };
-
-            CHECK(castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &info)));
-        }
-#endif
-
         // allocate and bind image memory
         vk::MemoryRequirements memRequirements = texture.image.getMemoryRequirements();
         auto allocResult = app.memoryHelper.allocate(
@@ -332,6 +310,23 @@ namespace VkRenderer::Geometry
         auto viewCreateResult = app.vkResFactory.get<ImageViewFactory>().create(viewCreateInfo);
         CHECK_KEEP(viewCreateResult);
         texture.view = viewCreateResult.take();
+
+        // assign debug name to image
+#ifndef NDEBUG
+        if (desc.image)
+        {
+            // TODO(craigj): This is fine for now, since this is basically static memory.
+            //  But... we probably should allocate a big chunk of memory for debug strings.
+            //  The logger, error messages, and StringId string table could use this memory.
+            std::string* imageName = new std::string();
+            *imageName = std::format("Image_{}", StringId::getString(desc.image));
+            CHECK(setDebugName(app, *texture.image, imageName->c_str()));
+
+            std::string* viewName = new std::string();
+            *viewName = std::format("ImageView_{}", StringId::getString(desc.image));
+            CHECK(setDebugName(app, *texture.view, viewName->c_str()));
+        }
+#endif
 
         // create a command buffer
         auto commandBeginResult = beginSingleTimeCommands(app, app.graphicsQueue);

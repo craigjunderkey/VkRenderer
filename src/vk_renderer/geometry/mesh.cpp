@@ -2,8 +2,9 @@
 #include "mesh.h"
 #include "vertex_buffer.h"
 #include "../utilities/staged_copy.h"
+#include "../utilities/vulkan_debug.h"
 
-using VkRenderer::Utilities::StagedCopy;
+using namespace VkRenderer::Utilities;
 
 namespace VkRenderer::Geometry
 {
@@ -38,6 +39,14 @@ namespace VkRenderer::Geometry
         this->vertexBuffer = vertexBufferResult.take();
         this->data.vertices = {};
 
+#ifndef NDEBUG
+        {
+            std::string* debugName = new std::string();
+            *debugName = std::format("Buffer_Vertex_{}", StringId::getString(this->name));
+            setDebugName(app, **this->vertexBuffer, debugName->c_str());
+        }
+#endif
+
         // create index buffer
         assert(this->data.numIndices == this->data.indices.size());
         
@@ -63,6 +72,14 @@ namespace VkRenderer::Geometry
         CHECK_KEEP(indexBufferResult);
         this->indexBuffer = indexBufferResult.take();
         this->data.indices = {};
+
+#ifndef NDEBUG
+        {
+            std::string* debugName = new std::string();
+            *debugName = std::format("Buffer_Index_{}", StringId::getString(this->name));
+            setDebugName(app, **this->indexBuffer, debugName->c_str());
+        }
+#endif
 
         return Ok();
     }

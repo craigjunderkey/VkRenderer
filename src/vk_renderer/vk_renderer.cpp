@@ -10,7 +10,7 @@
 #include "utilities/command_buffer.h"
 #include "utilities/sync_objects.h"
 #include "utilities/draw.h"
-#include "utilities/vulkan_debug_output.h"
+#include "utilities/vulkan_debug.h"
 #include "geometry/vertex_buffer.h"
 #include "geometry/descriptor_set_layout.h"
 #include "geometry/uniform_buffer.h"

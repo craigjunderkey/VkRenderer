@@ -3,6 +3,7 @@
 #include "vertex.h"
 #include "buffer.h"
 #include "../utilities/command_buffer.h"
+#include "../utilities/vulkan_debug.h"
 
 using VkRenderer::App;
 using VkRenderer::Geometry::Vertex;
@@ -28,6 +29,8 @@ namespace VkRenderer::Geometry
         CHECK_KEEP(createResult);
         FatBuffer stagingBuffer = createResult.take();
 
+        setDebugName(app, **stagingBuffer, "Buffer_Staging_createStagingBuffer");
+
         // fill it with the vertices
         auto mapResult = stagingBuffer.memory->map(0, size);
         CHECK_KEEP(mapResult);
@@ -37,6 +40,7 @@ namespace VkRenderer::Geometry
 
         return std::move(stagingBuffer);
     }
+
     void copyBufferToImage(vk::raii::CommandBuffer& commandBuffer, const vk::raii::Buffer& buffer,
         vk::raii::Image& image, u32 width, u32 height)
     {

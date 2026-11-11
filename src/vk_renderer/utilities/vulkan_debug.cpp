@@ -1,5 +1,5 @@
 #include "../vk_renderer.h"
-#include "vulkan_debug_output.h"
+#include "vulkan_debug.h"
 
 namespace VkRenderer::Utilities
 {
@@ -102,5 +102,50 @@ namespace VkRenderer::Utilities
         }
 
         return std::string_view(msgString.data(), pos - msgString.begin());
+    }
+
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::Image image, const char* name)
+    {
+        auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
+            vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
+
+        VkDebugUtilsObjectNameInfoEXT objInfo{
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+            .objectType = VK_OBJECT_TYPE_IMAGE,
+            .objectHandle = (u64)(VkImage)(image),
+            .pObjectName = name
+        };
+
+        return castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo));
+    }
+
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::ImageView imageView, const char* name)
+    {
+        auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
+            vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
+
+        VkDebugUtilsObjectNameInfoEXT objInfo{
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+            .objectType = VK_OBJECT_TYPE_IMAGE_VIEW,
+            .objectHandle = (u64)(VkImageView)(imageView),
+            .pObjectName = name
+        };
+
+        return castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo));
+    }
+
+    Result<Unit, ErrorMessage> setDebugName(App& app, vk::Buffer buffer, const char* name)
+    {
+        auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
+            vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
+
+        VkDebugUtilsObjectNameInfoEXT objInfo{
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+            .objectType = VK_OBJECT_TYPE_BUFFER,
+            .objectHandle = (u64)(VkBuffer)(buffer),
+            .pObjectName = name
+        };
+
+        return castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo));
     }
 }

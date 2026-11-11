@@ -1,11 +1,14 @@
 #include "../vk_renderer.h"
 #include "depth_resources.h"
 #include "texture.h"
+#include "../utilities/vulkan_debug.h"
 
 using VkRenderer::Resources::TextureDescription;
 
 namespace VkRenderer::Geometry
 {
+    using namespace Utilities;
+
     Result<vk::Format, ErrorMessage> findSupportedFormat(App& app, const std::vector<vk::Format>& candidates,
         vk::ImageTiling tiling, vk::FormatFeatureFlags features)
     {
@@ -41,18 +44,8 @@ namespace VkRenderer::Geometry
         CHECK_KEEP(texResult);
         app.depthTexture = texResult.take();
 
-        // set debug name
-        auto vkSetDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)
-            vkGetInstanceProcAddr(*app.instance, "vkSetDebugUtilsObjectNameEXT");
-
-        VkDebugUtilsObjectNameInfoEXT objInfo {
-            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
-            .objectType = VK_OBJECT_TYPE_IMAGE,
-            .objectHandle = (u64)(VkImage)(*app.depthTexture.image),
-            .pObjectName = "Image_DepthRenderTarget"
-        };
-
-        CHECK(castVkResult(vkSetDebugUtilsObjectNameEXT(*app.device, &objInfo)));
+        CHECK(setDebugName(app, *app.depthTexture.image, "Image_DepthRenderTarget"));
+        CHECK(setDebugName(app, *app.depthTexture.view, "ImageView_DepthRenderTarget"));
 
         return Ok();
     }

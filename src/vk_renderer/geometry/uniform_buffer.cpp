@@ -1,9 +1,12 @@
 #include "../vk_renderer.h"
 #include "uniform_buffer.h"
 #include "buffer.h"
+#include "../utilities/vulkan_debug.h"
 
 namespace VkRenderer::Geometry
 {
+    using namespace Utilities;
+
     Result<Unit, ErrorMessage> createPerFrameUbos(App& app)
     {
         for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -18,6 +21,12 @@ namespace VkRenderer::Geometry
             );
             CHECK_KEEP(ubo);
             app.uniformBuffers.emplace_back(ubo.take());
+        
+#ifndef NDEBUG
+            std::string *debugName = new std::string();
+            *debugName = std::format("Buffer_PerFrameUbo{}", i);
+            setDebugName(app, **app.uniformBuffers.back(), debugName->c_str());
+#endif
         }
         return Ok();
     }
