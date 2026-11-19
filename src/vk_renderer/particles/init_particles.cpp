@@ -4,6 +4,7 @@
 #include "../utilities/staged_copy.h"
 #include "../resources/shader.h"
 #include "../utilities/vulkan_debug.h"
+#include "../utilities/pipeline_builder.h"
 
 namespace VkRenderer::Particles
 {
@@ -15,7 +16,8 @@ namespace VkRenderer::Particles
         ParticleSystem particleSystem = { .numParticles = numParticles };
         
         // create particle buffers
-        auto bufferCreateResult = [&app, numParticles] -> Result<std::vector<FatBuffer>, ErrorMessage>
+        auto bufferCreateResult = [&app, numParticles]
+            -> Result<std::vector<FatBuffer>, ErrorMessage>
         {
             std::vector<FatBuffer> buffers {};
             for (u32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -61,7 +63,8 @@ namespace VkRenderer::Particles
         }();
 
         // copy initial (CPU) particle data to all (GPU) particle buffers
-        auto copyResult = [&app, &buffers = particleSystem.buffers, &initialParticleData] -> Result<Unit, ErrorMessage>
+        auto copyResult = [&app, &buffers = particleSystem.buffers, &initialParticleData]
+            -> Result<Unit, ErrorMessage>
         {
             StagedCopy copy(app);
             copy.begin(initialParticleData.data(), initialParticleData.size() * sizeof(Particle));
@@ -78,7 +81,7 @@ namespace VkRenderer::Particles
         return particleSystem;
     }
 
-    Result<Utilities::FatPipeline, ErrorMessage> createParticleComputePipeline(App& app)
+    Result<Unit, ErrorMessage> createParticleComputePipelines(App& app)
     {
         // create pipeline layout
         auto layoutResult = [&descriptorSet = app.descriptorSetLayout, &device = app.device]
@@ -113,26 +116,47 @@ namespace VkRenderer::Particles
         CHECK_KEEP(moduleResult);
         vk::raii::ShaderModule shaderModule = moduleResult.take();
 
-        // create compute shader pipeline
-        vk::PipelineShaderStageCreateInfo stageInfo {
-            .stage = vk::ShaderStageFlagBits::eCompute,
-            .module = *shaderModule,
-            .pName = shader.getEntryPoint(Resources::ShaderStage::Compute).functionName.c_str()
+        // create pipeline factory
+        auto makePipeline = [&shaderModule, layout, &app]
+            (const char* entryPointName) -> Result<Utilities::FatPipeline, ErrorMessage>
+        {
+            vk::PipelineShaderStageCreateInfo stageInfo{
+                .stage = vk::ShaderStageFlagBits::eCompute,
+                .module = *shaderModule,
+                .pName = entryPointName
+            };
+
+            vk::ComputePipelineCreateInfo pipelineCreateInfo{
+                .stage = stageInfo,
+                .layout = **layout
+            };
+
+            auto pipelineResult = castVkResult(app.device.createComputePipeline(nullptr, pipelineCreateInfo));
+            CHECK_KEEP(pipelineResult);
+            vk::raii::Pipeline pipeline = pipelineResult.take();
+
+            Utilities::FatPipeline fatty = {
+                .pipeline = std::move(pipeline),
+                .layout = std::move(layout)
+            };
+
+            return fatty;
         };
+
+        // create some friggin pipelines!
+        {
+            auto result = makePipeline("applyForces");
+            CHECK_KEEP(result);
+            app.pipelines.add("particle_compute_forces", result.take());
+        }
         
-        vk::ComputePipelineCreateInfo pipelineCreateInfo {
-            .stage = stageInfo,
-            .layout = **layout
-        };
+        {
+            auto result = makePipeline("updatePositions");
+            CHECK_KEEP(result);
+            app.pipelines.add("particle_compute_positions", result.take());
+        }
 
-        auto pipelineResult = castVkResult(app.device.createComputePipeline(nullptr, pipelineCreateInfo));
-        CHECK_KEEP(pipelineResult);
-        vk::raii::Pipeline pipeline = pipelineResult.take();
-
-        return Utilities::FatPipeline {
-            .pipeline = std::move(pipeline),
-            .layout = std::move(layout)
-        };
+        return Ok();
     }
 
     static std::array<vk::VertexInputAttributeDescription, 1> getParticleVertexDescription()

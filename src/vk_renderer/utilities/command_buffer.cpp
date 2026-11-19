@@ -73,28 +73,45 @@ namespace VkRenderer::Utilities
         cmdBuffer->reset();
         cmdBuffer->begin({});
 
-        // 3. bind compute pipeline
-        cmdBuffer->bindPipeline(vk::PipelineBindPoint::eCompute, *app.pipelines.get("particle_compute"));
+        // 3. dispatch compute in sequence
+        MemoryState memState;
+        auto doParticlePipeline = [&memState, &cmdBuffer, &app]
+            (const char* pipelineName)
+        {
+            memState = cmdBuffer.addMemoryBarrier(memState,
+                {
+                    .accessMask = vk::AccessFlagBits2::eShaderStorageRead
+                        | vk::AccessFlagBits2::eShaderStorageWrite,
+                    .stageMask = vk::PipelineStageFlagBits2::eComputeShader
+                }
+            );
 
-        // 4. update per-frame descriptor set
-        cmdBuffer->bindDescriptorSets(
-            vk::PipelineBindPoint::eCompute,
-            **app.pipelines.get("particle_compute").layout,
-            0,
-            {
-                *app.descriptorSets[app.frameIndex]
-            },
-            {}
-        );
+            // 3a. bind compute pipeline
+            //hai
+            FatPipeline& pipeline = app.pipelines.get(pipelineName);
+            cmdBuffer->bindPipeline(vk::PipelineBindPoint::eCompute, *pipeline);
 
-        // 5. dispatch compute
-        // TODO(craigj): Log a warning if we round down the number of particles.
-        cmdBuffer->dispatch(app.particleSystem.numParticles / PARTICLES_PER_WORKGROUP, 1, 1);
+            // 3b. update per-frame descriptor set
+            cmdBuffer->bindDescriptorSets(
+                vk::PipelineBindPoint::eCompute,
+                **pipeline.layout,
+                0,
+                { *app.descriptorSets[app.frameIndex] },
+                {}
+            );
 
-        // 6. end command buffer
+            // 3c. dispatch compute
+            // TODO(craigj): Log a warning if we round down the number of particles.
+            cmdBuffer->dispatch(app.particleSystem.numParticles / PARTICLES_PER_WORKGROUP, 1, 1);
+        };
+
+        doParticlePipeline("particle_compute_forces");
+        doParticlePipeline("particle_compute_positions");
+
+        // 4. end command buffer
         cmdBuffer->end();
         
-        // 7. submit to graphics queue
+        // 5. submit to graphics queue
         vk::SubmitInfo submitInfo {
             .commandBufferCount = 1,
             .pCommandBuffers = &**cmdBuffer,

@@ -1,6 +1,5 @@
 #include "particle.h"
 #include "../utilities/common.h"
-#include "../utilities/pipeline_builder.h"
 
 namespace VkRenderer { class App; }
 namespace VkRenderer::Geometry { class FatBuffer; }
@@ -12,5 +11,5 @@ namespace VkRenderer::Particles
     Result<ParticleSystem, ErrorMessage> createParticleSystem(App& app, u32 numParticles);
 
     /// @brief Creates a FatPipeline handling the particle compute shader.
-    Result<Utilities::FatPipeline, ErrorMessage> createParticleComputePipeline(App& app);
+    Result<Unit, ErrorMessage> createParticleComputePipelines(App& app);
 }

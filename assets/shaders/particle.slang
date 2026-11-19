@@ -28,17 +28,31 @@ struct ParticleFragIn
     float4 position : SV_Position;
 }
 
+#define PARTICLES_PER_WORKGROUP 256
+
 ParameterBlock<ParticleFrame> frame;
 
 [[vk::push_constant]] ParticleSystemPushConstants constants;
 
 [shader("compute")]
-[NumThreads(256, 1, 1)]
-void mainCompute(uint3 threadId : SV_DispatchThreadID)
+[NumThreads(PARTICLES_PER_WORKGROUP, 1, 1)]
+void applyForces(uint3 threadId : SV_DispatchThreadID)
 {
     uint i = threadId.x;
-    frame.currParticles[i].posRadius = frame.prevParticles[i].posRadius + frame.prevParticles[i].velocity * frame.data.dt;
-    frame.currParticles[i].velocity = frame.prevParticles[i].velocity;   
+    frame.currParticles[i].velocity.y = max(
+        frame.currParticles[i].velocity.y - 9.8f,   // acceleration due to gravity
+        -2.0                                        // terminal velocity
+    );
+}
+
+[shader("compute")]
+[NumThreads(PARTICLES_PER_WORKGROUP, 1, 1)]
+void updatePositions(uint3 threadId : SV_DispatchThreadID)
+{
+    uint i = threadId.x;
+    frame.currParticles[i].posRadius =
+        frame.prevParticles[i].posRadius +
+        frame.prevParticles[i].velocity * frame.data.dt;
 }
 
 [shader("vertex")]
