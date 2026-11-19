@@ -149,7 +149,13 @@ namespace VkRenderer::Utilities
         layoutBuilder.descriptorSetLayouts = {
             *app.descriptorSetLayout
         };
-        layoutBuilder.pushConstantRanges = {};
+        layoutBuilder.pushConstantRanges = {
+            vk::PushConstantRange {
+                .stageFlags = vk::ShaderStageFlagBits::eVertex,
+                .offset = 0,
+                .size = sizeof(Particles::ParticleSystemPushConstants)
+            }
+        };
         auto layoutResult = layoutBuilder.build(app);
         CHECK_KEEP(layoutResult);
         pipelineBuilder.layout = layoutResult.take();
@@ -159,7 +165,7 @@ namespace VkRenderer::Utilities
         pipelineBuilder.vertAttributeDescriptions.clear();
         for (const auto& desc : Particles::getParticleVertexAttributes())
         {
-            pipelineBuilder.vertAttributeDescriptions.emplace_back(desc);            
+            pipelineBuilder.vertAttributeDescriptions.emplace_back(desc);
         }
 
         // topology

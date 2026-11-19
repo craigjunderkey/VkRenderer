@@ -135,7 +135,7 @@ namespace VkRenderer::Particles
         };
     }
 
-    std::array<vk::VertexInputAttributeDescription, 1> getParticleVertexDescription()
+    static std::array<vk::VertexInputAttributeDescription, 1> getParticleVertexDescription()
     {
         return std::array<vk::VertexInputAttributeDescription, 1> {
             vk::VertexInputAttributeDescription {

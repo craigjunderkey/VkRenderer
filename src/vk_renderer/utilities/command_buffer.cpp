@@ -88,6 +88,7 @@ namespace VkRenderer::Utilities
         );
 
         // 5. dispatch compute
+        // TODO(craigj): Log a warning if we round down the number of particles.
         cmdBuffer->dispatch(app.particleSystem.numParticles / PARTICLES_PER_WORKGROUP, 1, 1);
 
         // 6. end command buffer
@@ -337,6 +338,17 @@ namespace VkRenderer::Utilities
                 *app.descriptorSets[app.frameIndex]
             },
             nullptr
+        );
+
+        // push constants
+        auto pushConstants = Particles::ParticleSystemPushConstants{
+            .viewProjection = app.projection * app.view
+        };
+
+        cmdBuffer.pushConstants<Particles::ParticleSystemPushConstants>(
+            pushConstants,
+            **app.pipelines.get("particle_render").layout,
+            vk::ShaderStageFlagBits::eVertex
         );
 
         // draw points

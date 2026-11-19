@@ -7,6 +7,11 @@ struct ParticleFrame
     StructuredBuffer<Particle> prevParticles;
 };
 
+struct ParticleSystemPushConstants
+{
+    float4x4 viewProjection;
+};
+
 struct ParticleVertIn
 {
     float4 posRadius;
@@ -25,6 +30,8 @@ struct ParticleFragIn
 
 ParameterBlock<ParticleFrame> frame;
 
+[[vk::push_constant]] ParticleSystemPushConstants constants;
+
 [shader("compute")]
 [NumThreads(256, 1, 1)]
 void mainCompute(uint3 threadId : SV_DispatchThreadID)
@@ -38,7 +45,7 @@ void mainCompute(uint3 threadId : SV_DispatchThreadID)
 ParticleVertOut mainVertex(ParticleVertIn in)
 {
     ParticleVertOut out;
-    out.position = mul(frame.data.projection, mul(frame.data.view, float4(in.posRadius.xyz, 1.0)));
+    out.position = mul(constants.viewProjection, float4(in.posRadius.xyz, 1.0));
     out.radius = in.posRadius.w;
 
     return out;
